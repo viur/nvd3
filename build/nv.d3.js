@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-05 */
+/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-16 */
 (function(){
 
 // set up main nv object
@@ -622,7 +622,13 @@ nv.models.tooltip = function() {
         trowEnter.append("td")
             .classed("key",true)
             .classed("total",function(p) { return !!p.total})
-            .html(function(p, i) { return keyFormatter(p.key, i)});
+            .html(function(p, i) {
+                //Viur HAMMER - Show the serie name if defined
+                if (p.name) {
+                    return keyFormatter(p.name, i);
+                }
+                return keyFormatter(p.key, i)
+            });
 
         trowEnter.append("td")
             .classed("value",true)
@@ -1623,6 +1629,11 @@ nv.utils.arrayEquals = function (array1, array2) {
 
             //TODO: consider calculating width/height based on whether or not label is added, for reference in charts using this component
             g.watchTransition(renderWatch, 'axis').call(axis);
+
+            //Viur HAMMER - Added line type to axis (for print and export)
+            g.selectAll('line')
+                .style("stroke", "black")
+                .style("stroke-opacity", 0.2);
 
             scale0 = scale0 || axis.scale();
 
@@ -2815,6 +2826,8 @@ nv.models.bulletChart = function() {
             // Display No Data message if there's nothing to show.
             if (!d || !ranges.call(this, d, i)) {
                 nv.utils.noData(chart, container)
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -3363,6 +3376,8 @@ nv.models.cumulativeLineChart = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container)
+                //FIX Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -3489,6 +3504,8 @@ nv.models.cumulativeLineChart = function() {
             }
 
             gEnter.select('.nv-background')
+                //Viur - For PNG Generation Purposes
+                .style("fill-opacity", "0")
                 .append('rect');
 
             g.select('.nv-background rect')
@@ -4026,6 +4043,12 @@ nv.models.discreteBar = function() {
                     .attr('y', function(d,i) { return getY(d,i) < 0 ? y(getY(d,i)) - y(0) + 12 : -4 })
 
                 ;
+
+                //Viur
+                bars.select('text')
+                    .style("fill", "#000000")
+                    .style("stroke", "#000000");
+
             } else {
                 bars.selectAll('text').remove();
             }
@@ -4192,6 +4215,8 @@ nv.models.discreteBarChart = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container);
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -5215,6 +5240,8 @@ nv.models.historicalBarChart = function(bar_model) {
             // Display noData message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container)
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -6055,6 +6082,8 @@ nv.models.line = function() {
                 .data(function(d) { return [d.values] });
 
             linePaths.enter().append('path')
+                //Viur
+                .style("fill", "none")
                 .attr('class', 'nv-line')
                 .attr('d',
                     d3.svg.line()
@@ -6163,6 +6192,8 @@ nv.models.lineChart = function() {
         , height = null
         , showLegend = true
         , legendPosition = 'top'
+        //Viur
+        //, legendPosition = "right"
         , showXAxis = true
         , showYAxis = true
         , rightAlignYAxis = false
@@ -6278,6 +6309,8 @@ nv.models.lineChart = function() {
             // Display noData message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length; }).length) {
                 nv.utils.noData(chart, container);
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -6318,6 +6351,11 @@ nv.models.lineChart = function() {
             } else {
                 legend.width(availableWidth);
 
+                //Viur
+                if (legendPosition === 'left') {
+                    legend.rightAlign(false);
+                }
+
                 g.select('.nv-legendWrap')
                     .datum(data)
                     .call(legend);
@@ -6325,7 +6363,8 @@ nv.models.lineChart = function() {
                 if (legendPosition === 'bottom') {
                     wrap.select('.nv-legendWrap')
                         .attr('transform', 'translate(0,' + (availableHeight1 + legend.height()) +')');
-                } else if (legendPosition === 'top') {
+                    //Viur
+                } else if (legendPosition === 'top' || legendPosition === 'left') {
                     if ( margin.top != legend.height()) {
                         margin.top = legend.height();
                         availableHeight1 = nv.utils.availableHeight(height, container, margin) - (focusEnable ? focusHeight : 0);
@@ -6542,6 +6581,8 @@ nv.models.lineChart = function() {
                         if (pointXLocation === undefined) pointXLocation = chart.xScale()(chart.x()(point,pointIndex));
                         allData.push({
                             key: series.key,
+                            //Viur - Support for Serie name
+                            name: series.name,
                             value: pointYValue,
                             color: color(series,series.seriesIndex),
                             data: point
@@ -6959,6 +7000,8 @@ nv.models.lineWithFocusChart = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container)
+                //FIX Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -7581,6 +7624,8 @@ nv.models.multiBar = function() {
                 series.values.forEach(function(point) {
                     point.series = i;
                     point.key = series.key;
+                    //Viur - Support for Serie name
+                    point.name = series.name;
                 });
             });
 
@@ -7932,6 +7977,8 @@ nv.models.multiBar = function() {
         , showControls = true
         , controlLabels = {}
         , showLegend = true
+        //Viur
+        , legendPosition = "right"
         , showXAxis = true
         , showYAxis = true
         , rightAlignYAxis = false
@@ -8047,6 +8094,8 @@ nv.models.multiBar = function() {
             // Display noData message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container)
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -8074,6 +8123,11 @@ nv.models.multiBar = function() {
             } else {
                 legend.width(availableWidth - controlWidth());
 
+                //Viur
+                if (legendPosition === 'left') {
+                    legend.rightAlign(false);
+                }
+
                 g.select('.nv-legendWrap')
                     .datum(data)
                     .call(legend);
@@ -8083,8 +8137,14 @@ nv.models.multiBar = function() {
                     availableHeight = nv.utils.availableHeight(height, container, margin);
                 }
 
-                g.select('.nv-legendWrap')
-                    .attr('transform', 'translate(' + controlWidth() + ',' + (-margin.top) +')');
+                //Viur
+                if (legendPosition === 'left') {
+                    g.select('.nv-legendWrap')
+                        .attr('transform', 'translate(' + 0 + ',' + (-margin.top) + ')');
+                } else {
+                    g.select('.nv-legendWrap')
+                        .attr('transform', 'translate(' + controlWidth() + ',' + (-margin.top) + ')');
+                }
             }
 
             // Controls
@@ -8304,6 +8364,8 @@ nv.models.multiBar = function() {
                     evt.value = chart.x()(evt.data);
                     evt['series'] = {
                         key: evt.data.key,
+                        //Viur - Support for Serie name
+                        name: evt.data.name,
                         value: chart.y()(evt.data),
                         color: evt.color
                     };
@@ -8346,6 +8408,8 @@ nv.models.multiBar = function() {
         width:      {get: function(){return width;}, set: function(_){width=_;}},
         height:     {get: function(){return height;}, set: function(_){height=_;}},
         showLegend: {get: function(){return showLegend;}, set: function(_){showLegend=_;}},
+        //Viur
+        legendPosition: {get: function(){return legendPosition;}, set: function(_){legendPosition = _;}},
         showControls: {get: function(){return showControls;}, set: function(_){showControls=_;}},
         controlLabels: {get: function(){return controlLabels;}, set: function(_){controlLabels=_;}},
         showXAxis:      {get: function(){return showXAxis;}, set: function(_){showXAxis=_;}},
@@ -8458,6 +8522,8 @@ nv.models.multiBarHorizontal = function() {
                 series.values.forEach(function(point) {
                     point.series = i;
                     point.key = series.key;
+                    //Viur - Support for Serie name
+                    point.name = series.name;
                 });
             });
 
@@ -8776,6 +8842,8 @@ nv.models.multiBarHorizontalChart = function() {
         , showControls = true
         , controlLabels = {}
         , showLegend = true
+        //Viur
+        , legendPosition = 'right'
         , showXAxis = true
         , showYAxis = true
         , stacked = false
@@ -8881,6 +8949,8 @@ nv.models.multiBarHorizontalChart = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container)
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -8909,6 +8979,11 @@ nv.models.multiBarHorizontalChart = function() {
             } else {
                 legend.width(availableWidth - controlWidth());
 
+                //Viur
+                if (legendPosition === 'left') {
+                    legend.rightAlign(false);
+                }
+
                 g.select('.nv-legendWrap')
                     .datum(data)
                     .call(legend);
@@ -8918,8 +8993,14 @@ nv.models.multiBarHorizontalChart = function() {
                     availableHeight = nv.utils.availableHeight(height, container, margin);
                 }
 
-                g.select('.nv-legendWrap')
-                    .attr('transform', 'translate(' + controlWidth() + ',' + (-margin.top) +')');
+                //Viur
+                if (legendPosition === "left") {
+                    g.select('.nv-legendWrap')
+                        .attr('transform', 'translate(' + 0 + ',' + (-margin.top) + ')');
+                } else {
+                    g.select('.nv-legendWrap')
+                        .attr('transform', 'translate(' + controlWidth() + ',' + (-margin.top) + ')');
+                }
             }
 
             // Controls
@@ -9057,6 +9138,8 @@ nv.models.multiBarHorizontalChart = function() {
         evt.value = chart.x()(evt.data);
         evt['series'] = {
             key: evt.data.key,
+            //Viur - Support for Serie name
+            name: evt.data.name,
             value: chart.y()(evt.data),
             color: evt.color
         };
@@ -9092,6 +9175,8 @@ nv.models.multiBarHorizontalChart = function() {
         width:      {get: function(){return width;}, set: function(_){width=_;}},
         height:     {get: function(){return height;}, set: function(_){height=_;}},
         showLegend: {get: function(){return showLegend;}, set: function(_){showLegend=_;}},
+        //Viur
+        legendPosition: {get: function(){return legendPosition;}, set: function(_){legendPosition = _;}},
         showControls: {get: function(){return showControls;}, set: function(_){showControls=_;}},
         controlLabels: {get: function(){return controlLabels;}, set: function(_){controlLabels=_;}},
         showXAxis:      {get: function(){return showXAxis;}, set: function(_){showXAxis=_;}},
@@ -10955,9 +11040,14 @@ nv.models.pie = function() {
             slices.attr('fill', function(d,i) { return color(d.data, i); });
             slices.attr('stroke', function(d,i) { return color(d.data, i); });
 
-            var paths = ae.append('path').each(function(d) {
-                this._current = d;
-            });
+            var paths = ae.append('path')
+                //Viur - For PNG Export purposes
+                .style("stroke", "#fff")
+                .style("stroke-width", "1px")
+                .style("stroke-opacity", "1")
+                .each(function (d) {
+                    this._current = d;
+                });
 
             slices.select('path')
                 .transition()
@@ -11274,6 +11364,8 @@ nv.models.pieChart = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length) {
                 nv.utils.noData(chart, container);
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -11291,8 +11383,14 @@ nv.models.pieChart = function() {
             if (!showLegend) {
                 g.select('.nv-legendWrap').selectAll('*').remove();
             } else {
-                if (legendPosition === "top") {
+                //Viur
+                if (legendPosition === "top" || legendPosition == "left") {
                     legend.width( availableWidth ).key(pie.x());
+
+                    //Viur
+                    if (legendPosition === "left") {
+                        legend.rightAlign(false);
+                    }
 
                     wrap.select('.nv-legendWrap')
                         .datum(data)
@@ -11604,6 +11702,9 @@ nv.models.scatter = function() {
                 .attr('height', (availableHeight > 0) ? availableHeight : 0);
 
             g.attr('clip-path', clipEdge ? 'url(#nv-edge-clip-' + id + ')' : '');
+
+            //Viur - for PNG export purposes
+            g.style("fill-opacity", 0);
 
             function updateInteractiveLayer() {
                 // Always clear needs-update flag regardless of whether or not
@@ -12164,6 +12265,8 @@ nv.models.scatterChart = function() {
             // Display noData message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container);
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 renderWatch.renderEnd('scatter immediate');
                 return chart;
             } else {
@@ -12485,7 +12588,9 @@ nv.models.sparkline = function() {
 
             var paths = wrap.selectAll('path')
                 .data(function(d) { return [d] });
-            paths.enter().append('path');
+            paths.enter().append('path')
+                //Viur
+                .style("fill", "none");
             paths.exit().remove();
             paths
                 .style('stroke', function(d,i) { return d.color || color(d, i) })
@@ -12521,6 +12626,15 @@ nv.models.sparkline = function() {
                 .attr('class', function(d,i) {
                     return getX(d, d.pointIndex) == x.domain()[1] ? 'nv-point nv-currentValue' :
                             getY(d, d.pointIndex) == y.domain()[0] ? 'nv-point nv-minValue' : 'nv-point nv-maxValue'
+                })
+                //Viur
+                .style('stroke', function (d, i) {
+                    return getX(d, d.pointIndex) == x.domain()[1] ? '618fb0' :
+                        getY(d, d.pointIndex) == y.domain()[0] ? '#d62728' : '#2ca02c'
+                })
+                .style('fill', function (d, i) {
+                    return getX(d, d.pointIndex) == x.domain()[1] ? '618fb0' :
+                        getY(d, d.pointIndex) == y.domain()[0] ? '#d62728' : '#2ca02c'
                 });
         });
         
@@ -12614,6 +12728,8 @@ nv.models.sparklinePlus = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length) {
                 nv.utils.noData(chart, container)
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -12651,7 +12767,13 @@ nv.models.sparklinePlus = function() {
                 value.enter().append('text').attr('class', 'nv-currentValue')
                     .attr('dx', rightAlignValue ? -8 : 8)
                     .attr('dy', '.9em')
-                    .style('text-anchor', rightAlignValue ? 'end' : 'start');
+                    .style('text-anchor', rightAlignValue ? 'end' : 'start')
+                    //Viur
+                    .style('display', function () {
+                        if (showValue)
+                            return 'inline';
+                        return 'none';
+                    });
 
                 value
                     .attr('x', availableWidth + (rightAlignValue ? margin.right : 0))
@@ -12663,6 +12785,9 @@ nv.models.sparklinePlus = function() {
             }
 
             gEnter.select('.nv-hoverArea').append('rect')
+                //Viur
+                .style("fill-opacity", "0")
+                .style("stroke-opacity", "0")
                 .on('mousemove', sparklineHover)
                 .on('click', function() { paused = !paused })
                 .on('mouseout', function() { index = []; updateValueLine(); });
@@ -13248,6 +13373,8 @@ nv.models.stackedAreaChart = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container)
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
