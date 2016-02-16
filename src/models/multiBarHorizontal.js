@@ -63,6 +63,8 @@ nv.models.multiBarHorizontal = function() {
                 series.values.forEach(function(point) {
                     point.series = i;
                     point.key = series.key;
+                    //Viur - Support for Serie name
+                    point.name = series.name;
                 });
             });
 

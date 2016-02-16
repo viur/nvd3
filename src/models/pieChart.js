@@ -93,6 +93,8 @@ nv.models.pieChart = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length) {
                 nv.utils.noData(chart, container);
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -110,8 +112,14 @@ nv.models.pieChart = function() {
             if (!showLegend) {
                 g.select('.nv-legendWrap').selectAll('*').remove();
             } else {
-                if (legendPosition === "top") {
+                //Viur
+                if (legendPosition === "top" || legendPosition == "left") {
                     legend.width( availableWidth ).key(pie.x());
+
+                    //Viur
+                    if (legendPosition === "left") {
+                        legend.rightAlign(false);
+                    }
 
                     wrap.select('.nv-legendWrap')
                         .datum(data)

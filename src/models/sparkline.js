@@ -55,7 +55,9 @@ nv.models.sparkline = function() {
 
             var paths = wrap.selectAll('path')
                 .data(function(d) { return [d] });
-            paths.enter().append('path');
+            paths.enter().append('path')
+                //Viur
+                .style("fill", "none");
             paths.exit().remove();
             paths
                 .style('stroke', function(d,i) { return d.color || color(d, i) })
@@ -91,6 +93,15 @@ nv.models.sparkline = function() {
                 .attr('class', function(d,i) {
                     return getX(d, d.pointIndex) == x.domain()[1] ? 'nv-point nv-currentValue' :
                             getY(d, d.pointIndex) == y.domain()[0] ? 'nv-point nv-minValue' : 'nv-point nv-maxValue'
+                })
+                //Viur
+                .style('stroke', function (d, i) {
+                    return getX(d, d.pointIndex) == x.domain()[1] ? '618fb0' :
+                        getY(d, d.pointIndex) == y.domain()[0] ? '#d62728' : '#2ca02c'
+                })
+                .style('fill', function (d, i) {
+                    return getX(d, d.pointIndex) == x.domain()[1] ? '618fb0' :
+                        getY(d, d.pointIndex) == y.domain()[0] ? '#d62728' : '#2ca02c'
                 });
         });
         

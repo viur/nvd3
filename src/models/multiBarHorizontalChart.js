@@ -21,6 +21,8 @@ nv.models.multiBarHorizontalChart = function() {
         , showControls = true
         , controlLabels = {}
         , showLegend = true
+        //Viur
+        , legendPosition = 'right'
         , showXAxis = true
         , showYAxis = true
         , stacked = false
@@ -126,6 +128,8 @@ nv.models.multiBarHorizontalChart = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container)
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -154,6 +158,11 @@ nv.models.multiBarHorizontalChart = function() {
             } else {
                 legend.width(availableWidth - controlWidth());
 
+                //Viur
+                if (legendPosition === 'left') {
+                    legend.rightAlign(false);
+                }
+
                 g.select('.nv-legendWrap')
                     .datum(data)
                     .call(legend);
@@ -163,8 +172,14 @@ nv.models.multiBarHorizontalChart = function() {
                     availableHeight = nv.utils.availableHeight(height, container, margin);
                 }
 
-                g.select('.nv-legendWrap')
-                    .attr('transform', 'translate(' + controlWidth() + ',' + (-margin.top) +')');
+                //Viur
+                if (legendPosition === "left") {
+                    g.select('.nv-legendWrap')
+                        .attr('transform', 'translate(' + 0 + ',' + (-margin.top) + ')');
+                } else {
+                    g.select('.nv-legendWrap')
+                        .attr('transform', 'translate(' + controlWidth() + ',' + (-margin.top) + ')');
+                }
             }
 
             // Controls
@@ -302,6 +317,8 @@ nv.models.multiBarHorizontalChart = function() {
         evt.value = chart.x()(evt.data);
         evt['series'] = {
             key: evt.data.key,
+            //Viur - Support for Serie name
+            name: evt.data.name,
             value: chart.y()(evt.data),
             color: evt.color
         };
@@ -337,6 +354,8 @@ nv.models.multiBarHorizontalChart = function() {
         width:      {get: function(){return width;}, set: function(_){width=_;}},
         height:     {get: function(){return height;}, set: function(_){height=_;}},
         showLegend: {get: function(){return showLegend;}, set: function(_){showLegend=_;}},
+        //Viur
+        legendPosition: {get: function(){return legendPosition;}, set: function(_){legendPosition = _;}},
         showControls: {get: function(){return showControls;}, set: function(_){showControls=_;}},
         controlLabels: {get: function(){return controlLabels;}, set: function(_){controlLabels=_;}},
         showXAxis:      {get: function(){return showXAxis;}, set: function(_){showXAxis=_;}},

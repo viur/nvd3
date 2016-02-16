@@ -56,6 +56,11 @@ nv.models.axis = function() {
             //TODO: consider calculating width/height based on whether or not label is added, for reference in charts using this component
             g.watchTransition(renderWatch, 'axis').call(axis);
 
+            //Viur HAMMER - Added line type to axis (for print and export)
+            g.selectAll('line')
+                .style("stroke", "black")
+                .style("stroke-opacity", 0.2);
+
             scale0 = scale0 || axis.scale();
 
             var fmt = axis.tickFormat();

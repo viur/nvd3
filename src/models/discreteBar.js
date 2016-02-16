@@ -167,6 +167,12 @@ nv.models.discreteBar = function() {
                     .attr('y', function(d,i) { return getY(d,i) < 0 ? y(getY(d,i)) - y(0) + 12 : -4 })
 
                 ;
+
+                //Viur
+                bars.select('text')
+                    .style("fill", "#000000")
+                    .style("stroke", "#000000");
+
             } else {
                 bars.selectAll('text').remove();
             }

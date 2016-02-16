@@ -45,6 +45,8 @@ nv.models.bulletChart = function() {
             // Display No Data message if there's nothing to show.
             if (!d || !ranges.call(this, d, i)) {
                 nv.utils.noData(chart, container)
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();

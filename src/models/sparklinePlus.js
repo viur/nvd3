@@ -46,6 +46,8 @@ nv.models.sparklinePlus = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length) {
                 nv.utils.noData(chart, container)
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -83,7 +85,13 @@ nv.models.sparklinePlus = function() {
                 value.enter().append('text').attr('class', 'nv-currentValue')
                     .attr('dx', rightAlignValue ? -8 : 8)
                     .attr('dy', '.9em')
-                    .style('text-anchor', rightAlignValue ? 'end' : 'start');
+                    .style('text-anchor', rightAlignValue ? 'end' : 'start')
+                    //Viur
+                    .style('display', function () {
+                        if (showValue)
+                            return 'inline';
+                        return 'none';
+                    });
 
                 value
                     .attr('x', availableWidth + (rightAlignValue ? margin.right : 0))
@@ -95,6 +103,9 @@ nv.models.sparklinePlus = function() {
             }
 
             gEnter.select('.nv-hoverArea').append('rect')
+                //Viur
+                .style("fill-opacity", "0")
+                .style("stroke-opacity", "0")
                 .on('mousemove', sparklineHover)
                 .on('click', function() { paused = !paused })
                 .on('mouseout', function() { index = []; updateValueLine(); });

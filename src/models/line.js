@@ -145,6 +145,8 @@ nv.models.line = function() {
                 .data(function(d) { return [d.values] });
 
             linePaths.enter().append('path')
+                //Viur
+                .style("fill", "none")
                 .attr('class', 'nv-line')
                 .attr('d',
                     d3.svg.line()

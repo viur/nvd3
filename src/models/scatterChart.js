@@ -123,6 +123,8 @@ nv.models.scatterChart = function() {
             // Display noData message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container);
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 renderWatch.renderEnd('scatter immediate');
                 return chart;
             } else {

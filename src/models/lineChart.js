@@ -24,6 +24,8 @@ nv.models.lineChart = function() {
         , height = null
         , showLegend = true
         , legendPosition = 'top'
+        //Viur
+        //, legendPosition = "right"
         , showXAxis = true
         , showYAxis = true
         , rightAlignYAxis = false
@@ -139,6 +141,8 @@ nv.models.lineChart = function() {
             // Display noData message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length; }).length) {
                 nv.utils.noData(chart, container);
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -179,6 +183,11 @@ nv.models.lineChart = function() {
             } else {
                 legend.width(availableWidth);
 
+                //Viur
+                if (legendPosition === 'left') {
+                    legend.rightAlign(false);
+                }
+
                 g.select('.nv-legendWrap')
                     .datum(data)
                     .call(legend);
@@ -186,7 +195,8 @@ nv.models.lineChart = function() {
                 if (legendPosition === 'bottom') {
                     wrap.select('.nv-legendWrap')
                         .attr('transform', 'translate(0,' + (availableHeight1 + legend.height()) +')');
-                } else if (legendPosition === 'top') {
+                    //Viur
+                } else if (legendPosition === 'top' || legendPosition === 'left') {
                     if ( margin.top != legend.height()) {
                         margin.top = legend.height();
                         availableHeight1 = nv.utils.availableHeight(height, container, margin) - (focusEnable ? focusHeight : 0);
@@ -403,6 +413,8 @@ nv.models.lineChart = function() {
                         if (pointXLocation === undefined) pointXLocation = chart.xScale()(chart.x()(point,pointIndex));
                         allData.push({
                             key: series.key,
+                            //Viur - Support for Serie name
+                            name: series.name,
                             value: pointYValue,
                             color: color(series,series.seriesIndex),
                             data: point

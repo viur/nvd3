@@ -155,6 +155,8 @@ nv.models.cumulativeLineChart = function() {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container)
+                //FIX Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -281,6 +283,8 @@ nv.models.cumulativeLineChart = function() {
             }
 
             gEnter.select('.nv-background')
+                //Viur - For PNG Generation Purposes
+                .style("fill-opacity", "0")
                 .append('rect');
 
             g.select('.nv-background rect')

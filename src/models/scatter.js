@@ -185,6 +185,9 @@ nv.models.scatter = function() {
 
             g.attr('clip-path', clipEdge ? 'url(#nv-edge-clip-' + id + ')' : '');
 
+            //Viur - for PNG export purposes
+            g.style("fill-opacity", 0);
+
             function updateInteractiveLayer() {
                 // Always clear needs-update flag regardless of whether or not
                 // we will actually do anything (avoids needless invocations).

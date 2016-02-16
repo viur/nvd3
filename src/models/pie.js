@@ -203,9 +203,14 @@ nv.models.pie = function() {
             slices.attr('fill', function(d,i) { return color(d.data, i); });
             slices.attr('stroke', function(d,i) { return color(d.data, i); });
 
-            var paths = ae.append('path').each(function(d) {
-                this._current = d;
-            });
+            var paths = ae.append('path')
+                //Viur - For PNG Export purposes
+                .style("stroke", "#fff")
+                .style("stroke-width", "1px")
+                .style("stroke-opacity", "1")
+                .each(function (d) {
+                    this._current = d;
+                });
 
             slices.select('path')
                 .transition()

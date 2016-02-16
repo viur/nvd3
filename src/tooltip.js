@@ -105,7 +105,13 @@ nv.models.tooltip = function() {
         trowEnter.append("td")
             .classed("key",true)
             .classed("total",function(p) { return !!p.total})
-            .html(function(p, i) { return keyFormatter(p.key, i)});
+            .html(function(p, i) {
+                //Viur HAMMER - Show the serie name if defined
+                if (p.name) {
+                    return keyFormatter(p.name, i);
+                }
+                return keyFormatter(p.key, i)
+            });
 
         trowEnter.append("td")
             .classed("value",true)
