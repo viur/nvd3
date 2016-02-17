@@ -271,10 +271,17 @@ nv.models.multiBarChart = function() {
                         .call(nv.utils.wrapTicks, chart.xAxis.rangeBand())
                 }
 
+
+                //Viur
+                var reduceValue = 100;
+                if(rotateLabels && rotateLabels > -20){
+                    reduceValue = 50;
+                }
+
                 if (reduceXTicks)
                     xTicks
                         .filter(function(d,i) {
-                            return i % Math.ceil(data[0].values.length / (availableWidth / 100)) !== 0;
+                            return i % Math.ceil(data[0].values.length / (availableWidth / reduceValue)) !== 0;
                         })
                         .selectAll('text, line')
                         .style('opacity', 0);
