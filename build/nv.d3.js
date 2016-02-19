@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-16 */
+/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-19 */
 (function(){
 
 // set up main nv object
@@ -10068,10 +10068,17 @@ nv.models.multiBar = function() {
                         .call(nv.utils.wrapTicks, chart.xAxis.rangeBand())
                 }
 
+
+                //Viur
+                var reduceValue = 100;
+                if(rotateLabels && rotateLabels > -20){
+                    reduceValue = 50;
+                }
+
                 if (reduceXTicks)
                     xTicks
                         .filter(function(d,i) {
-                            return i % Math.ceil(data[0].values.length / (availableWidth / 100)) !== 0;
+                            return i % Math.ceil(data[0].values.length / (availableWidth / reduceValue)) !== 0;
                         })
                         .selectAll('text, line')
                         .style('opacity', 0);
