@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-19 */
+/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-23 */
 (function(){
 
 // set up main nv object
@@ -15706,8 +15706,7 @@ nv.models.scatterChart = function() {
                 .width(availableWidth)
                 .height(availableHeight)
                 .color(data.map(function(d,i) {
-                    d.color = d.color || color(d, i);
-                    return d.color;
+                    return d.color || color(d, i);
                 }).filter(function(d,i) { return !data[i].disabled }))
                 .showLabels(showLabels);
 
