@@ -181,8 +181,7 @@ nv.models.scatterChart = function() {
                 .width(availableWidth)
                 .height(availableHeight)
                 .color(data.map(function(d,i) {
-                    d.color = d.color || color(d, i);
-                    return d.color;
+                    return d.color || color(d, i);
                 }).filter(function(d,i) { return !data[i].disabled }))
                 .showLabels(showLabels);
 
