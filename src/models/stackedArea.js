@@ -115,8 +115,7 @@ nv.models.stackedArea = function() {
                     if (d.display !== undefined) { return d.display.y + d.display.y0; }
                 })
                 .color(data.map(function(d,i) {
-                    d.color = d.color || color(d, d.seriesIndex);
-                    return d.color;
+                    return d.color || color(d, d.seriesIndex);
                 }));
 
             var scatterWrap = g.select('.nv-scatterWrap')
