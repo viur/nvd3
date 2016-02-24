@@ -6,7 +6,7 @@
  */
 nv.dom.write = function(callback) {
 	if (window.fastdom !== undefined) {
-		return fastdom.mutate(callback);
+		return fastdom.write(callback);
 	}
 	return callback();
 };
@@ -19,7 +19,7 @@ nv.dom.write = function(callback) {
  */
 nv.dom.read = function(callback) {
 	if (window.fastdom !== undefined) {
-		return fastdom.measure(callback);
+		return fastdom.read(callback);
 	}
 	return callback();
 };
