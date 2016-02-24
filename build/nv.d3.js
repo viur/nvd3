@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-23 */
+/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-24 */
 (function(){
 
 // set up main nv object
@@ -162,7 +162,7 @@ if (typeof(window) !== 'undefined') {
  */
 nv.dom.write = function(callback) {
 	if (window.fastdom !== undefined) {
-		return fastdom.write(callback);
+		return fastdom.mutate(callback);
 	}
 	return callback();
 };
@@ -175,10 +175,11 @@ nv.dom.write = function(callback) {
  */
 nv.dom.read = function(callback) {
 	if (window.fastdom !== undefined) {
-		return fastdom.read(callback);
+		return fastdom.measure(callback);
 	}
 	return callback();
-};/* Utility class to handle creation of an interactive layer.
+};
+/* Utility class to handle creation of an interactive layer.
  This places a rectangle on top of the chart. When you mouse move over it, it sends a dispatch
  containing the X-coordinate. It can also render a vertical line where the mouse is located.
 
