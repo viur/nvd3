@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-24 */
+/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-25 */
 (function(){
 
 // set up main nv object
@@ -8037,6 +8037,7 @@ nv.models.lineChart = function() {
         //, legendPosition = "right"
         , showXAxis = true
         , showYAxis = true
+        , wrapLabels = false
         , rightAlignYAxis = false
         , useInteractiveGuideline = false
         , x
@@ -8386,6 +8387,11 @@ nv.models.lineChart = function() {
                     .attr('transform', 'translate(0,' + y2.range()[0] + ')');
             }
 
+            if (wrapLabels) {
+                g.selectAll('.tick text')
+                    .call(nv.utils.wrapTicks, 10);
+            }
+
             //============================================================
             // Event Handling/Dispatching (in chart's scope)
             //------------------------------------------------------------
@@ -8629,6 +8635,7 @@ nv.models.lineChart = function() {
         brushExtent: {get: function(){return brushExtent;}, set: function(_){brushExtent=_;}},
         defaultState:    {get: function(){return defaultState;}, set: function(_){defaultState=_;}},
         noData:    {get: function(){return noData;}, set: function(_){noData=_;}},
+        wrapLabels:   {get: function(){return wrapLabels;}, set: function(_){wrapLabels=!!_;}},
 
         // options that require extra logic in the setter
         margin: {get: function(){return margin;}, set: function(_){
