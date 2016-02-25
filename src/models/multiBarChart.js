@@ -274,8 +274,8 @@ nv.models.multiBarChart = function() {
 
                 //Viur
                 var reduceValue = 100;
-                if(rotateLabels && rotateLabels > -20){
-                    reduceValue = 50;
+                if(rotateLabels && Math.abs(rotateLabels) > 20){
+                    reduceValue = 30;
                 }
 
                 if (reduceXTicks)
