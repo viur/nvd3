@@ -27,6 +27,7 @@ nv.models.stackedAreaChart = function() {
         , useInteractiveGuideline = false
         , showTotalInTooltip = true
         , totalLabel = 'TOTAL'
+        , wrapLabels = false
         , x //can be accessed via chart.xScale()
         , y //can be accessed via chart.yScale()
         , state = nv.utils.state()
@@ -303,6 +304,11 @@ nv.models.stackedAreaChart = function() {
                     .call(yAxis);
             }
 
+            if (wrapLabels) {
+                g.select('.nv-x').selectAll('.tick text')
+                    .call(nv.utils.wrapTicks, 10);
+            }
+
             //============================================================
             // Event Handling/Dispatching (in chart's scope)
             //------------------------------------------------------------
@@ -519,6 +525,7 @@ nv.models.stackedAreaChart = function() {
         controlOptions:    {get: function(){return controlOptions;}, set: function(_){controlOptions=_;}},
         showTotalInTooltip:      {get: function(){return showTotalInTooltip;}, set: function(_){showTotalInTooltip=_;}},
         totalLabel:      {get: function(){return totalLabel;}, set: function(_){totalLabel=_;}},
+        wrapLabels:   {get: function(){return wrapLabels;}, set: function(_){wrapLabels=!!_;}},
 
         // options that require extra logic in the setter
         margin: {get: function(){return margin;}, set: function(_){
