@@ -14,6 +14,9 @@ nv.models.pieChart = function() {
         , height = null
         , showLegend = true
         , legendPosition = "top"
+        , getLegendKey = function (d) {
+            return pie.x()(d);
+        }
         , color = nv.utils.defaultColor()
         , state = nv.utils.state()
         , defaultState = null
@@ -113,8 +116,10 @@ nv.models.pieChart = function() {
                 g.select('.nv-legendWrap').selectAll('*').remove();
             } else {
                 //Viur
+                legend.key(getLegendKey);
+
                 if (legendPosition === "top" || legendPosition == "left") {
-                    legend.width( availableWidth ).key(pie.x());
+                    legend.width( availableWidth );
 
                     //Viur
                     if (legendPosition === "left") {
@@ -137,7 +142,7 @@ nv.models.pieChart = function() {
                     if (availableWidth / 2 < legendWidth) {
                         legendWidth = (availableWidth / 2)
                     }
-                    legend.height(availableHeight).key(pie.x());
+                    legend.height(availableHeight);
                     legend.width(legendWidth);
                     availableWidth -= legend.width();
 
@@ -223,6 +228,7 @@ nv.models.pieChart = function() {
         showLegend:     {get: function(){return showLegend;},     set: function(_){showLegend=_;}},
         legendPosition: {get: function(){return legendPosition;}, set: function(_){legendPosition=_;}},
         defaultState:   {get: function(){return defaultState;},   set: function(_){defaultState=_;}},
+        legendKey:        {get: function(){return getLegendKey;}, set: function(_){getLegendKey=_;}},
 
         // options that require extra logic in the setter
         color: {get: function(){return color;}, set: function(_){
