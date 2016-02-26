@@ -12717,6 +12717,9 @@ nv.models.pie = function() {
         , container = null
         , color = nv.utils.defaultColor()
         , valueFormat = d3.format(',.2f')
+        , labelFormat = function(d){
+            return d;
+        }
         , showLabels = true
         , labelsOutside = false
         , labelType = "key"
@@ -13031,7 +13034,7 @@ nv.models.pie = function() {
                         } else {
                             switch (labelType) {
                                 case 'key':
-                                    label = getX(d.data);
+                                    label = labelFormat(getX(d.data));
                                     break;
                                 case 'value':
                                     label = valueFormat(getY(d.data));
@@ -13108,10 +13111,9 @@ nv.models.pie = function() {
             labelsOutside=_;
             nv.deprecated('donutLabelsOutside', 'use labelsOutside instead');
         }},
-        // deprecated after 1.7.1
-        labelFormat: {get: function(){ return valueFormat;}, set: function(_) {
-            valueFormat=_;
-            nv.deprecated('labelFormat','use valueFormat instead');
+        // deprecated after 1.7.1 Why ?
+        labelFormat: {get: function(){ return labelFormat;}, set: function(_) {
+            labelFormat=_;
         }},
 
         // options that require extra logic in the setter
