@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-26 */
+/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-28 */
 (function(){
 
 // set up main nv object
@@ -5225,7 +5225,7 @@ nv.models.funnelChart = function () {
     });
 
     funnel.dispatch.on('elementMousemove.tooltip', function (evt) {
-        tooltip.position({top: d3.event.pageY, left: d3.event.pageX})();
+        tooltip();
     });
 
     //============================================================
