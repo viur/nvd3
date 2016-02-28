@@ -4577,6 +4577,7 @@ nv.models.distribution = function() {
 }
 nv.models.funnel = function () {
     "use strict";
+
     //============================================================
     // Public Variables with Default Settings
     //------------------------------------------------------------
@@ -4588,12 +4589,8 @@ nv.models.funnel = function () {
         , container
         , x = d3.scale.ordinal()
         , y = d3.scale.linear()
-        , getX = function (d) {
-            return d.x
-        }
-        , getY = function (d) {
-            return d.y
-        }
+        , getX = function(d) { return d.x }
+        , getY = function(d) { return d.y }
         , forceY = [0] // 0 is forced by default.. this makes sense for the majority of bar graphs... user can always do chart.forceY([]) to remove
         , color = nv.utils.defaultColor()
         , showValues = false
@@ -4608,27 +4605,20 @@ nv.models.funnel = function () {
         ;
 
     //============================================================
-
-
-    //============================================================
     // Private Variables
     //------------------------------------------------------------
 
     var x0, y0;
     var renderWatch = nv.utils.renderWatch(dispatch, duration);
 
-    //============================================================
-
-
     function chart(selection) {
         renderWatch.reset();
-        selection.each(function (data) {
+        selection.each(function(data) {
             var availableWidth = width - margin.left - margin.right,
                 availableHeight = height - margin.top - margin.bottom;
 
             container = d3.select(this);
             nv.utils.initSVG(container);
-
 
             //add series index to each data point for reference
             data.forEach(function (series, index) {
@@ -4646,28 +4636,18 @@ nv.models.funnel = function () {
                     });
             });
 
-
-            //------------------------------------------------------------
             // Setup Scales
-
             // remap and flatten the data for use in calculating the scales' domains
             var seriesData = (xDomain && yDomain) ? [] : // if we know xDomain and yDomain, no need to calculate
-                data
-                    .map(function (d) {
-                        return d.values.map(function (d, i) {
-                            return {x: getX(d, i), y: getY(d, i), y0: d.y0}
-                        })
-                    });
+                data.map(function(d) {
+                    return d.values.map(function(d,i) {
+                        return { x: getX(d,i), y: getY(d,i), y0: d.y0 }
+                    })
+                });
 
-            x.domain(xDomain || d3.merge(seriesData).map(function (d) {
-                        return d.x
-                    }))
+            x   .domain(xDomain || d3.merge(seriesData).map(function(d) { return d.x }))
                 .rangeBands(xRange || [0, availableWidth], .1);
-
-            y.domain(yDomain || d3.extent(d3.merge(seriesData).map(function (d) {
-                    return d.y
-                }).concat(forceY)));
-
+            y   .domain(yDomain || d3.extent(d3.merge(seriesData).map(function(d) { return d.y }).concat(forceY)));
 
             // If showValues, pad the Y axis range to account for label height
             if (showValues) y.range(yRange || [availableHeight - (y.domain()[0] < 0 ? 12 : 0), y.domain()[1] > 0 ? 12 : 0]);
@@ -4675,33 +4655,20 @@ nv.models.funnel = function () {
 
             //store old scales if they exist
             x0 = x0 || x;
-            y0 = y0 || y.copy().range([y(0), y(0)]);
+            y0 = y0 || y.copy().range([y(0),y(0)]);
 
-            //------------------------------------------------------------
-
-
-            //------------------------------------------------------------
             // Setup containers and skeleton of chart
-
             var wrap = container.selectAll('g.nv-wrap.nv-discretebar').data([data]);
             var wrapEnter = wrap.enter().append('g').attr('class', 'nvd3 nv-wrap nv-discretebar');
             var gEnter = wrapEnter.append('g');
             var g = wrap.select('g');
 
             gEnter.append('g').attr('class', 'nv-groups');
-
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-            //------------------------------------------------------------
-
 
             //TODO: by definition, the discrete bar should not have multiple groups, will modify/remove later
             var groups = wrap.select('.nv-groups').selectAll('.nv-group')
-                .data(function (d) {
-                    return d
-                }, function (d) {
-                    return d.key
-                });
+                .data(function(d) { return d }, function(d) { return d.key });
             groups.enter().append('g')
                 .style('stroke-opacity', 1e-6)
                 .style('fill-opacity', 1e-6);
@@ -4711,23 +4678,15 @@ nv.models.funnel = function () {
                 .style('fill-opacity', 1e-6)
                 .remove();
             groups
-                .attr('class', function (d, i) {
-                    return 'nv-group nv-series-' + i
-                })
-                .classed('hover', function (d) {
-                    return d.hover
-                });
+                .attr('class', function(d,i) { return 'nv-group nv-series-' + i })
+                .classed('hover', function(d) { return d.hover });
             groups
                 .watchTransition(renderWatch, 'discreteBar: groups')
                 .style('stroke-opacity', 1)
                 .style('fill-opacity', .75);
 
-
             var bars = groups.selectAll('g.nv-bar')
-                .data(function (d) {
-                    return d.values
-                });
-
+                .data(function(d) { return d.values });
             bars.exit().remove();
 
             //Percents
@@ -4771,10 +4730,10 @@ nv.models.funnel = function () {
             ////////////////////////////////////////////////////////////////
 
             var barsEnter = bars.enter().append('g')
-                .attr('transform', function (d, i, j) {
-                    return 'translate(' + (x(getX(d, i)) + x.rangeBand() * .05 ) + ', ' + y(0) + ')'
+                .attr('transform', function(d,i,j) {
+                    return 'translate(' + (x(getX(d,i)) + x.rangeBand() * .05 ) + ', ' + y(0) + ')'
                 })
-                .on('mouseover', function (d, i) { //TODO: figure out why j works above, but not here
+                .on('mouseover', function(d,i) { //TODO: figure out why j works above, but not here
                     d3.select(this).classed('hover', true);
                     dispatch.elementMouseover({
                         data: d,
@@ -4782,7 +4741,7 @@ nv.models.funnel = function () {
                         color: d3.select(this).style("fill")
                     });
                 })
-                .on('mouseout', function (d, i) {
+                .on('mouseout', function(d,i) {
                     d3.select(this).classed('hover', false);
                     dispatch.elementMouseout({
                         data: d,
@@ -4790,22 +4749,25 @@ nv.models.funnel = function () {
                         color: d3.select(this).style("fill")
                     });
                 })
-                .on('mousemove', function (d, i) {
+                .on('mousemove', function(d,i) {
                     dispatch.elementMousemove({
                         data: d,
                         index: i,
                         color: d3.select(this).style("fill")
                     });
                 })
-                .on('click', function (d, i) {
+                .on('click', function(d,i) {
+                    var element = this;
                     dispatch.elementClick({
                         data: d,
                         index: i,
-                        color: d3.select(this).style("fill")
+                        color: d3.select(this).style("fill"),
+                        event: d3.event,
+                        element: element
                     });
                     d3.event.stopPropagation();
                 })
-                .on('dblclick', function (d, i) {
+                .on('dblclick', function(d,i) {
                     dispatch.elementDblClick({
                         data: d,
                         index: i,
@@ -4824,32 +4786,26 @@ nv.models.funnel = function () {
                 ;
 
                 bars.select('text')
-                    .text(function (d, i) {
-                        return valueFormat(getY(d, i))
-                    })
+                    .text(function(d,i) { return valueFormat(getY(d,i)) })
                     .watchTransition(renderWatch, 'discreteBar: bars text')
                     .attr('x', x.rangeBand() * .50 / 2)
-                    .attr('y', function (d, i) {
-                        return getY(d, i) < 0 ? y(getY(d, i)) - y(0) + 12 : -4
-                    })
+                    .attr('y', function(d,i) { return getY(d,i) < 0 ? y(getY(d,i)) - y(0) + 12 : -4 })
 
                 ;
 
+                //Viur
+                bars.select('text')
+                    .style("fill", "#000000")
+                    .style("stroke", "#000000");
 
             } else {
                 bars.selectAll('text').remove();
             }
 
             bars
-                .attr('class', function (d, i) {
-                    return getY(d, i) < 0 ? 'nv-bar negative' : 'nv-bar positive'
-                })
-                .style('fill', function (d, i) {
-                    return d.color || color(d, i)
-                })
-                .style('stroke', function (d, i) {
-                    return d.color || color(d, i)
-                })
+                .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive' })
+                .style('fill', function(d,i) { return d.color || color(d,i) })
+                .style('stroke', function(d,i) { return d.color || color(d,i) })
                 .select('rect')
                 .attr('class', rectClass)
                 .watchTransition(renderWatch, 'discreteBar: bars rect')
@@ -4860,15 +4816,15 @@ nv.models.funnel = function () {
                     var left = x(getX(d, i)) + x.rangeBand() * .25,
                         top = getY(d, i) < 0 ?
                             y(0) :
-                            y(0) - y(getY(d, i)) < 1 ?
+                                y(0) - y(getY(d,i)) < 1 ?
                             y(0) - 1 : //make 1 px positive bars show up above y=0
-                                y(getY(d, i));
+                            y(getY(d,i));
 
                     return 'translate(' + left + ', ' + top + ')'
                 })
                 .select('rect')
-                .attr('height', function (d, i) {
-                    return Math.max(Math.abs(y(getY(d, i)) - y((yDomain && yDomain[0]) || 0)) || 1)
+                .attr('height', function(d,i) {
+                    return  Math.max(Math.abs(y(getY(d,i)) - y(0)), 1)
                 });
 
 
@@ -4891,138 +4847,36 @@ nv.models.funnel = function () {
 
     chart._options = Object.create({}, {
         // simple options, just get/set the necessary values
-        width: {
-            get: function () {
-                return width;
-            }, set: function (_) {
-                width = _;
-            }
-        },
-        height: {
-            get: function () {
-                return height;
-            }, set: function (_) {
-                height = _;
-            }
-        },
-        forceY: {
-            get: function () {
-                return forceY;
-            }, set: function (_) {
-                forceY = _;
-            }
-        },
-        showValues: {
-            get: function () {
-                return showValues;
-            }, set: function (_) {
-                showValues = _;
-            }
-        },
-        x: {
-            get: function () {
-                return getX;
-            }, set: function (_) {
-                getX = _;
-            }
-        },
-        y: {
-            get: function () {
-                return getY;
-            }, set: function (_) {
-                getY = _;
-            }
-        },
-        xScale: {
-            get: function () {
-                return x;
-            }, set: function (_) {
-                x = _;
-            }
-        },
-        yScale: {
-            get: function () {
-                return y;
-            }, set: function (_) {
-                y = _;
-            }
-        },
-        xDomain: {
-            get: function () {
-                return xDomain;
-            }, set: function (_) {
-                xDomain = _;
-            }
-        },
-        yDomain: {
-            get: function () {
-                return yDomain;
-            }, set: function (_) {
-                yDomain = _;
-            }
-        },
-        xRange: {
-            get: function () {
-                return xRange;
-            }, set: function (_) {
-                xRange = _;
-            }
-        },
-        yRange: {
-            get: function () {
-                return yRange;
-            }, set: function (_) {
-                yRange = _;
-            }
-        },
-        valueFormat: {
-            get: function () {
-                return valueFormat;
-            }, set: function (_) {
-                valueFormat = _;
-            }
-        },
-        id: {
-            get: function () {
-                return id;
-            }, set: function (_) {
-                id = _;
-            }
-        },
-        rectClass: {
-            get: function () {
-                return rectClass;
-            }, set: function (_) {
-                rectClass = _;
-            }
-        },
+        width:   {get: function(){return width;}, set: function(_){width=_;}},
+        height:  {get: function(){return height;}, set: function(_){height=_;}},
+        forceY:  {get: function(){return forceY;}, set: function(_){forceY=_;}},
+        showValues: {get: function(){return showValues;}, set: function(_){showValues=_;}},
+        x:       {get: function(){return getX;}, set: function(_){getX=_;}},
+        y:       {get: function(){return getY;}, set: function(_){getY=_;}},
+        xScale:  {get: function(){return x;}, set: function(_){x=_;}},
+        yScale:  {get: function(){return y;}, set: function(_){y=_;}},
+        xDomain: {get: function(){return xDomain;}, set: function(_){xDomain=_;}},
+        yDomain: {get: function(){return yDomain;}, set: function(_){yDomain=_;}},
+        xRange:  {get: function(){return xRange;}, set: function(_){xRange=_;}},
+        yRange:  {get: function(){return yRange;}, set: function(_){yRange=_;}},
+        valueFormat:    {get: function(){return valueFormat;}, set: function(_){valueFormat=_;}},
+        id:          {get: function(){return id;}, set: function(_){id=_;}},
+        rectClass: {get: function(){return rectClass;}, set: function(_){rectClass=_;}},
 
         // options that require extra logic in the setter
-        margin: {
-            get: function () {
-                return margin;
-            }, set: function (_) {
-                margin.top = _.top !== undefined ? _.top : margin.top;
-                margin.right = _.right !== undefined ? _.right : margin.right;
-                margin.bottom = _.bottom !== undefined ? _.bottom : margin.bottom;
-                margin.left = _.left !== undefined ? _.left : margin.left;
-            }
-        },
-        color: {
-            get: function () {
-                return color;
-            }, set: function (_) {
-                color = nv.utils.getColor(_);
-            }
-        },
-        duration: {
-            get: function () {
-                return duration;
-            }, set: function (_) {
-                duration = _;
-                renderWatch.reset(duration);
-            }
-        }
+        margin: {get: function(){return margin;}, set: function(_){
+            margin.top    = _.top    !== undefined ? _.top    : margin.top;
+            margin.right  = _.right  !== undefined ? _.right  : margin.right;
+            margin.bottom = _.bottom !== undefined ? _.bottom : margin.bottom;
+            margin.left   = _.left   !== undefined ? _.left   : margin.left;
+        }},
+        color:  {get: function(){return color;}, set: function(_){
+            color = nv.utils.getColor(_);
+        }},
+        duration: {get: function(){return duration;}, set: function(_){
+            duration = _;
+            renderWatch.reset(duration);
+        }}
     });
 
     nv.utils.initOptions(chart);
@@ -5039,6 +4893,7 @@ nv.models.funnelChart = function () {
     var funnel = nv.models.funnel()
         , xAxis = nv.models.axis()
         , yAxis = nv.models.axis()
+	    , legend = nv.models.legend()
         , tooltip = nv.models.tooltip()
         ;
 
@@ -5046,23 +4901,24 @@ nv.models.funnelChart = function () {
         , width = null
         , height = null
         , color = nv.utils.getColor()
+	    , showLegend = false
         , showXAxis = true
         , showYAxis = true
         , rightAlignYAxis = false
         , staggerLabels = false
+        , wrapLabels = false
+        , rotateLabels = 0
         , x
         , y
         , noData = null
-        , dispatch = d3.dispatch('beforeUpdate', 'renderEnd')
+        , dispatch = d3.dispatch('beforeUpdate','renderEnd')
         , duration = 250
         ;
 
     xAxis
         .orient('bottom')
         .showMaxMin(false)
-        .tickFormat(function (d) {
-            return d
-        })
+        .tickFormat(function(d) { return d })
     ;
     yAxis
         .orient((rightAlignYAxis) ? 'right' : 'left')
@@ -5072,10 +4928,10 @@ nv.models.funnelChart = function () {
     tooltip
         .duration(0)
         .headerEnabled(false)
-        .valueFormatter(function (d, i) {
+        .valueFormatter(function(d, i) {
             return yAxis.tickFormat()(d, i);
         })
-        .keyFormatter(function (d, i) {
+        .keyFormatter(function(d, i) {
             return xAxis.tickFormat()(d, i);
         });
 
@@ -5091,28 +4947,24 @@ nv.models.funnelChart = function () {
         if (showXAxis) renderWatch.models(xAxis);
         if (showYAxis) renderWatch.models(yAxis);
 
-        selection.each(function (data) {
+        selection.each(function(data) {
             var container = d3.select(this),
                 that = this;
             nv.utils.initSVG(container);
             var availableWidth = nv.utils.availableWidth(width, container, margin),
                 availableHeight = nv.utils.availableHeight(height, container, margin);
 
-            chart.update = function () {
+            chart.update = function() {
                 dispatch.beforeUpdate();
                 container.transition().duration(duration).call(chart);
             };
             chart.container = this;
 
             // Display No Data message if there's nothing to show.
-            if (!data || !data.length || !data.filter(function (d) {
-                    return d.values.length
-                }).length) {
+            if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container);
-
-                //FIX Clean previous chart
+                //Viur - Clean previous chart
                 container.selectAll('.nv-wrap').remove();
-
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -5134,8 +4986,28 @@ nv.models.funnelChart = function () {
                 .append('line');
 
             gEnter.append('g').attr('class', 'nv-barsWrap');
+	        gEnter.append('g').attr('class', 'nv-legendWrap');
 
             g.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+            // Legend
+            if (!showLegend) {
+                g.select('.nv-legendWrap').selectAll('*').remove();
+            } else {
+                legend.width(availableWidth);
+
+                g.select('.nv-legendWrap')
+                    .datum(data)
+                    .call(legend);
+
+                if ( margin.top != legend.height()) {
+                    margin.top = legend.height();
+                    availableHeight = nv.utils.availableHeight(height, container, margin);
+                }
+
+                wrap.select('.nv-legendWrap')
+                    .attr('transform', 'translate(0,' + (-margin.top) +')')
+            }
 
             if (rightAlignYAxis) {
                 g.select(".nv-y.nv-axis")
@@ -5148,9 +5020,7 @@ nv.models.funnelChart = function () {
                 .height(availableHeight);
 
             var barsWrap = g.select('.nv-barsWrap')
-                .datum(data.filter(function (d) {
-                    return !d.disabled
-                }));
+                .datum(data.filter(function(d) { return !d.disabled }));
 
             barsWrap.transition().call(funnel);
 
@@ -5168,36 +5038,46 @@ nv.models.funnelChart = function () {
             if (showXAxis) {
                 xAxis
                     .scale(x)
-                    ._ticks(nv.utils.calcTicksX(availableWidth / 100, data))
+                    ._ticks( nv.utils.calcTicksX(availableWidth/100, data) )
                     .tickSize(-availableHeight, 0);
 
                 g.select('.nv-x.nv-axis')
-                    .attr('transform', 'translate(0,' + (y.range()[0] + ((funnel.showValues() && y.domain()[0] < 0) ? 16 : 0)) + ')');
+                    .attr('transform', 'translate(0,' + (y.range()[0] + ((discretebar.showValues() && y.domain()[0] < 0) ? 16 : 0)) + ')');
                 g.select('.nv-x.nv-axis').call(xAxis);
 
                 var xTicks = g.select('.nv-x.nv-axis').selectAll('g');
                 if (staggerLabels) {
                     xTicks
                         .selectAll('text')
-                        .attr('transform', function (d, i, j) {
-                            return 'translate(0,' + (j % 2 == 0 ? '5' : '17') + ')'
-                        })
+                        .attr('transform', function(d,i,j) { return 'translate(0,' + (j % 2 == 0 ? '5' : '17') + ')' })
+                }
+
+                if (rotateLabels) {
+                    xTicks
+                        .selectAll('.tick text')
+                        .attr('transform', 'rotate(' + rotateLabels + ' 0,0)')
+                        .style('text-anchor', rotateLabels > 0 ? 'start' : 'end');
+                }
+
+                if (wrapLabels) {
+                    g.selectAll('.tick text')
+                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand())
                 }
             }
 
             if (showYAxis) {
                 yAxis
                     .scale(y)
-                    ._ticks(nv.utils.calcTicksY(availableHeight / 36, data))
-                    .tickSize(-availableWidth, 0);
+                    ._ticks( nv.utils.calcTicksY(availableHeight/36, data) )
+                    .tickSize( -availableWidth, 0);
 
                 g.select('.nv-y.nv-axis').call(yAxis);
             }
 
             // Zero line
             g.select(".nv-zeroLine line")
-                .attr("x1", 0)
-                .attr("x2", availableWidth)
+                .attr("x1",0)
+                .attr("x2",(rightAlignYAxis) ? -availableWidth : availableWidth)
                 .attr("y1", y(0))
                 .attr("y2", y(0))
             ;
@@ -5220,11 +5100,11 @@ nv.models.funnelChart = function () {
         tooltip.data(evt).hidden(false);
     });
 
-    funnel.dispatch.on('elementMouseout.tooltip', function (evt) {
+    funnel.dispatch.on('elementMouseout.tooltip', function(evt) {
         tooltip.hidden(true);
     });
 
-    funnel.dispatch.on('elementMousemove.tooltip', function (evt) {
+    funnel.dispatch.on('elementMousemove.tooltip', function(evt) {
         tooltip();
     });
 
@@ -5234,6 +5114,7 @@ nv.models.funnelChart = function () {
 
     chart.dispatch = dispatch;
     chart.funnel = funnel;
+    chart.legend = legend;
     chart.xAxis = xAxis;
     chart.yAxis = yAxis;
     chart.tooltip = tooltip;
@@ -5242,107 +5123,39 @@ nv.models.funnelChart = function () {
 
     chart._options = Object.create({}, {
         // simple options, just get/set the necessary values
-        width: {
-            get: function () {
-                return width;
-            }, set: function (_) {
-                width = _;
-            }
-        },
-        height: {
-            get: function () {
-                return height;
-            }, set: function (_) {
-                height = _;
-            }
-        },
-        staggerLabels: {
-            get: function () {
-                return staggerLabels;
-            }, set: function (_) {
-                staggerLabels = _;
-            }
-        },
-        showXAxis: {
-            get: function () {
-                return showXAxis;
-            }, set: function (_) {
-                showXAxis = _;
-            }
-        },
-        showYAxis: {
-            get: function () {
-                return showYAxis;
-            }, set: function (_) {
-                showYAxis = _;
-            }
-        },
-        noData: {
-            get: function () {
-                return noData;
-            }, set: function (_) {
-                noData = _;
-            }
-        },
-
-        // deprecated options
-        tooltips: {
-            get: function () {
-                return tooltip.enabled();
-            }, set: function (_) {
-                // deprecated after 1.7.1
-                nv.deprecated('tooltips', 'use chart.tooltip.enabled() instead');
-                tooltip.enabled(!!_);
-            }
-        },
-        tooltipContent: {
-            get: function () {
-                return tooltip.contentGenerator();
-            }, set: function (_) {
-                // deprecated after 1.7.1
-                nv.deprecated('tooltipContent', 'use chart.tooltip.contentGenerator() instead');
-                tooltip.contentGenerator(_);
-            }
-        },
+        width:      {get: function(){return width;}, set: function(_){width=_;}},
+        height:     {get: function(){return height;}, set: function(_){height=_;}},
+	    showLegend: {get: function(){return showLegend;}, set: function(_){showLegend=_;}},
+        staggerLabels: {get: function(){return staggerLabels;}, set: function(_){staggerLabels=_;}},
+        rotateLabels:  {get: function(){return rotateLabels;}, set: function(_){rotateLabels=_;}},
+        wrapLabels:  {get: function(){return wrapLabels;}, set: function(_){wrapLabels=!!_;}},
+        showXAxis: {get: function(){return showXAxis;}, set: function(_){showXAxis=_;}},
+        showYAxis: {get: function(){return showYAxis;}, set: function(_){showYAxis=_;}},
+        noData:    {get: function(){return noData;}, set: function(_){noData=_;}},
 
         // options that require extra logic in the setter
-        margin: {
-            get: function () {
-                return margin;
-            }, set: function (_) {
-                margin.top = _.top !== undefined ? _.top : margin.top;
-                margin.right = _.right !== undefined ? _.right : margin.right;
-                margin.bottom = _.bottom !== undefined ? _.bottom : margin.bottom;
-                margin.left = _.left !== undefined ? _.left : margin.left;
-            }
-        },
-        duration: {
-            get: function () {
-                return duration;
-            }, set: function (_) {
-                duration = _;
-                renderWatch.reset(duration);
-                funnel.duration(duration);
-                xAxis.duration(duration);
-                yAxis.duration(duration);
-            }
-        },
-        color: {
-            get: function () {
-                return color;
-            }, set: function (_) {
-                color = nv.utils.getColor(_);
-                funnel.color(color);
-            }
-        },
-        rightAlignYAxis: {
-            get: function () {
-                return rightAlignYAxis;
-            }, set: function (_) {
-                rightAlignYAxis = _;
-                yAxis.orient((_) ? 'right' : 'left');
-            }
-        }
+        margin: {get: function(){return margin;}, set: function(_){
+            margin.top    = _.top    !== undefined ? _.top    : margin.top;
+            margin.right  = _.right  !== undefined ? _.right  : margin.right;
+            margin.bottom = _.bottom !== undefined ? _.bottom : margin.bottom;
+            margin.left   = _.left   !== undefined ? _.left   : margin.left;
+        }},
+        duration: {get: function(){return duration;}, set: function(_){
+            duration = _;
+            renderWatch.reset(duration);
+            funnel.duration(duration);
+            xAxis.duration(duration);
+            yAxis.duration(duration);
+        }},
+        color:  {get: function(){return color;}, set: function(_){
+            color = nv.utils.getColor(_);
+            funnel.color(color);
+	    legend.color(color);
+        }},
+        rightAlignYAxis: {get: function(){return rightAlignYAxis;}, set: function(_){
+            rightAlignYAxis = _;
+            yAxis.orient( (_) ? 'right' : 'left');
+        }}
     });
 
     nv.utils.inheritOptions(chart, funnel);
