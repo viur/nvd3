@@ -4793,11 +4793,6 @@ nv.models.funnel = function () {
 
                 ;
 
-                //Viur
-                bars.select('text')
-                    .style("fill", "#000000")
-                    .style("stroke", "#000000");
-
             } else {
                 bars.selectAll('text').remove();
             }
@@ -5042,7 +5037,7 @@ nv.models.funnelChart = function () {
                     .tickSize(-availableHeight, 0);
 
                 g.select('.nv-x.nv-axis')
-                    .attr('transform', 'translate(0,' + (y.range()[0] + ((discretebar.showValues() && y.domain()[0] < 0) ? 16 : 0)) + ')');
+                    .attr('transform', 'translate(0,' + (y.range()[0] + ((funnel.showValues() && y.domain()[0] < 0) ? 16 : 0)) + ')');
                 g.select('.nv-x.nv-axis').call(xAxis);
 
                 var xTicks = g.select('.nv-x.nv-axis').selectAll('g');
