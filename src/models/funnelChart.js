@@ -8,6 +8,7 @@ nv.models.funnelChart = function () {
     var funnel = nv.models.funnel()
         , xAxis = nv.models.axis()
         , yAxis = nv.models.axis()
+	    , legend = nv.models.legend()
         , tooltip = nv.models.tooltip()
         ;
 
@@ -15,23 +16,24 @@ nv.models.funnelChart = function () {
         , width = null
         , height = null
         , color = nv.utils.getColor()
+	    , showLegend = false
         , showXAxis = true
         , showYAxis = true
         , rightAlignYAxis = false
         , staggerLabels = false
+        , wrapLabels = false
+        , rotateLabels = 0
         , x
         , y
         , noData = null
-        , dispatch = d3.dispatch('beforeUpdate', 'renderEnd')
+        , dispatch = d3.dispatch('beforeUpdate','renderEnd')
         , duration = 250
         ;
 
     xAxis
         .orient('bottom')
         .showMaxMin(false)
-        .tickFormat(function (d) {
-            return d
-        })
+        .tickFormat(function(d) { return d })
     ;
     yAxis
         .orient((rightAlignYAxis) ? 'right' : 'left')
@@ -41,10 +43,10 @@ nv.models.funnelChart = function () {
     tooltip
         .duration(0)
         .headerEnabled(false)
-        .valueFormatter(function (d, i) {
+        .valueFormatter(function(d, i) {
             return yAxis.tickFormat()(d, i);
         })
-        .keyFormatter(function (d, i) {
+        .keyFormatter(function(d, i) {
             return xAxis.tickFormat()(d, i);
         });
 
@@ -60,28 +62,24 @@ nv.models.funnelChart = function () {
         if (showXAxis) renderWatch.models(xAxis);
         if (showYAxis) renderWatch.models(yAxis);
 
-        selection.each(function (data) {
+        selection.each(function(data) {
             var container = d3.select(this),
                 that = this;
             nv.utils.initSVG(container);
             var availableWidth = nv.utils.availableWidth(width, container, margin),
                 availableHeight = nv.utils.availableHeight(height, container, margin);
 
-            chart.update = function () {
+            chart.update = function() {
                 dispatch.beforeUpdate();
                 container.transition().duration(duration).call(chart);
             };
             chart.container = this;
 
             // Display No Data message if there's nothing to show.
-            if (!data || !data.length || !data.filter(function (d) {
-                    return d.values.length
-                }).length) {
+            if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container);
-
-                //FIX Clean previous chart
+                //Viur - Clean previous chart
                 container.selectAll('.nv-wrap').remove();
-
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -103,8 +101,28 @@ nv.models.funnelChart = function () {
                 .append('line');
 
             gEnter.append('g').attr('class', 'nv-barsWrap');
+	        gEnter.append('g').attr('class', 'nv-legendWrap');
 
             g.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+            // Legend
+            if (!showLegend) {
+                g.select('.nv-legendWrap').selectAll('*').remove();
+            } else {
+                legend.width(availableWidth);
+
+                g.select('.nv-legendWrap')
+                    .datum(data)
+                    .call(legend);
+
+                if ( margin.top != legend.height()) {
+                    margin.top = legend.height();
+                    availableHeight = nv.utils.availableHeight(height, container, margin);
+                }
+
+                wrap.select('.nv-legendWrap')
+                    .attr('transform', 'translate(0,' + (-margin.top) +')')
+            }
 
             if (rightAlignYAxis) {
                 g.select(".nv-y.nv-axis")
@@ -117,9 +135,7 @@ nv.models.funnelChart = function () {
                 .height(availableHeight);
 
             var barsWrap = g.select('.nv-barsWrap')
-                .datum(data.filter(function (d) {
-                    return !d.disabled
-                }));
+                .datum(data.filter(function(d) { return !d.disabled }));
 
             barsWrap.transition().call(funnel);
 
@@ -137,36 +153,46 @@ nv.models.funnelChart = function () {
             if (showXAxis) {
                 xAxis
                     .scale(x)
-                    ._ticks(nv.utils.calcTicksX(availableWidth / 100, data))
+                    ._ticks( nv.utils.calcTicksX(availableWidth/100, data) )
                     .tickSize(-availableHeight, 0);
 
                 g.select('.nv-x.nv-axis')
-                    .attr('transform', 'translate(0,' + (y.range()[0] + ((funnel.showValues() && y.domain()[0] < 0) ? 16 : 0)) + ')');
+                    .attr('transform', 'translate(0,' + (y.range()[0] + ((discretebar.showValues() && y.domain()[0] < 0) ? 16 : 0)) + ')');
                 g.select('.nv-x.nv-axis').call(xAxis);
 
                 var xTicks = g.select('.nv-x.nv-axis').selectAll('g');
                 if (staggerLabels) {
                     xTicks
                         .selectAll('text')
-                        .attr('transform', function (d, i, j) {
-                            return 'translate(0,' + (j % 2 == 0 ? '5' : '17') + ')'
-                        })
+                        .attr('transform', function(d,i,j) { return 'translate(0,' + (j % 2 == 0 ? '5' : '17') + ')' })
+                }
+
+                if (rotateLabels) {
+                    xTicks
+                        .selectAll('.tick text')
+                        .attr('transform', 'rotate(' + rotateLabels + ' 0,0)')
+                        .style('text-anchor', rotateLabels > 0 ? 'start' : 'end');
+                }
+
+                if (wrapLabels) {
+                    g.selectAll('.tick text')
+                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand())
                 }
             }
 
             if (showYAxis) {
                 yAxis
                     .scale(y)
-                    ._ticks(nv.utils.calcTicksY(availableHeight / 36, data))
-                    .tickSize(-availableWidth, 0);
+                    ._ticks( nv.utils.calcTicksY(availableHeight/36, data) )
+                    .tickSize( -availableWidth, 0);
 
                 g.select('.nv-y.nv-axis').call(yAxis);
             }
 
             // Zero line
             g.select(".nv-zeroLine line")
-                .attr("x1", 0)
-                .attr("x2", availableWidth)
+                .attr("x1",0)
+                .attr("x2",(rightAlignYAxis) ? -availableWidth : availableWidth)
                 .attr("y1", y(0))
                 .attr("y2", y(0))
             ;
@@ -189,11 +215,11 @@ nv.models.funnelChart = function () {
         tooltip.data(evt).hidden(false);
     });
 
-    funnel.dispatch.on('elementMouseout.tooltip', function (evt) {
+    funnel.dispatch.on('elementMouseout.tooltip', function(evt) {
         tooltip.hidden(true);
     });
 
-    funnel.dispatch.on('elementMousemove.tooltip', function (evt) {
+    funnel.dispatch.on('elementMousemove.tooltip', function(evt) {
         tooltip();
     });
 
@@ -203,6 +229,7 @@ nv.models.funnelChart = function () {
 
     chart.dispatch = dispatch;
     chart.funnel = funnel;
+    chart.legend = legend;
     chart.xAxis = xAxis;
     chart.yAxis = yAxis;
     chart.tooltip = tooltip;
@@ -211,107 +238,39 @@ nv.models.funnelChart = function () {
 
     chart._options = Object.create({}, {
         // simple options, just get/set the necessary values
-        width: {
-            get: function () {
-                return width;
-            }, set: function (_) {
-                width = _;
-            }
-        },
-        height: {
-            get: function () {
-                return height;
-            }, set: function (_) {
-                height = _;
-            }
-        },
-        staggerLabels: {
-            get: function () {
-                return staggerLabels;
-            }, set: function (_) {
-                staggerLabels = _;
-            }
-        },
-        showXAxis: {
-            get: function () {
-                return showXAxis;
-            }, set: function (_) {
-                showXAxis = _;
-            }
-        },
-        showYAxis: {
-            get: function () {
-                return showYAxis;
-            }, set: function (_) {
-                showYAxis = _;
-            }
-        },
-        noData: {
-            get: function () {
-                return noData;
-            }, set: function (_) {
-                noData = _;
-            }
-        },
-
-        // deprecated options
-        tooltips: {
-            get: function () {
-                return tooltip.enabled();
-            }, set: function (_) {
-                // deprecated after 1.7.1
-                nv.deprecated('tooltips', 'use chart.tooltip.enabled() instead');
-                tooltip.enabled(!!_);
-            }
-        },
-        tooltipContent: {
-            get: function () {
-                return tooltip.contentGenerator();
-            }, set: function (_) {
-                // deprecated after 1.7.1
-                nv.deprecated('tooltipContent', 'use chart.tooltip.contentGenerator() instead');
-                tooltip.contentGenerator(_);
-            }
-        },
+        width:      {get: function(){return width;}, set: function(_){width=_;}},
+        height:     {get: function(){return height;}, set: function(_){height=_;}},
+	    showLegend: {get: function(){return showLegend;}, set: function(_){showLegend=_;}},
+        staggerLabels: {get: function(){return staggerLabels;}, set: function(_){staggerLabels=_;}},
+        rotateLabels:  {get: function(){return rotateLabels;}, set: function(_){rotateLabels=_;}},
+        wrapLabels:  {get: function(){return wrapLabels;}, set: function(_){wrapLabels=!!_;}},
+        showXAxis: {get: function(){return showXAxis;}, set: function(_){showXAxis=_;}},
+        showYAxis: {get: function(){return showYAxis;}, set: function(_){showYAxis=_;}},
+        noData:    {get: function(){return noData;}, set: function(_){noData=_;}},
 
         // options that require extra logic in the setter
-        margin: {
-            get: function () {
-                return margin;
-            }, set: function (_) {
-                margin.top = _.top !== undefined ? _.top : margin.top;
-                margin.right = _.right !== undefined ? _.right : margin.right;
-                margin.bottom = _.bottom !== undefined ? _.bottom : margin.bottom;
-                margin.left = _.left !== undefined ? _.left : margin.left;
-            }
-        },
-        duration: {
-            get: function () {
-                return duration;
-            }, set: function (_) {
-                duration = _;
-                renderWatch.reset(duration);
-                funnel.duration(duration);
-                xAxis.duration(duration);
-                yAxis.duration(duration);
-            }
-        },
-        color: {
-            get: function () {
-                return color;
-            }, set: function (_) {
-                color = nv.utils.getColor(_);
-                funnel.color(color);
-            }
-        },
-        rightAlignYAxis: {
-            get: function () {
-                return rightAlignYAxis;
-            }, set: function (_) {
-                rightAlignYAxis = _;
-                yAxis.orient((_) ? 'right' : 'left');
-            }
-        }
+        margin: {get: function(){return margin;}, set: function(_){
+            margin.top    = _.top    !== undefined ? _.top    : margin.top;
+            margin.right  = _.right  !== undefined ? _.right  : margin.right;
+            margin.bottom = _.bottom !== undefined ? _.bottom : margin.bottom;
+            margin.left   = _.left   !== undefined ? _.left   : margin.left;
+        }},
+        duration: {get: function(){return duration;}, set: function(_){
+            duration = _;
+            renderWatch.reset(duration);
+            funnel.duration(duration);
+            xAxis.duration(duration);
+            yAxis.duration(duration);
+        }},
+        color:  {get: function(){return color;}, set: function(_){
+            color = nv.utils.getColor(_);
+            funnel.color(color);
+	    legend.color(color);
+        }},
+        rightAlignYAxis: {get: function(){return rightAlignYAxis;}, set: function(_){
+            rightAlignYAxis = _;
+            yAxis.orient( (_) ? 'right' : 'left');
+        }}
     });
 
     nv.utils.inheritOptions(chart, funnel);
