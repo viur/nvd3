@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-28 */
+/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-02-29 */
 (function(){
 
 // set up main nv object
@@ -1596,6 +1596,8 @@ nv.utils.arrayEquals = function (array1, array2) {
         , fontSize = undefined
         , duration = 250
         , dispatch = d3.dispatch('renderEnd')
+        , ticksInterval = null
+        , ticksStep = 1
         ;
     axis
         .scale(scale)
@@ -1622,7 +1624,9 @@ nv.utils.arrayEquals = function (array1, array2) {
             var gEnter = wrapEnter.append('g');
             var g = wrap.select('g');
 
-            if (ticks !== null)
+            if (ticks !== null && ticksInterval !== null)
+                axis.ticks(ticksInterval,ticksStep);
+            else if (ticks !== null)
                 axis.ticks(ticks);
             else if (axis.orient() == 'top' || axis.orient() == 'bottom')
                 axis.ticks(Math.abs(scale.range()[1] - scale.range()[0]) / 100);
@@ -1702,7 +1706,7 @@ nv.utils.arrayEquals = function (array1, array2) {
                     var rotateLabelsRule = '';
                     if (rotateLabels%360) {
                         //Reset transform on ticks so textHeight can be calculated correctly
-                        xTicks.attr('transform', ''); 
+                        xTicks.attr('transform', '');
                         //Calculate the longest xTick width
                         xTicks.each(function(d,i){
                             var box = this.getBoundingClientRect();
@@ -1910,9 +1914,9 @@ nv.utils.arrayEquals = function (array1, array2) {
                     and the arithmetic trick below solves that.
                     */
                     return !parseFloat(Math.round(d * 100000) / 1000000) && (d !== undefined)
-                }) 
+                })
                 .classed('zero', true);
-            
+
             //store old scales for use in transitions on update
             scale0 = scale.copy();
 
@@ -1943,6 +1947,9 @@ nv.utils.arrayEquals = function (array1, array2) {
         ticks:             {get: function(){return ticks;}, set: function(_){ticks=_;}},
         width:             {get: function(){return width;}, set: function(_){width=_;}},
         fontSize:          {get: function(){return fontSize;}, set: function(_){fontSize=_;}},
+
+        ticksInterval:     {get: function(){return ticksInterval;}, set: function(_){ticksInterval=_;}},
+        ticksStep:         {get: function(){return ticksStep;}, set: function(_){ticksStep=_;}},
 
         // options that require extra logic in the setter
         margin: {get: function(){return margin;}, set: function(_){
