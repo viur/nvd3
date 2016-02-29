@@ -51,7 +51,12 @@ nv.models.axis = function() {
             var g = wrap.select('g');
 
             if (ticks !== null && ticksInterval !== null)
-                axis.ticks(ticksInterval,ticksStep);
+                if(ticksStep !== null)
+                    axis.ticks(ticksInterval,ticksStep);
+                else {
+                    ticksStep = Math.ceil(ticksInterval.range(scale.domain()[0],scale.domain()[1]).length / ticks);
+                    axis.ticks(ticksInterval,ticksStep);
+                }
             else if (ticks !== null)
                 axis.ticks(ticks);
             else if (axis.orient() == 'top' || axis.orient() == 'bottom')
