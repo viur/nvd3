@@ -23,7 +23,7 @@ nv.models.axis = function() {
         , duration = 250
         , dispatch = d3.dispatch('renderEnd')
         , ticksInterval = null
-        , ticksStep = 1
+        , ticksStep = null
         ;
     axis
         .scale(scale)
