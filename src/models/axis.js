@@ -22,6 +22,8 @@ nv.models.axis = function() {
         , fontSize = undefined
         , duration = 250
         , dispatch = d3.dispatch('renderEnd')
+        , ticksInterval = null
+        , ticksStep = 1
         ;
     axis
         .scale(scale)
@@ -48,7 +50,9 @@ nv.models.axis = function() {
             var gEnter = wrapEnter.append('g');
             var g = wrap.select('g');
 
-            if (ticks !== null)
+            if (ticks !== null && ticksInterval !== null)
+                axis.ticks(ticksInterval,ticksStep);
+            else if (ticks !== null)
                 axis.ticks(ticks);
             else if (axis.orient() == 'top' || axis.orient() == 'bottom')
                 axis.ticks(Math.abs(scale.range()[1] - scale.range()[0]) / 100);
@@ -128,7 +132,7 @@ nv.models.axis = function() {
                     var rotateLabelsRule = '';
                     if (rotateLabels%360) {
                         //Reset transform on ticks so textHeight can be calculated correctly
-                        xTicks.attr('transform', ''); 
+                        xTicks.attr('transform', '');
                         //Calculate the longest xTick width
                         xTicks.each(function(d,i){
                             var box = this.getBoundingClientRect();
@@ -336,9 +340,9 @@ nv.models.axis = function() {
                     and the arithmetic trick below solves that.
                     */
                     return !parseFloat(Math.round(d * 100000) / 1000000) && (d !== undefined)
-                }) 
+                })
                 .classed('zero', true);
-            
+
             //store old scales for use in transitions on update
             scale0 = scale.copy();
 
@@ -369,6 +373,9 @@ nv.models.axis = function() {
         ticks:             {get: function(){return ticks;}, set: function(_){ticks=_;}},
         width:             {get: function(){return width;}, set: function(_){width=_;}},
         fontSize:          {get: function(){return fontSize;}, set: function(_){fontSize=_;}},
+
+        ticksInterval:     {get: function(){return ticksInterval;}, set: function(_){ticksInterval=_;}},
+        ticksStep:         {get: function(){return ticksStep;}, set: function(_){ticksStep=_;}},
 
         // options that require extra logic in the setter
         margin: {get: function(){return margin;}, set: function(_){
