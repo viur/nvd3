@@ -17,6 +17,7 @@ nv.models.line = function() {
         , getX = function(d) { return d.x } // accessor to get the x value from a data point
         , getY = function(d) { return d.y } // accessor to get the y value from a data point
         , defined = function(d,i) { return !isNaN(getY(d,i)) && getY(d,i) !== null } // allows a line to be not continuous when it is not defined
+        , connectNulls = false
         , isArea = function(d) { return d.area } // decides if a line is an area or just a line
         , clipEdge = false // if true, masks lines within x and y scale
         , x //can be accessed via chart.xScale()
@@ -221,6 +222,16 @@ nv.models.line = function() {
         color:  {get: function(){return color;}, set: function(_){
             color = nv.utils.getColor(_);
             scatter.color(color);
+        }},
+        //connect line across null points
+        connectNulls: {get: function(){return connectNulls;}, set: function(_){
+            if(_){
+                connectNulls = true;
+                defined = function(){ return true};
+            }else{
+                connectNulls = false;
+                defined = function(d,i) { return !isNaN(getY(d,i)) && getY(d,i) !== null }
+            }
         }}
     });
 
