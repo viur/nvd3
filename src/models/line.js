@@ -146,7 +146,7 @@ nv.models.line = function() {
                 .data(function(d) {
                     if(connectNulls){
                         return [d.values.filter(function(d){
-                            return !isNaN(getY(d));
+                            return !isNaN(getY(d)) && getY(d) !== null;
                         })];
                     }
                     return [d.values]
