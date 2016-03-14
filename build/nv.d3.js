@@ -16162,6 +16162,7 @@ nv.models.stackedArea = function() {
         , getX = function(d) { return d.x } // accessor to get the x value from a data point
         , getY = function(d) { return d.y } // accessor to get the y value from a data point
         , defined = function(d,i) { return !isNaN(getY(d,i)) && getY(d,i) !== null } // allows a line to be not continuous when it is not defined
+        , connectNulls = false
         , style = 'stack'
         , offset = 'zero'
         , order = 'default'
@@ -16467,6 +16468,16 @@ nv.models.stackedArea = function() {
             duration = _;
             renderWatch.reset(duration);
             scatter.duration(duration);
+        }},
+        //connect line across null points
+        connectNulls: {get: function(){return connectNulls;}, set: function(_){
+            if(_){
+                connectNulls = true;
+                defined = function(){ return true};
+            }else{
+                connectNulls = false;
+                defined = function(d,i) { return !isNaN(getY(d,i)) && getY(d,i) !== null }
+            }
         }}
     });
 
