@@ -7741,7 +7741,14 @@ nv.models.line = function() {
                 });
 
             var linePaths = groups.selectAll('path.nv-line')
-                .data(function(d) { return [d.values] });
+                .data(function(d) {
+                    if(connectNulls){
+                        return [d.values.filter(function(d){
+                            return !isNaN(getY(d));
+                        })];
+                    }
+                    return [d.values]
+                });
 
             linePaths.enter().append('path')
                 //Viur
@@ -7823,13 +7830,7 @@ nv.models.line = function() {
         }},
         //connect line across null points
         connectNulls: {get: function(){return connectNulls;}, set: function(_){
-            if(_){
-                connectNulls = true;
-                defined = function(){ return true};
-            }else{
-                connectNulls = false;
-                defined = function(d,i) { return !isNaN(getY(d,i)) && getY(d,i) !== null }
-            }
+            connectNulls = _;
         }}
     });
 
