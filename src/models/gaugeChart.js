@@ -204,7 +204,7 @@ nv.models.gaugeChart = function () {
     // Event Handling/Dispatching (out of chart's scope)
     //------------------------------------------------------------
 
-    pie.dispatch.on('elementMouseover.tooltip', function (evt) {
+    pie.dispatch.on('elementMouseover.tooltip', function(evt) {
         evt['series'] = {
             key: chart.x()(evt.data),
             value: chart.y()(evt.data),
@@ -213,12 +213,12 @@ nv.models.gaugeChart = function () {
         tooltip.data(evt).hidden(false);
     });
 
-    pie.dispatch.on('elementMouseout.tooltip', function (evt) {
+    pie.dispatch.on('elementMouseout.tooltip', function(evt) {
         tooltip.hidden(true);
     });
 
-    pie.dispatch.on('elementMousemove.tooltip', function (evt) {
-        tooltip.position({top: d3.event.pageY, left: d3.event.pageX})();
+    pie.dispatch.on('elementMousemove.tooltip', function(evt) {
+        tooltip();
     });
 
     //============================================================
