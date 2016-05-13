@@ -18,6 +18,9 @@ nv.models.gauge = function () {
         , container = null
         , color = nv.utils.defaultColor()
         , valueFormat = d3.format(',.2f')
+        , labelFormat = function(d){
+            return d;
+        }
         , showLabels = false
         , labelsOutside = false
         , labelType = "key"
