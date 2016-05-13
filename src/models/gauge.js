@@ -348,7 +348,7 @@ nv.models.gauge = function () {
             });
 
             var paths = ae.append('path')
-                //FIX
+                //Viur - For PNG Export purposes
                 .style("stroke", "#fff")
                 .style("stroke-width", "1px")
                 .style("stroke-opacity", "1")
@@ -418,6 +418,9 @@ nv.models.gauge = function () {
                 var createHashKey = function (coordinates) {
                     return Math.floor(coordinates[0] / avgWidth) * avgWidth + ',' + Math.floor(coordinates[1] / avgHeight) * avgHeight;
                 };
+                var getSlicePercentage = function(d) {
+                    return (d.endAngle - d.startAngle) / (2 * Math.PI);
+                };
 
                 pieLabels.watchTransition(renderWatch, 'pie labels').attr('transform', function (d, i) {
                     if (labelSunbeamLayout) {
@@ -456,8 +459,8 @@ nv.models.gauge = function () {
                         //center the text on it's origin or begin/end if orthogonal aligned
                         return labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle';
                     })
-                    .text(function (d, i) {
-                        var percent = (d.endAngle - d.startAngle) / (2 * Math.PI);
+                    .text(function(d, i) {
+                        var percent = getSlicePercentage(d);
                         var label = '';
                         if (!d.value || percent < labelThreshold) return '';
 
@@ -470,7 +473,7 @@ nv.models.gauge = function () {
                         } else {
                             switch (labelType) {
                                 case 'key':
-                                    label = getX(d.data);
+                                    label = labelFormat(getX(d.data));
                                     break;
                                 case 'value':
                                     label = valueFormat(getY(d.data));
@@ -676,15 +679,10 @@ nv.models.gauge = function () {
                 nv.deprecated('donutLabelsOutside', 'use labelsOutside instead');
             }
         },
-        // deprecated after 1.7.1
-        labelFormat: {
-            get: function () {
-                return valueFormat;
-            }, set: function (_) {
-                valueFormat = _;
-                nv.deprecated('labelFormat', 'use valueFormat instead');
-            }
-        },
+        // deprecated after 1.7.1 Why ?
+        labelFormat: {get: function(){ return labelFormat;}, set: function(_) {
+            labelFormat=_;
+        }},
 
         // options that require extra logic in the setter
         margin: {
@@ -751,4 +749,3 @@ nv.models.gauge = function () {
     nv.utils.initOptions(chart);
     return chart;
 };
-
