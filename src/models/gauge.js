@@ -18,7 +18,7 @@ nv.models.gauge = function () {
         , container = null
         , color = nv.utils.defaultColor()
         , valueFormat = d3.format(',.2f')
-        , labelFormat = function(d){
+        , labelFormat = function (d) {
             return d;
         }
         , showLabels = false
@@ -255,7 +255,9 @@ nv.models.gauge = function () {
                 }
 
                 return valueFormat(value);
-            }
+            };
+
+            var valueFontSize;
 
             wrap.select('.nv-pie-title')
                 .style("text-anchor", "middle")
@@ -263,6 +265,7 @@ nv.models.gauge = function () {
                 .style("font-size", function (d) {
                     var text = valueText(d);
                     var fontSize = (Math.min(availableWidth, availableHeight)) * donutRatio * 1.3 / (text.toString().length + 2);
+                    valueFontSize = fontSize;
                     return fontSize + "px"
                 })
                 .attr("dy", "0.35em"); // trick to vertically center text
@@ -275,10 +278,10 @@ nv.models.gauge = function () {
             wrap.select('.nv-pie-label')
                 .style("text-anchor", "middle")
                 .text(label)
-                .style("font-size", (Math.min(availableWidth, availableHeight)) * donutRatio * 1.1 / (label.length + 2) + "px")
+                .style("font-size", labelFontSize + "px")
                 .attr("dy", "0.35em") // trick to vertically center text
                 .attr('transform', function (d, i) {
-                    return "translate(0, " + (labelFontSize * 1.3) + ")";
+                    return "translate(0, " + valueFontSize / 1.2 + ")";
                 });
 
             if (image != 'none') {
@@ -351,7 +354,7 @@ nv.models.gauge = function () {
             });
 
             var paths = ae.append('path')
-                //Viur - For PNG Export purposes
+            //Viur - For PNG Export purposes
                 .style("stroke", "#fff")
                 .style("stroke-width", "1px")
                 .style("stroke-opacity", "1")
@@ -421,7 +424,7 @@ nv.models.gauge = function () {
                 var createHashKey = function (coordinates) {
                     return Math.floor(coordinates[0] / avgWidth) * avgWidth + ',' + Math.floor(coordinates[1] / avgHeight) * avgHeight;
                 };
-                var getSlicePercentage = function(d) {
+                var getSlicePercentage = function (d) {
                     return (d.endAngle - d.startAngle) / (2 * Math.PI);
                 };
 
@@ -462,7 +465,7 @@ nv.models.gauge = function () {
                         //center the text on it's origin or begin/end if orthogonal aligned
                         return labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle';
                     })
-                    .text(function(d, i) {
+                    .text(function (d, i) {
                         var percent = getSlicePercentage(d);
                         var label = '';
                         if (!d.value || percent < labelThreshold) return '';
@@ -683,9 +686,13 @@ nv.models.gauge = function () {
             }
         },
         // deprecated after 1.7.1 Why ?
-        labelFormat: {get: function(){ return labelFormat;}, set: function(_) {
-            labelFormat=_;
-        }},
+        labelFormat: {
+            get: function () {
+                return labelFormat;
+            }, set: function (_) {
+                labelFormat = _;
+            }
+        },
 
         // options that require extra logic in the setter
         margin: {
