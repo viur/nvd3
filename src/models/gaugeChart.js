@@ -14,6 +14,9 @@ nv.models.gaugeChart = function () {
         , height = null
         , showLegend = false
         , legendPosition = "top"
+        , getLegendKey = function (d) {
+            return pie.x()(d);
+        }
         , color = nv.utils.defaultColor()
         , state = nv.utils.state()
         , defaultState = null
@@ -99,10 +102,8 @@ nv.models.gaugeChart = function () {
             // Display No Data message if there's nothing to show.
             if (!data || !data.length) {
                 nv.utils.noData(chart, container);
-
-                //FIX Clean previous chart
+                //Viur - Clean previous chart
                 container.selectAll('.nv-wrap').remove();
-
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -117,10 +118,16 @@ nv.models.gaugeChart = function () {
             gEnter.append('g').attr('class', 'nv-legendWrap');
 
             // Legend
-            if (showLegend) {
+            if (!showLegend) {
+                g.select('.nv-legendWrap').selectAll('*').remove();
+            } else {
+                //Viur
+                legend.key(getLegendKey);
+
                 if (legendPosition === "top" || legendPosition == "left") {
                     legend.width(availableWidth).key(pie.x());
 
+                    //Viur
                     if (legendPosition === "left") {
                         legend.rightAlign(false);
                     }
@@ -254,6 +261,14 @@ nv.models.gaugeChart = function () {
                 return defaultState;
             }, set: function (_) {
                 defaultState = _;
+            }
+        },
+
+        legendKey: {
+            get: function () {
+                return getLegendKey;
+            }, set: function (_) {
+                getLegendKey = _;
             }
         },
 
