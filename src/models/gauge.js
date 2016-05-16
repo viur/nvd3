@@ -29,6 +29,7 @@ nv.models.gauge = function () {
         , labelThreshold = .02 //if slice percentage is under this, don't show label
         , donut = true
         , value = 0
+        , maxValue = 0
         , growOnHover = true
         , titleOffset = 0
         , labelSunbeamLayout = false
@@ -63,7 +64,15 @@ nv.models.gauge = function () {
                 , arcsRadiusInner = []
                 ;
 
-            var max = data[0][1].value - data[0][0].value;
+            var max;
+
+            if (maxValue > 0) {
+                max = maxValue;
+            } else {
+                max = data[0][1].value;
+            }
+
+            max = max - data[0][0].value;
 
             if (max < 0) {
                 max = 0;
@@ -73,7 +82,8 @@ nv.models.gauge = function () {
                 max = 1
             }
 
-            container = d3.select(this)
+            container = d3.select(this);
+
             if (arcsRadius.length === 0) {
                 var outer = radius - radius / 5;
                 var inner = donutRatio * radius;
@@ -752,6 +762,13 @@ nv.models.gauge = function () {
                 return image;
             }, set: function (_) {
                 image = _;
+            }
+        },
+        maxValue: {
+            get: function () {
+                return maxValue;
+            }, set: function (_) {
+                maxValue = _;
             }
         }
     });
