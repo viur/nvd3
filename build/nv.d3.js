@@ -8089,7 +8089,8 @@ nv.models.lineChart = function() {
                 wrap.select(".nv-interactive").call(interactiveLayer);
             }
 
-            g.select('.nv-focus .nv-background rect')
+            //viur - fix for png export
+            g.select('.nv-focus .nv-background rect').attr("fill","none")
                 .attr('width', availableWidth)
                 .attr('height', availableHeight1);
                 
