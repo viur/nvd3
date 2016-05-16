@@ -72,14 +72,14 @@ nv.models.gauge = function () {
                 max = data[0][1].value;
             }
 
-            max = max - data[0][0].value;
+            var diff = max - data[0][0].value;
 
-            if (max < 0) {
-                max = 0;
+            if (diff < 0) {
+                diff = 0;
             }
 
             if (data[0][0].value == 0) {
-                max = 1
+                diff = 1
             }
 
             container = d3.select(this);
@@ -166,7 +166,7 @@ nv.models.gauge = function () {
                 .sort(null)
                 .value(function (d) {
                     if (d.label == "Max") {
-                        return max;
+                        return diff;
                     }
                     return d.disabled ? 0 : getY(d)
                 });
@@ -252,11 +252,11 @@ nv.models.gauge = function () {
                     case 'absolute':
                         return valueFormat(value);
                     case 'percent':
-                        var percent = d[0].value / d[1].value;
+                        var percent = max ? d[0].value / max : 1;
                         value = d3.format('%')(percent);
                         return value;
                     case 'variance':
-                        var variance = (((d[0].value - d[1].value) / d[1].value) * 100);
+                        var variance = (((d[0].value - max) / max) * 100);
                         if (variance > 0) {
                             return '+' + d3.format('.1f')(variance) + '%';
                         } else {
