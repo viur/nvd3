@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-05-16 */
+/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-06-02 */
 (function(){
 
 // set up main nv object
@@ -10781,7 +10781,7 @@ nv.models.multiBarHorizontalChart = function() {
                 if (reduceXTicks)
                     xTicks
                         .filter(function(d,i) {
-                            return i % Math.ceil(data[0].values.length / (availableHeight / 24)) !== 0;
+                            return i % Math.ceil(data[0].values.length / (availableHeight / 10)) !== 0;
                         })
                         .selectAll('text, line')
                         .style('opacity', 0);
