@@ -233,7 +233,7 @@ nv.models.multiBarHorizontalChart = function() {
                 if (reduceXTicks)
                     xTicks
                         .filter(function(d,i) {
-                            return i % Math.ceil(data[0].values.length / (availableHeight / 24)) !== 0;
+                            return i % Math.ceil(data[0].values.length / (availableHeight / 10)) !== 0;
                         })
                         .selectAll('text, line')
                         .style('opacity', 0);
