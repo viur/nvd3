@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.2-dev (https://github.com/novus/nvd3) 2016-06-02 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2016-06-09 */
 (function(){
 
 // set up main nv object
@@ -162,7 +162,7 @@ if (typeof(window) !== 'undefined') {
  */
 nv.dom.write = function(callback) {
 	if (window.fastdom !== undefined) {
-		return fastdom.write(callback);
+		return fastdom.mutate(callback);
 	}
 	return callback();
 };
@@ -175,10 +175,11 @@ nv.dom.write = function(callback) {
  */
 nv.dom.read = function(callback) {
 	if (window.fastdom !== undefined) {
-		return fastdom.read(callback);
+		return fastdom.measure(callback);
 	}
 	return callback();
-};/* Utility class to handle creation of an interactive layer.
+};
+/* Utility class to handle creation of an interactive layer.
  This places a rectangle on top of the chart. When you mouse move over it, it sends a dispatch
  containing the X-coordinate. It can also render a vertical line where the mouse is located.
 
@@ -1539,7 +1540,7 @@ nv.utils.wrapTicks = function (text, width) {
                 line.pop();
                 tspan.text(line.join(" "));
                 line = [word];
-                tspan = text.append("tspan").attr("x", 0).attr("y", 0).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
             }
         }
     });
@@ -5351,13 +5352,13 @@ nv.models.furiousLegend = function() {
                 var seriesWidths = [];
                 series.each(function(d,i) {
                     var legendText;
-                    if (getKey(d).length > maxKeyLength) { 
+                    if (getKey(d) && (getKey(d).length > maxKeyLength)) {
                         var trimmedKey = getKey(d).substring(0, maxKeyLength);
                         legendText = d3.select(this).select('text').text(trimmedKey + "...");
                         d3.select(this).append("svg:title").text(getKey(d));
                     } else {
                         legendText = d3.select(this).select('text');
-                    } 
+                    }
                     var nodeTextLength;
                     try {
                         nodeTextLength = legendText.node().getComputedTextLength();
@@ -7319,7 +7320,7 @@ nv.models.legend = function() {
                     .attr('class','nv-legend-symbol')
                     .attr('r', 5);
 
-                seriesShape = series.select('circle');
+                seriesShape = series.select('.nv-legend-symbol');
             } else if (vers == 'furious') {
                 seriesEnter.append('rect')
                     .style('stroke-width', 2)
@@ -7436,13 +7437,13 @@ nv.models.legend = function() {
                 var seriesWidths = [];
                 series.each(function(d,i) {
                     var legendText;
-                    if (getKey(d).length > maxKeyLength) { 
+                    if (getKey(d) && (getKey(d).length > maxKeyLength)) {
                         var trimmedKey = getKey(d).substring(0, maxKeyLength);
                         legendText = d3.select(this).select('text').text(trimmedKey + "...");
                         d3.select(this).append("svg:title").text(getKey(d));
                     } else {
                         legendText = d3.select(this).select('text');
-                    } 
+                    }
                     var nodeTextLength;
                     try {
                         nodeTextLength = legendText.node().getComputedTextLength();
@@ -8651,13 +8652,13 @@ nv.models.lineWithFocusChart = function() {
     //------------------------------------------------------------
 
     var getBarsAxis = function() {
-        return switchYAxisOrder
+        return !switchYAxisOrder
             ? { main: y2Axis, focus: y4Axis }
             : { main: y1Axis, focus: y3Axis }
     }
 
     var getLinesAxis = function() {
-        return switchYAxisOrder
+        return !switchYAxisOrder
             ? { main: y1Axis, focus: y3Axis }
             : { main: y2Axis, focus: y4Axis }
     }
@@ -9350,7 +9351,7 @@ nv.models.multiBar = function() {
             });
 
             // HACK for negative value stacking
-            if (stacked) {
+            if (stacked && data.length > 0) {
                 data[0].values.map(function(d,i) {
                     var posBase = 0, negBase = 0;
                     data.map(function(d, idx) {
@@ -9674,7 +9675,8 @@ nv.models.multiBar = function() {
     nv.utils.initOptions(chart);
 
     return chart;
-};nv.models.multiBarChart = function() {
+};
+nv.models.multiBarChart = function() {
     "use strict";
 
     //============================================================
@@ -10968,7 +10970,7 @@ nv.models.multiChart = function() {
         yDomain2,
         getX = function(d) { return d.x },
         getY = function(d) { return d.y},
-        interpolate = 'monotone',
+        interpolate = 'linear',
         useVoronoi = true,
         interactiveLayer = nv.interactiveGuideline(),
         useInteractiveGuideline = false,
@@ -11048,7 +11050,7 @@ nv.models.multiChart = function() {
                     })
                 });
 
-            x   .domain(d3.extent(d3.merge(series1.concat(series2)), function(d) { return getX(d) }))
+            x   .domain(d3.extent(d3.merge(series1.concat(series2)), function(d) { return d.x }))
                 .range([0, availableWidth]);
 
             var wrap = container.selectAll('g.wrap.multiChart').data([data]);
@@ -11130,10 +11132,12 @@ nv.models.multiChart = function() {
             stack1
                 .width(availableWidth)
                 .height(availableHeight)
+                .interpolate(interpolate)
                 .color(color_array.filter(function(d,i) { return !data[i].disabled && data[i].yAxis == 1 && data[i].type == 'area'}));
             stack2
                 .width(availableWidth)
                 .height(availableHeight)
+                .interpolate(interpolate)
                 .color(color_array.filter(function(d,i) { return !data[i].disabled && data[i].yAxis == 2 && data[i].type == 'area'}));
 
             g.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
@@ -11372,6 +11376,9 @@ nv.models.multiChart = function() {
 
                     interactiveLayer.tooltip
                     .chartContainer(chart.container.parentNode)
+                    .headerFormatter(function(d, i) {
+                        return xAxis.tickFormat()(d, i);
+                    })
                     .valueFormatter(function(d,i) {
                         var yAxis = allData[i].yAxis;
                         return d === null ? "N/A" : yAxis.tickFormat()(d);
@@ -12181,15 +12188,6 @@ nv.models.parallelCoordinates = function() {
 
                 dispatch.dimensionsOrder(enabledDimensions);
             }
-            function resetBrush() {
-                filters = [];
-                active = [];
-                dispatch.stateChange();
-            }
-            function resetDrag() {
-                dimensionName.map(function (d, i) { return d.currentPosition = d.originalPosition; });
-                dispatch.stateChange();
-            }
             function dimensionPosition(d) {
                 var v = dragging[d];
                 return v == null ? x(d) : v;
@@ -12279,7 +12277,6 @@ nv.models.parallelCoordinatesChart = function () {
 		, color = nv.utils.defaultColor()
         , state = nv.utils.state()
         , dimensionData = []
-        , dimensionNames = []
         , displayBrush = true
         , defaultState = null
         , noData = null
@@ -12362,21 +12359,6 @@ nv.models.parallelCoordinatesChart = function () {
                     d.currentPosition = isNaN(d.currentPosition) ? i : d.currentPosition;
                 });
 
-                var currentDimensions = dimensionNames.map(function (d) { return d.key; });
-                var newDimensions = dimensionData.map(function (d) { return d.key; });
-                dimensionData.forEach(function (k, i) {
-                    var idx = currentDimensions.indexOf(k.key);
-                        if (idx < 0) {
-                            dimensionNames.splice(i, 0, k);
-                        } else {
-                            var gap = dimensionNames[idx].currentPosition - dimensionNames[idx].originalPosition;
-                            dimensionNames[idx].originalPosition = k.originalPosition;
-                            dimensionNames[idx].currentPosition = k.originalPosition + gap;
-                        }
-                });
-                //Remove old dimensions
-                dimensionNames = dimensionNames.filter(function (d) { return newDimensions.indexOf(d.key) >= 0; });
-
                if (!defaultState) {
                     var key;
                     defaultState = {};
@@ -12419,7 +12401,7 @@ nv.models.parallelCoordinatesChart = function () {
                         .color(function (d) { return "rgb(188,190,192)"; });
 
                     g.select('.nv-legendWrap')
-                        .datum(dimensionNames.sort(function (a, b) { return a.originalPosition - b.originalPosition; }))
+                        .datum(dimensionData.sort(function (a, b) { return a.originalPosition - b.originalPosition; }))
                         .call(legend);
 
                     if (margin.top != legend.height()) {
@@ -12435,7 +12417,7 @@ nv.models.parallelCoordinatesChart = function () {
                 parallelCoordinates
                     .width(availableWidth)
                     .height(availableHeight)
-                    .dimensionData(dimensionNames)
+                    .dimensionData(dimensionData)
                     .displayBrush(displayBrush);
 		
 		        var parallelCoordinatesWrap = g.select('.nv-parallelCoordinatesWrap ')
@@ -12467,21 +12449,21 @@ nv.models.parallelCoordinatesChart = function () {
 
                 //Update dimensions order and display reset sorting button
 		        parallelCoordinates.dispatch.on('dimensionsOrder', function (e) {
-		            dimensionNames.sort(function (a, b) { return a.currentPosition - b.currentPosition; });
+		            dimensionData.sort(function (a, b) { return a.currentPosition - b.currentPosition; });
 		            var isSorted = false;
-		            dimensionNames.forEach(function (d, i) {
+		            dimensionData.forEach(function (d, i) {
 		                d.currentPosition = i;
 		                if (d.currentPosition !== d.originalPosition)
 		                    isSorted = true;
 		            });
-		            dispatch.dimensionsOrder(dimensionNames, isSorted);
+		            dispatch.dimensionsOrder(dimensionData, isSorted);
 		        });
 
 				// Update chart from a state object passed to event handler
                 dispatch.on('changeState', function (e) {
 
                     if (typeof e.disabled !== 'undefined') {
-                        dimensionNames.forEach(function (series, i) {
+                        dimensionData.forEach(function (series, i) {
                             series.disabled = e.disabled[i];
                         });
                         state.disabled = e.disabled;
@@ -15831,6 +15813,8 @@ nv.models.sparkline = function() {
         , yDomain
         , xRange
         , yRange
+        , showMinMaxPoints = true
+        , showCurrentPoint = true
         , dispatch = d3.dispatch('renderEnd')
         ;
 
@@ -15893,7 +15877,7 @@ nv.models.sparkline = function() {
                     var maxPoint = pointIndex(yValues.lastIndexOf(y.domain()[1])),
                         minPoint = pointIndex(yValues.indexOf(y.domain()[0])),
                         currentPoint = pointIndex(yValues.length - 1);
-                    return [minPoint, maxPoint, currentPoint].filter(function (d) {return d != null;});
+                    return [(showMinMaxPoints ? minPoint : null), (showMinMaxPoints ? maxPoint : null), (showCurrentPoint ? currentPoint : null)].filter(function (d) {return d != null;});
                 });
             points.enter().append('circle');
             points.exit().remove();
@@ -15928,15 +15912,17 @@ nv.models.sparkline = function() {
 
     chart._options = Object.create({}, {
         // simple options, just get/set the necessary values
-        width:     {get: function(){return width;}, set: function(_){width=_;}},
-        height:    {get: function(){return height;}, set: function(_){height=_;}},
-        xDomain:   {get: function(){return xDomain;}, set: function(_){xDomain=_;}},
-        yDomain:   {get: function(){return yDomain;}, set: function(_){yDomain=_;}},
-        xRange:    {get: function(){return xRange;}, set: function(_){xRange=_;}},
-        yRange:    {get: function(){return yRange;}, set: function(_){yRange=_;}},
-        xScale:    {get: function(){return x;}, set: function(_){x=_;}},
-        yScale:    {get: function(){return y;}, set: function(_){y=_;}},
-        animate:   {get: function(){return animate;}, set: function(_){animate=_;}},
+        width:            {get: function(){return width;}, set: function(_){width=_;}},
+        height:           {get: function(){return height;}, set: function(_){height=_;}},
+        xDomain:          {get: function(){return xDomain;}, set: function(_){xDomain=_;}},
+        yDomain:          {get: function(){return yDomain;}, set: function(_){yDomain=_;}},
+        xRange:           {get: function(){return xRange;}, set: function(_){xRange=_;}},
+        yRange:           {get: function(){return yRange;}, set: function(_){yRange=_;}},
+        xScale:           {get: function(){return x;}, set: function(_){x=_;}},
+        yScale:           {get: function(){return y;}, set: function(_){y=_;}},
+        animate:          {get: function(){return animate;}, set: function(_){animate=_;}},
+        showMinMaxPoints: {get: function(){return showMinMaxPoints;}, set: function(_){showMinMaxPoints=_;}},
+        showCurrentPoint: {get: function(){return showCurrentPoint;}, set: function(_){showCurrentPoint=_;}},
 
         //functor options
         x: {get: function(){return getX;}, set: function(_){getX=d3.functor(_);}},
@@ -17595,5 +17581,5 @@ nv.models.sunburstChart = function() {
 
 };
 
-nv.version = "1.8.2-dev";
+nv.version = "1.8.3";
 })();

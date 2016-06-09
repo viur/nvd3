@@ -8,40 +8,36 @@
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script>
-        $('body').ready(function () {
+        $('body').ready(function() {
             // preload iframe with message
             var iframe = document.getElementById('show');
             var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
             iframedoc.body.innerHTML = ''
-                    + '<br><br>'
-                    + '<div style="text-align: center; color: #CCC; font-family: arial; font-size: 14px; font-weight:bold;">'
-                    + 'Click the links above to load the example here'
-                    + '</div>';
+                + '<br><br>'
+                + '<div style="text-align: center; color: #CCC; font-family: arial; font-size: 14px; font-weight:bold;">'
+                + 'Click the links above to load the example here'
+                + '</div>';
 
-            $('.showbases').click(function (evt) {
+            $('.showbases').click(function(evt){
                 evt.preventDefault();
                 evt.stopPropagation();
                 $(evt.target).fadeOut();
-                $('.chartlinks').stop().slideUp({
-                    complete: function () {
-                        $('.showcharts').fadeIn();
-                        $('.baselinks').slideDown();
-                    }
-                });
+                $('.chartlinks').stop().slideUp({complete: function() {
+                    $('.showcharts').fadeIn();
+                    $('.baselinks').slideDown();
+                }});
             });
-            $('.showcharts').click(function (evt) {
+            $('.showcharts').click(function(evt){
                 evt.preventDefault();
                 evt.stopPropagation();
                 $(evt.target).fadeOut();
-                $('.baselinks').stop().slideUp({
-                    complete: function () {
-                        $('.showbases').fadeIn();
-                        $('.chartlinks').slideDown();
-                    }
-                });
+                $('.baselinks').stop().slideUp({complete: function() {
+                    $('.showbases').fadeIn();
+                    $('.chartlinks').slideDown();
+                }});
             });
-            $('.examplelinks a').each(function (i, elem) {
-                $(elem).click(function (evt) {
+            $('.examplelinks a').each(function(i, elem) {
+                $(elem).click(function(evt) {
                     $('#show').prop('src', $(evt.target).prop('href'));
                     evt.stopPropagation();
                     evt.preventDefault();
@@ -133,6 +129,7 @@
             <a href="sunburst.html">sunburst</a> |
             <a href="boxPlot.html">boxPlot</a> |
             <a href="boxPlotCustomModel.html">boxPlotCustomModel</a> |
+            <a href="forceDirected.html">forceDirected</a> |
             <a href="./viur/lineChart.html">Viur - LineChart</a>
         </div>
 
@@ -149,9 +146,7 @@
             <a href="tooltip.html">tooltip</a>
         </div>
 
-        <div id="show_wrapper">
-            <iframe id="show"></iframe>
-        </div>
+        <div id="show_wrapper"><iframe id="show"></iframe></div>
         <div id="example_options" style="visibility: hidden;">
             <a target="source" id="tosource" href="#">View source for the example above!</a> |
             <a target="alone" id="showonlythis" href="#">View Just This</a>
