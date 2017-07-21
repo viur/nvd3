@@ -420,7 +420,6 @@ nv.models.multiChart = function() {
                     });
 
                     interactiveLayer.tooltip
-                    .chartContainer(chart.container.parentNode)
                     .headerFormatter(function(d, i) {
                         return xAxis.tickFormat()(d, i);
                     })

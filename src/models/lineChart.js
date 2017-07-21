@@ -442,7 +442,6 @@ nv.models.lineChart = function() {
                 };
 
                 interactiveLayer.tooltip
-                    .chartContainer(chart.container.parentNode)
                     .valueFormatter(interactiveLayer.tooltip.valueFormatter() || defaultValueFormatter)
                     .data({
                         value: chart.x()( singlePoint,pointIndex ),
@@ -490,7 +489,6 @@ nv.models.lineChart = function() {
 
                     state.disabled = e.disabled;
                 }
-
                 chart.update();
             });
 

@@ -16,6 +16,7 @@ nv.models.cumulativeLineChart = function() {
         ;
 
     var margin = {top: 30, right: 30, bottom: 50, left: 60}
+        , marginTop = null
         , color = nv.utils.defaultColor()
         , width = null
         , height = null
@@ -60,6 +61,7 @@ nv.models.cumulativeLineChart = function() {
     var dx = d3.scale.linear()
         , index = {i: 0, x: 0}
         , renderWatch = nv.utils.renderWatch(dispatch, duration)
+        , currentYDomain
         ;
 
     var stateGetter = function(data) {
@@ -166,36 +168,24 @@ nv.models.cumulativeLineChart = function() {
             x = lines.xScale();
             y = lines.yScale();
 
-            if (!rescaleY) {
-                var seriesDomains = data
-                    .filter(function(series) { return !series.disabled })
-                    .map(function(series,i) {
-                        var initialDomain = d3.extent(series.values, lines.y());
-
-                        //account for series being disabled when losing 95% or more
-                        if (initialDomain[0] < -.95) initialDomain[0] = -.95;
-
-                        return [
-                                (initialDomain[0] - initialDomain[1]) / (1 + initialDomain[1]),
-                                (initialDomain[1] - initialDomain[0]) / (1 + initialDomain[0])
-                        ];
-                    });
-
-                var completeDomain = [
-                    d3.min(seriesDomains, function(d) { return d[0] }),
-                    d3.max(seriesDomains, function(d) { return d[1] })
-                ];
-
-                lines.yDomain(completeDomain);
-            } else {
-                lines.yDomain(null);
-            }
 
             dx.domain([0, data[0].values.length - 1]) //Assumes all series have same length
                 .range([0, availableWidth])
                 .clamp(true);
 
             var data = indexify(index.i, data);
+
+            // initialize the starting yDomain for the not-rescale case after indexify (to have calculated point.display)
+            if (typeof(currentYDomain) === "undefined") {
+                currentYDomain = getCurrentYDomain(data);
+            }
+
+            if (!rescaleY) {
+                lines.yDomain(currentYDomain);
+                lines.clipEdge(true);
+            } else {
+                lines.yDomain(null);
+            }
 
             // Setup containers and skeleton of chart
             var interactivePointerEvents = (useInteractiveGuideline) ? "none" : "all";
@@ -222,7 +212,7 @@ nv.models.cumulativeLineChart = function() {
                     .datum(data)
                     .call(legend);
 
-                if ( margin.top != legend.height()) {
+                if (!marginTop && legend.height() !== margin.top) {
                     margin.top = legend.height();
                     availableHeight = nv.utils.availableHeight(height, container, margin);
                 }
@@ -259,7 +249,7 @@ nv.models.cumulativeLineChart = function() {
                     .attr("transform", "translate(" + availableWidth + ",0)");
             }
 
-            // Show error if series goes below 100%
+            // Show error if index point value is 0 (division by zero avoided)
             var tempDisabled = data.filter(function(d) { return d.tempDisabled });
 
             wrap.select('.tempDisabled').remove(); //clean-up and prevent duplicates
@@ -431,8 +421,10 @@ nv.models.cumulativeLineChart = function() {
             controls.dispatch.on('legendClick', function(d,i) {
                 d.disabled = !d.disabled;
                 rescaleY = !d.disabled;
-
                 state.rescaleY = rescaleY;
+                if (!rescaleY) {
+                    currentYDomain = getCurrentYDomain(data); // rescale is turned off, so set the currentYDomain
+                }
                 dispatch.stateChange(state);
                 chart.update();
             });
@@ -451,7 +443,7 @@ nv.models.cumulativeLineChart = function() {
                 data
                     .filter(function(series, i) {
                         series.seriesIndex = i;
-                        return !series.disabled;
+                        return !(series.disabled || series.tempDisabled);
                     })
                     .forEach(function(series,i) {
                         pointIndex = nv.interactiveBisect(series.values, e.pointXValue, chart.x());
@@ -479,7 +471,6 @@ nv.models.cumulativeLineChart = function() {
 
                 var xValue = xAxis.tickFormat()(chart.x()(singlePoint,pointIndex), pointIndex);
                 interactiveLayer.tooltip
-                    .chartContainer(that.parentNode)
                     .valueFormatter(function(d,i) {
                         return yAxis.tickFormat()(d);
                     })
@@ -567,10 +558,8 @@ nv.models.cumulativeLineChart = function() {
             }
             var v = indexifyYGetter(indexValue, idx);
 
-            //TODO: implement check below, and disable series if series loses 100% or more cause divide by 0 issue
-            if (v < -.95 && !noErrorCheck) {
-                //if a series loses more than 100%, calculations fail.. anything close can cause major distortion (but is mathematically correct till it hits 100)
-
+            // avoid divide by zero
+            if (Math.abs(v) < 0.00001 && !noErrorCheck) {
                 line.tempDisabled = true;
                 return line;
             }
@@ -578,12 +567,25 @@ nv.models.cumulativeLineChart = function() {
             line.tempDisabled = false;
 
             line.values = line.values.map(function(point, pointIndex) {
-                point.display = {'y': (indexifyYGetter(point, pointIndex) - v) / (1 + v) };
+                point.display = {'y': (indexifyYGetter(point, pointIndex) - v) / v };
                 return point;
             });
 
             return line;
         })
+    }
+
+    function getCurrentYDomain(data) {
+        var seriesDomains = data
+            .filter(function(series) { return !(series.disabled || series.tempDisabled)})
+            .map(function(series,i) {
+                return d3.extent(series.values, function (d) { return d.display.y });
+            });
+
+        return [
+            d3.min(seriesDomains, function(d) { return d[0] }),
+            d3.max(seriesDomains, function(d) { return d[1] })
+        ];
     }
 
     //============================================================
@@ -607,7 +609,6 @@ nv.models.cumulativeLineChart = function() {
         // simple options, just get/set the necessary values
         width:      {get: function(){return width;}, set: function(_){width=_;}},
         height:     {get: function(){return height;}, set: function(_){height=_;}},
-        rescaleY:     {get: function(){return rescaleY;}, set: function(_){rescaleY=_;}},
         showControls:     {get: function(){return showControls;}, set: function(_){showControls=_;}},
         showLegend: {get: function(){return showLegend;}, set: function(_){showLegend=_;}},
         average: {get: function(){return average;}, set: function(_){average=_;}},
@@ -618,8 +619,15 @@ nv.models.cumulativeLineChart = function() {
         noErrorCheck:    {get: function(){return noErrorCheck;}, set: function(_){noErrorCheck=_;}},
 
         // options that require extra logic in the setter
+        rescaleY:     {get: function(){return rescaleY;}, set: function(_){
+            rescaleY = _;
+            chart.state.rescaleY = _; // also update state
+        }},
         margin: {get: function(){return margin;}, set: function(_){
-            margin.top    = _.top    !== undefined ? _.top    : margin.top;
+            if (_.top !== undefined) {
+                margin.top = _.top;
+                marginTop = _.top;
+            }
             margin.right  = _.right  !== undefined ? _.right  : margin.right;
             margin.bottom = _.bottom !== undefined ? _.bottom : margin.bottom;
             margin.left   = _.left   !== undefined ? _.left   : margin.left;

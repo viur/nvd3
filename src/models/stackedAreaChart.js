@@ -57,7 +57,7 @@ nv.models.stackedAreaChart = function() {
             return xAxis.tickFormat()(d, i);
         })
         .valueFormatter(function(d, i) {
-            return yAxis.tickFormat()(d, i);
+            return d == null ? "N/A" : yAxis.tickFormat()(d, i);
         });
 
     var oldYTickFormat = null,
@@ -139,7 +139,6 @@ nv.models.stackedAreaChart = function() {
             } else {
                 container.selectAll('.nv-noData').remove();
             }
-
             // Setup Scales
             x = stacked.xScale();
             y = stacked.yScale();
@@ -438,7 +437,6 @@ nv.models.stackedAreaChart = function() {
                 }
 
                 interactiveLayer.tooltip
-                    .chartContainer(that.parentNode)
                     .valueFormatter(valueFormatter)
                     .data(
                     {
