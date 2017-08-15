@@ -23,6 +23,7 @@ nv.models.pieChart = function() {
         , noData = null
         , duration = 250
         , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , slices = null
         ;
 
     tooltip
@@ -74,6 +75,10 @@ nv.models.pieChart = function() {
 
             chart.update = function() { container.transition().call(chart); };
             chart.container = this;
+
+            if (data && data.length && slices) {
+                data = data.slice(0, slices-1);
+            }
 
             state.setter(stateSetter(data), chart.update)
                 .getter(stateGetter(data))
@@ -245,6 +250,9 @@ nv.models.pieChart = function() {
             margin.right  = _.right  !== undefined ? _.right  : margin.right;
             margin.bottom = _.bottom !== undefined ? _.bottom : margin.bottom;
             margin.left   = _.left   !== undefined ? _.left   : margin.left;
+        }},
+        slices: {get: function(){return duration;}, set: function(_){
+            slices = _;
         }}
     });
     nv.utils.inheritOptions(chart, pie);
