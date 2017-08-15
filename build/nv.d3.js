@@ -13097,7 +13097,7 @@ nv.models.pieChart = function() {
             chart.container = this;
 
             if (data && data.length && slices && slices < data.length) {
-                var total = data.slice(slices).reduce(function(sum, d) {
+                var total = data.slice(slices-1).reduce(function(sum, d) {
                     return sum + d.value;
                 }, 0);
                 data = data.slice(0, slices-1);
