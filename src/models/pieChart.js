@@ -76,7 +76,7 @@ nv.models.pieChart = function() {
             chart.update = function() { container.transition().call(chart); };
             chart.container = this;
 
-            if (data && data.length && slices && slices <= data.length) {
+            if (data && data.length && slices && slices < data.length) {
                 var sum = data.slice(slices, data.length).reduce(function(sum, d) {
                     return sum + d.value;
                 }, 0);
