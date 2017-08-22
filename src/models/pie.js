@@ -32,7 +32,7 @@ nv.models.pie = function() {
         , cornerRadius = 0
         , donutRatio = 0.5
         , arcsRadius = []
-        , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
+        , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd', 'elementTouchstart')
         ;
 
     var arcs = [];
@@ -200,6 +200,16 @@ nv.models.pie = function() {
                     data: d.data,
                     index: i,
                     color: d3.select(this).style("fill")
+                });
+            });
+            ae.on('touchstart', function(d, i) {
+                var element = this;
+                dispatch.elementClick({
+                    data: d.data,
+                    index: i,
+                    color: d3.select(this).style("fill"),
+                    event: d3.event,
+                    element: element
                 });
             });
 

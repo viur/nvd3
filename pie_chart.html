@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <link href="build/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js" charset="utf-8"></script>
+    <script src="src/core.js"></script>
+    <script src="src/interactiveLayer.js"></script>
+    <script src="src/tooltip.js"></script>
+    <script src="src/utils.js"></script>
+    <script src="src/dom.js"></script>
+    <script src="src/models/axis.js"></script>
+    <script src="src/models/legend.js"></script>
+    <script src="src/models/pie.js"></script>
+    <script src="src/models/pieChart.js"></script>
+
+    <style>
+        text {
+            font: 12px sans-serif;
+        }
+
+        svg {
+            display: block;
+        }
+
+        html, body, #chart, svg {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="chart">
+    <svg></svg>
+</div>
+<script>
+
+    var data = [
+        {label: 'A', value: 24},
+        {label: 'B', value: 45},
+        {label: 'C', value: 24}
+    ];
+
+    var chart;
+    nv.addGraph(function () {
+        chart = nv.models.pieChart()
+            .x(function (d) {
+                return d.label
+            })
+            .y(function (d) {
+                return d.value
+            })
+        ;
+
+        d3.select("#chart svg")
+            .datum(data)
+            .transition().duration(1200)
+            .call(chart);
+
+        return chart;
+    });
+
+
+</script>
+</body>
+</html>
