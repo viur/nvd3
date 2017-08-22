@@ -204,7 +204,7 @@ nv.models.pie = function() {
             });
             ae.on('touchstart', function(d, i) {
                 var element = this;
-                dispatch.elementClick({
+                dispatch.elementTouchstart({
                     data: d.data,
                     index: i,
                     color: d3.select(this).style("fill"),

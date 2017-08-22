@@ -60,6 +60,10 @@
             .transition().duration(1200)
             .call(chart);
 
+        chart.pie.dispatch.on('elementTouchstart.tooltip', function () {
+            console.log('elementTouchstart.tooltip');
+        });
+
         return chart;
     });
 
