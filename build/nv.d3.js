@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2017-08-15 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2017-08-22 */
 (function(){
 
 // set up main nv object
@@ -12616,7 +12616,7 @@ nv.models.pie = function() {
         , cornerRadius = 0
         , donutRatio = 0.5
         , arcsRadius = []
-        , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
+        , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd', 'elementTouchstart')
         ;
 
     var arcs = [];
@@ -12784,6 +12784,16 @@ nv.models.pie = function() {
                     data: d.data,
                     index: i,
                     color: d3.select(this).style("fill")
+                });
+            });
+            ae.on('touchstart', function(d, i) {
+                var element = this;
+                dispatch.elementClick({
+                    data: d.data,
+                    index: i,
+                    color: d3.select(this).style("fill"),
+                    event: d3.event,
+                    element: element
                 });
             });
 
@@ -13227,6 +13237,10 @@ nv.models.pieChart = function() {
             color: evt.color
         };
         tooltip.data(evt).hidden(false);
+    });
+
+    pie.dispatch.on('elementTouchstart.tooltip', function(evt) {
+        tooltip.hidden(false);
     });
 
     pie.dispatch.on('elementMouseout.tooltip', function(evt) {
