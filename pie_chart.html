@@ -64,6 +64,10 @@
             console.log('elementTouchstart.tooltip');
         });
 
+        window.addEventListener('scroll', function() {
+            chart.tooltip.hidden(true);
+        });
+
         return chart;
     });
 

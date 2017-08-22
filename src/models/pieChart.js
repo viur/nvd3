@@ -209,10 +209,6 @@ nv.models.pieChart = function() {
         tooltip.data(evt).hidden(false);
     });
 
-    pie.dispatch.on('elementTouchstart.tooltip', function(evt) {
-        tooltip.hidden(false);
-    });
-
     pie.dispatch.on('elementMouseout.tooltip', function(evt) {
         tooltip.hidden(true);
     });
