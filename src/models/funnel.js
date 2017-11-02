@@ -119,35 +119,37 @@ nv.models.funnel = function () {
             var part = bars.enter().append('g')
                 .attr("class", "nv-percentage")
                 .filter(function (d, i) {
-                    return i != 0;
+                    return i !== 0;
                 })
                 .attr('transform', function (d, i) {
-                    var left = x(getX(d)) - x.rangeBand() * .18,
-                        top = availableHeight - (y(getY(max)) * 10);
+                    var left = (x(getX(d,i)) - x.rangeBand() * .25 / data.length),
+                        top = availableHeight / 2;
                     return 'translate(' + left + ', ' + top + ')'
                 });
 
             part.append('polygon')
                 .style('fill', '#586481')
-                .attr('transform', "scale(5)")
-                .attr('points', "0,0 10,0 15,5 10,10 0,10");
+                .attr('points', function() {
+                    var maxWidth = x.rangeBand() * .5 / data.length;
+                    var maxHeight = availableHeight * 0.08;
+                    return "0,0 " + (maxWidth-(maxWidth*0.25)) + ",0 " + maxWidth + "," +(maxHeight/2) +" "
+                        + (maxWidth-(maxWidth*0.25)) + ","+maxHeight+ " 0,"+maxHeight;
+                });
 
             part.append('text')
-                .attr("y", "27")
-                .attr("x", "26")
+                .attr("y", function () {
+                    var maxHeight = availableHeight * 0.08;
+                    return maxHeight / 2;
+                })
+                .attr("x", function(){
+                    var maxWidth = x.rangeBand() * .5 / data.length;
+                    return (maxWidth / 2) - ((maxWidth*0.25)/2);
+                })
                 .style("text-anchor", "middle")
                 .attr('transform', "scale(1.1)")
                 .attr("fill", "white")
                 .text(function (d, i) {
                     return d3.round(d.percent, 2) + '%';
-                });
-
-            groups.selectAll('.nv-percentage')
-                .watchTransition(renderWatch, 'discreteBar: bars percentage')
-                .attr('transform', function (d, i) {
-                    var left = x(getX(d)) - x.rangeBand() * .18,
-                        top = availableHeight - (y(getY(max)) * 10);
-                    return 'translate(' + left + ', ' + top + ')';
                 });
 
             ////////////////////////////////////////////////////////////////
