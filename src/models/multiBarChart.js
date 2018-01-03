@@ -15,6 +15,7 @@ nv.models.multiBarChart = function() {
         ;
 
     var margin = {top: 30, right: 20, bottom: 50, left: 60}
+        , marginTop = null
         , width = null
         , height = null
         , color = nv.utils.defaultColor()
@@ -56,6 +57,31 @@ nv.models.multiBarChart = function() {
     ;
 
     tooltip
+        .duration(0)
+        .valueFormatter(function(d, i) {
+            return yAxis.tickFormat()(d, i);
+        })
+        .headerFormatter(function(d, i) {
+            return xAxis.tickFormat()(d, i);
+        });
+
+    interactiveLayer.tooltip
+        .valueFormatter(function(d, i) {
+            return d == null ? "N/A" : yAxis.tickFormat()(d, i);
+        })
+        .headerFormatter(function(d, i) {
+            return xAxis.tickFormat()(d, i);
+        });
+
+    interactiveLayer.tooltip
+        .valueFormatter(function (d, i) {
+            return d == null ? "N/A" : yAxis.tickFormat()(d, i);
+        })
+        .headerFormatter(function (d, i) {
+            return xAxis.tickFormat()(d, i);
+        });
+
+    interactiveLayer.tooltip
         .duration(0)
         .valueFormatter(function(d, i) {
             return yAxis.tickFormat()(d, i);
@@ -165,29 +191,42 @@ nv.models.multiBarChart = function() {
             if (!showLegend) {
                 g.select('.nv-legendWrap').selectAll('*').remove();
             } else {
-                legend.width(availableWidth - controlWidth());
+                if (legendPosition === 'bottom') {
+                    legend.width(availableWidth - margin.right);
 
-                //Viur
-                if (legendPosition === 'left') {
-                    legend.rightAlign(false);
-                }
+                     g.select('.nv-legendWrap')
+                         .datum(data)
+                         .call(legend);
 
-                g.select('.nv-legendWrap')
-                    .datum(data)
-                    .call(legend);
-
-                if ( margin.top != legend.height()) {
-                    margin.top = legend.height();
-                    availableHeight = nv.utils.availableHeight(height, container, margin);
-                }
-
-                //Viur
-                if (legendPosition === 'left') {
-                    g.select('.nv-legendWrap')
-                        .attr('transform', 'translate(' + 0 + ',' + (-margin.top) + ')');
+                     margin.bottom = xAxis.height() + legend.height();
+                     availableHeight = nv.utils.availableHeight(height, container, margin);
+                     g.select('.nv-legendWrap')
+                         .attr('transform', 'translate(0,' + (availableHeight + xAxis.height())  +')');
                 } else {
+                    legend.width(availableWidth - controlWidth());
+
+                    //Viur
+                    if (legendPosition === 'left') {
+                        legend.rightAlign(false);
+                    }
+
                     g.select('.nv-legendWrap')
-                        .attr('transform', 'translate(' + controlWidth() + ',' + (-margin.top) + ')');
+                        .datum(data)
+                        .call(legend);
+
+                    if (!marginTop && legend.height() !== margin.top) {
+                        margin.top = legend.height();
+                        availableHeight = nv.utils.availableHeight(height, container, margin);
+                    }
+
+                    //Viur
+                    if (legendPosition === 'left') {
+                        g.select('.nv-legendWrap')
+                            .attr('transform', 'translate(' + 0 + ',' + (-margin.top) + ')');
+                    } else {
+                        g.select('.nv-legendWrap')
+                            .attr('transform', 'translate(' + controlWidth() + ',' + (-margin.top) + ')');
+                    }
                 }
             }
 
@@ -458,8 +497,7 @@ nv.models.multiBarChart = function() {
         width:      {get: function(){return width;}, set: function(_){width=_;}},
         height:     {get: function(){return height;}, set: function(_){height=_;}},
         showLegend: {get: function(){return showLegend;}, set: function(_){showLegend=_;}},
-        //Viur
-        legendPosition: {get: function(){return legendPosition;}, set: function(_){legendPosition = _;}},
+        legendPosition: {get: function(){return legendPosition;}, set: function(_){legendPosition=_;}},
         showControls: {get: function(){return showControls;}, set: function(_){showControls=_;}},
         controlLabels: {get: function(){return controlLabels;}, set: function(_){controlLabels=_;}},
         showXAxis:      {get: function(){return showXAxis;}, set: function(_){showXAxis=_;}},
@@ -473,7 +511,10 @@ nv.models.multiBarChart = function() {
 
         // options that require extra logic in the setter
         margin: {get: function(){return margin;}, set: function(_){
-            margin.top    = _.top    !== undefined ? _.top    : margin.top;
+            if (_.top !== undefined) {
+                margin.top = _.top;
+                marginTop = _.top;
+            }
             margin.right  = _.right  !== undefined ? _.right  : margin.right;
             margin.bottom = _.bottom !== undefined ? _.bottom : margin.bottom;
             margin.left   = _.left   !== undefined ? _.left   : margin.left;
