@@ -10,8 +10,8 @@
     <script src="src/dom.js"></script>
     <script src="src/models/axis.js"></script>
     <script src="src/models/legend.js"></script>
-    <script src="src/models/multiBar.js"></script>
-    <script src="src/models/multiBarChart.js"></script>
+    <script src="src/models/stackedBar.js"></script>
+    <script src="src/models/stackedBarChart.js"></script>
 
     <style>
         text {
@@ -64,11 +64,8 @@
     var chart;
     nv.addGraph(function () {
 
-        chart = nv.models.multiBarChart()
-            .stacked(true);
-
-        chart.yAxis.tickFormat(d3.format('%'));
-        chart.tooltip.valueFormatter(d3.format('.2%'));
+        chart = nv.models
+            .stackedBarChart();
 
         d3.select("#chart svg")
             .datum(data)
