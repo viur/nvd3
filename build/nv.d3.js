@@ -10863,7 +10863,7 @@ nv.models.multiBarHorizontalChart = function() {
 
                 if (wrapLabels) {
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, margin.left);
+                        .call(nv.utils.wrapTicks, margin.left - 5);
 
                     g.selectAll('.tick text tspan').attr("x",-5);
                 }
