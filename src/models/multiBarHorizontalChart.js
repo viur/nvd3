@@ -233,14 +233,14 @@ nv.models.multiBarHorizontalChart = function() {
 
                 if (wrapLabels) {
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, margin.left - 5);
+                        .call(nv.utils.wrapTicks, margin.left - 15);
 
                     g.selectAll('.tick text tspan').attr("x",-5);
                     g.selectAll('.tick text').each(function(d) {
                         var tspans = d3.select(this).selectAll('tspan');
                         var size = tspans.size();
                         if (size > 1) {
-                            tspans.attr("y",-8*(size-1));
+                            tspans.attr("y",-7*(size-1));
                         }
                     })
                 }
