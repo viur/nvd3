@@ -27,6 +27,7 @@ nv.models.multiBarHorizontalChart = function() {
         , showYAxis = true
         , stacked = false
         , reduceXTicks = true // if false a tick will show for every data point
+        , wrapLabels = false
         , x //can be accessed via chart.xScale()
         , y //can be accessed via chart.yScale()
         , state = nv.utils.state()
@@ -230,6 +231,13 @@ nv.models.multiBarHorizontalChart = function() {
                     .selectAll('line, text')
                     .style('opacity', 1);
 
+                if (wrapLabels) {
+                    g.selectAll('.tick text')
+                        .call(nv.utils.wrapTicks, margin.left);
+
+                    g.selectAll('.tick text tspan').attr("x",-5);
+                }
+
                 if (reduceXTicks)
                     xTicks
                         .filter(function(d,i) {
@@ -373,6 +381,7 @@ nv.models.multiBarHorizontalChart = function() {
         defaultState:    {get: function(){return defaultState;}, set: function(_){defaultState=_;}},
         noData:    {get: function(){return noData;}, set: function(_){noData=_;}},
         reduceXTicks:    {get: function(){return reduceXTicks;}, set: function(_){reduceXTicks=_;}},
+        wrapLabels:   {get: function(){return wrapLabels;}, set: function(_){wrapLabels=!!_;}},
 
         // options that require extra logic in the setter
         margin: {get: function(){return margin;}, set: function(_){
