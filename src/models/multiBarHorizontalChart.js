@@ -237,10 +237,11 @@ nv.models.multiBarHorizontalChart = function() {
 
                     g.selectAll('.tick text tspan').attr("x",-5);
                     g.selectAll('.tick text').each(function(d) {
+                        var tspan = d3.select(this).select('tspan');
                         var tspans = d3.select(this).selectAll('tspan');
                         var size = tspans.size();
                         if (size > 1) {
-                            tspans.attr("y",-7*(size-1));
+                            tspans.attr("y",tspan.node().getBBox().y*(size-1));
                         }
                     })
                 }
