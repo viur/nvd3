@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-01-03 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-05-04 */
 (function(){
 
 // set up main nv object
@@ -1553,15 +1553,17 @@ nv.utils.wrapTicks = function (text, width) {
             y = text.attr("y"),
             dy = parseFloat(text.attr("dy")),
             tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        var first = true;
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
+            if (tspan.node().getComputedTextLength() > width && !first) {
                 line.pop();
                 tspan.text(line.join(" "));
                 line = [word];
                 tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
             }
+            first = false;
         }
     });
 };
@@ -10023,7 +10025,7 @@ nv.models.multiBarChart = function() {
 
                 if (wrapLabels) {
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand())
+                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand()-10)
                 }
 
 
@@ -10655,6 +10657,7 @@ nv.models.multiBarHorizontalChart = function() {
         , showYAxis = true
         , stacked = false
         , reduceXTicks = true // if false a tick will show for every data point
+        , wrapLabels = false
         , x //can be accessed via chart.xScale()
         , y //can be accessed via chart.yScale()
         , state = nv.utils.state()
@@ -10858,6 +10861,13 @@ nv.models.multiBarHorizontalChart = function() {
                     .selectAll('line, text')
                     .style('opacity', 1);
 
+                if (wrapLabels) {
+                    g.selectAll('.tick text')
+                        .call(nv.utils.wrapTicks, margin.left);
+
+                    g.selectAll('.tick text tspan').attr("x",-5);
+                }
+
                 if (reduceXTicks)
                     xTicks
                         .filter(function(d,i) {
@@ -11001,6 +11011,7 @@ nv.models.multiBarHorizontalChart = function() {
         defaultState:    {get: function(){return defaultState;}, set: function(_){defaultState=_;}},
         noData:    {get: function(){return noData;}, set: function(_){noData=_;}},
         reduceXTicks:    {get: function(){return reduceXTicks;}, set: function(_){reduceXTicks=_;}},
+        wrapLabels:   {get: function(){return wrapLabels;}, set: function(_){wrapLabels=!!_;}},
 
         // options that require extra logic in the setter
         margin: {get: function(){return margin;}, set: function(_){
