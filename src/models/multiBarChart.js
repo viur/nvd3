@@ -306,8 +306,33 @@ nv.models.multiBarChart = function() {
                 }
 
                 if (wrapLabels) {
+                    //adds a invisible text to help us obtain the font size so we can calculate free space
+                    var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
+                    var sampleTextHeight = sampleText.node().getBBox().height;
+
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand()-15);
+                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15);
+
+                    g.selectAll('.tick text').each(function (d) {
+                        var tspans = d3.select(this).selectAll('tspan');
+                        var isTickPoped = false;
+
+                        //remove tspans if there is not enough space
+                        while (tspans.size() >= margin.bottom / sampleTextHeight) {
+                            d3.select(tspans[0].pop()).remove();
+                            if (!isTickPoped) {
+                                isTickPoped = true;
+                            }
+                        }
+
+                        if (isTickPoped) {
+                            var tick = d3.select(tspans[0].pop());
+                            tick.text(tick.text() + '...');
+                        }
+                    });
+
+                    //removes the invisible text
+                    sampleText.remove();
                 }
 
 
@@ -333,6 +358,39 @@ nv.models.multiBarChart = function() {
 
                 g.select('.nv-x.nv-axis').selectAll('g.nv-axisMaxMin text')
                     .style('opacity', 1);
+
+                //VIUR
+                var barSize = g.select('.nv-bar').node().getBBox().width;
+                var sampleText2 = wrap.append("text").style('opacity', 0).text('Sample');
+                var sampleTextHeight2 = sampleText2.node().getBBox().height;
+
+                g.selectAll('.tick text').each(function (d) {
+                    var tspans = d3.select(this).selectAll('tspan');
+
+                    tspans.each(function (_d, _i) {
+                        var _tspan = d3.select(this);
+                        var text = _tspan.text();
+                        var isTextCut = false;
+
+                        while(_tspan.node().getComputedTextLength() > Math.hypot(barSize - sampleTextHeight2 * _i, margin.bottom - (sampleTextHeight2 * _i) - (sampleTextHeight2 * 0.8 * _i))){
+                            if (!isTextCut) {
+                                isTextCut = true;
+                            }
+                            text = text.slice(0, (text.length - 1));
+                            _tspan.text(text);
+                        }
+
+                        if(isTextCut){
+                            if(text.length === 2){
+                                text = text.slice(0, (text.length - 1));
+                            } else {
+                                text = text.slice(0, (text.length - 2));
+                            }
+                             _tspan.text(text + '...');
+                        }
+                    });
+                });
+                sampleText2.remove();
             }
 
             if (showYAxis) {

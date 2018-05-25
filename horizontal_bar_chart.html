@@ -14,8 +14,8 @@
     <script src="src/models/multiBarHorizontalChart.js"></script>
 
     <style>
-        text {
-            font: 12px sans-serif;
+        .nvd3 text {
+            font: 8px sans-serif;
         }
 
         svg {
@@ -34,28 +34,34 @@
 <body>
 
 <div id="chart"
-     style="height: 517px; width: 1591px;">
-    <svg></svg>
+     style="height: 300px; width: 600px;padding-left:200px;">
+    <svg style="border: 1px solid"></svg>
 </div>
 <script>
 
     var data = [
         {
             key: 'AL', values: [
-                {x: 'Under 5 Years', y: 5},
-                {x: '5 to 13 Years', y: 10}
+                {x: 'Under 5 Years asasdasdas huehue zaza', y: 5},
+                {x: '5 to 13 Years boatarde bomdia', y: 10},
+                {x: 'texto', y: 10},
+                {x: 'outra textograndenemcabeoqueequeacontece', y: 10}
             ]
         },
         {
             key: 'AK', values: [
-                {x: 'Under 5 Years', y: 4},
-                {x: '5 to 13 Years', y: 8}
+                {x: 'Under 5 Years asasdasdas huehue zaza', y: 4},
+                {x: '5 to 13 Years boatarde bomdia', y: 8},
+                {x: 'texto', y: 8},
+                {x: 'outra textograndenemcabeoqueequeacontece', y: 8}
             ]
         },
         {
             key: 'AZ', values: [
-                {x: 'Under 5 Years', y: 11},
-                {x: '5 to 13 Years', y: 5}
+                {x: 'Under 5 Years asasdasdas huehue zaza', y: 11},
+                {x: '5 to 13 Years boatarde bomdia', y: 5},
+                {x: 'texto', y: 5},
+                {x: 'outra textograndenemcabeoqueequeacontece', y: 5}
             ]
         }
     ];
@@ -69,11 +75,20 @@
 
         chart.yAxis.tickFormat(d3.format('%'));
         chart.tooltip.valueFormatter(d3.format('.2%'));
+        chart.wrapLabels(true);
 
         d3.select("#chart svg")
             .datum(data)
             .transition().duration(1200)
             .call(chart);
+
+        chart.multibar.dispatch.on("elementClick", function(e) {
+            console.log(e.data);
+        });
+
+        chart.legend.dispatch.legendClick = function(d){
+            console.log(d);
+        };
 
         return chart;
     });

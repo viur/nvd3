@@ -232,18 +232,46 @@ nv.models.multiBarHorizontalChart = function() {
                     .style('opacity', 1);
 
                 if (wrapLabels) {
+                    //adds a invisible text to help us obtain the font size so we can calculate free space
+                    var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
+                    var sampleTextHeight = sampleText.node().getBBox().height;
+
                     g.selectAll('.tick text')
                         .call(nv.utils.wrapTicks, margin.left - 15);
 
-                    g.selectAll('.tick text tspan').attr("x",-5);
-                    g.selectAll('.tick text').each(function(d) {
-                        var tspan = d3.select(this).select('tspan');
+                    g.selectAll('.tick text tspan').attr("x", -5);
+
+                    g.selectAll('.tick text').each(function (d) {
+                        var text = d3.select(this);
+                        var tspans = text.selectAll('tspan');
+                        var isTickPoped = false;
+
+                        //remove tspans if there is not enough space
+                        while (sampleTextHeight * text.selectAll('tspan').size() > chart.xAxis.rangeBand()) {
+                            d3.select(tspans[0].pop()).remove();
+                            if (!isTickPoped) {
+                                isTickPoped = true;
+                            }
+                        }
+
+                        if (isTickPoped) {
+                            var tick = d3.select(tspans[0].pop());
+                            tick.text(tick.text() + '...');
+                        }
+                    });
+
+                    //Pulls the positioning of the tspan up to center the text
+                    g.selectAll('.tick text').each(function (d) {
+                        var text = d3.select(this);
                         var tspans = d3.select(this).selectAll('tspan');
                         var size = tspans.size();
                         if (size > 1) {
-                            tspans.attr("y",tspan.node().getBBox().y*(size-1));
+                            tspans.attr("y", text.node().getBBox().y * (size - 1));
                         }
-                    })
+                    });
+
+                    //removes the invisible text
+                    sampleText.remove();
                 }
 
                 if (reduceXTicks)

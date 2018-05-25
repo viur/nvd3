@@ -38,11 +38,44 @@
 </div>
 <script>
 
+    /*
     var data = [
-        {label: 'A', value: 24},
-        {label: 'B', value: 45},
-        {label: 'C', value: 24}
+        {label: '1 tao mas que brincadeira vem a ser esta', value: 50},
+        {label: '2222222222222 colidam para ai', value: 50},
+        {label: '333333333333333333333333 textos grandes', value: 50},
+        {label: '4 e soube e desce sem parar o i o ai', value: 50}
     ];
+    */
+
+    /*
+    var data = [
+        {label: '1 tao mas que brincadeira vem a ser esta', value: 50},
+        {label: '2222222222222 colidam para ai', value: 50},
+        {label: '333333333333333333333333 textos grandes', value: 50},
+        {label: '4 e soube e desce sem parar o i o ai', value: 50},
+        {label: '5 ai o vida minha', value: 50},
+        {label: '6 e soube e desce sem parar o i o ai', value: 50}
+    ];
+    */
+
+    var data = [
+        {label: '1 tao mas que brincadeira vem a ser esta', value: 20},
+        {label: '2222222222222 colidam para ai', value: 30},
+        {label: '333333333333333333333333 textos grandes', value: 10},
+        {label: '4 e soube e desce sem parar o i o ai', value: 20},
+        {label: '5 sai ao pai', value: 5},
+        {label: '6 e soube e desce sem parar o i o ai', value: 6},
+        {label: '7 e soube e desce sem parar o i o ai', value: 7},
+        {label: '8 e soube e desce sem parar o i o ai', value: 7}
+    ];
+
+    /*
+    var data = [
+        {label: '4', value: 24},
+        {label: 'ffff', value: 45},
+        {label: 'fddddfff', value: 24}
+    ];
+    */
 
     var chart;
     nv.addGraph(function () {
@@ -52,12 +85,10 @@
             })
             .y(function (d) {
                 return d.value
-            })
-        ;
+            });
 
         d3.select("#chart svg")
             .datum(data)
-            .transition().duration(1200)
             .call(chart);
 
         chart.pie.dispatch.on('elementTouchstart.tooltip', function () {
@@ -67,6 +98,14 @@
         window.addEventListener('scroll', function() {
             chart.tooltip.hidden(true);
         });
+
+        chart.pie.dispatch.on("elementClick", function(e) {
+            console.log(e.data);
+        });
+
+        chart.legend.dispatch.legendClick = function(d){
+            console.log(d);
+        };
 
         return chart;
     });

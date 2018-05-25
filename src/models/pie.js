@@ -249,7 +249,6 @@ nv.models.pie = function() {
 
                 pieLabels.enter().append("g").classed("nv-label",true).each(function(d,i) {
                     var group = d3.select(this);
-
                     group.attr('transform', function (d, i) {
                         if (labelSunbeamLayout) {
                             d.outerRadius = arcsRadiusOuter[i] + 10; // Set Outer Coordinate
@@ -289,6 +288,7 @@ nv.models.pie = function() {
                     return (d.endAngle - d.startAngle) / (2 * Math.PI);
                 };
 
+                var backupCenter = [];
                 pieLabels.watchTransition(renderWatch, 'pie labels').attr('transform', function (d, i) {
                     if (labelSunbeamLayout) {
                         d.outerRadius = arcsRadiusOuter[i] + 10; // Set Outer Coordinate
@@ -318,7 +318,36 @@ nv.models.pie = function() {
                             }
                             labelLocationHash[createHashKey(center)] = true;
                         }
-                        return 'translate(' + center + ')'
+
+                        var g = d3.select(this);
+                        var node = g.node();
+
+                        var sampleText = wrap.append("text").style('opacity', 0).text(d.data.label);
+                        var labelWidth = sampleText.node().getBBox().width;
+                        var labelHeight = sampleText.node().getBBox().height;
+
+                        backupCenter.push({
+                            "center": center,
+                            "labelWidth": labelWidth,
+                            "labelHeight": labelHeight
+                        });
+
+                        sampleText.remove();
+
+                        var index = backupCenter.length - 1;
+                        for(var c1=0; c1<backupCenter.length; c1++){
+                            if(center[0] === backupCenter[c1].center[0] && center[1] === backupCenter[c1].center[1]) {
+                            } else if (Math.abs(Math.min(center[1],backupCenter[c1].center[1]))+(backupCenter[c1].labelHeight) >= Math.abs(Math.max(center[1],backupCenter[c1].center[1]))){
+                                if(Math.abs(center[0])+Math.abs(backupCenter[c1].center[0]) <= (labelWidth+(backupCenter[c1].labelWidth))/2){
+                                    if(center[1] > 0 ){
+                                        backupCenter[index].center[1] += labelHeight;
+                                    } else {
+                                        backupCenter[index].center[1] -= labelHeight;
+                                    }
+                                }
+                            }
+                        }
+                        return 'translate(' + backupCenter[index].center + ')';
                     }
                 });
 
