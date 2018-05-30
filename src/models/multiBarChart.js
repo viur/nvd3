@@ -36,7 +36,7 @@ nv.models.multiBarChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'viurPointSelected')
         , controlWidth = function() { return showControls ? 180 : 0 }
         , duration = 250
         , useInteractiveGuideline = false
@@ -422,7 +422,21 @@ nv.models.multiBarChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].key});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
+            });
+
+            multibar.dispatch.on('elementClick', function (d) {
+                var out = [{xValue:d.data.x,serie:d.data.key}];
+                dispatch.viurPointSelected(out);
             });
 
             controls.dispatch.on('legendClick', function(d,i) {

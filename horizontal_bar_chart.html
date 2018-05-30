@@ -82,13 +82,9 @@
             .transition().duration(1200)
             .call(chart);
 
-        chart.multibar.dispatch.on("elementClick", function(e) {
-            console.log(e.data);
+        chart.dispatch.on("viurPointSelected", function(e) {
+            console.log(e);
         });
-
-        chart.legend.dispatch.legendClick = function(d){
-            console.log(d);
-        };
 
         return chart;
     });

@@ -30,7 +30,7 @@ nv.models.scatterChart = function() {
         , rightAlignYAxis = false
         , state = nv.utils.state()
         , defaultState = null
-        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'viurPointSelected')
         , noData       = null
         , duration = 250
         , showLabels    = false
@@ -294,7 +294,21 @@ nv.models.scatterChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].key});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
+            });
+
+            scatter.dispatch.on('elementClick', function (d) {
+                var out = [{serie:d.data.key}];
+                dispatch.viurPointSelected(out);
             });
 
             // Update chart from a state object passed to event handler

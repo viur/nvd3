@@ -10,8 +10,8 @@
     <script src="src/dom.js"></script>
     <script src="src/models/axis.js"></script>
     <script src="src/models/legend.js"></script>
-    <script src="src/models/pie.js"></script>
-    <script src="src/models/pieChart.js"></script>
+    <script src="src/models/gauge.js"></script>
+    <script src="src/models/gaugeChart.js"></script>
 
     <style>
         text {
@@ -59,14 +59,8 @@
     */
 
     var data = [
-        {label: '1 tao mas que brincadeira vem a ser esta', value: 20},
-        {label: '2222222222222 colidam para ai', value: 30},
-        {label: '333333333333333333333333 textos grandes', value: 10},
-        {label: '4 e soube e desce sem parar o i o ai', value: 20},
-        {label: '5 sai ao pai', value: 5},
-        {label: '6 e soube e desce sem parar o i o ai', value: 6},
-        {label: '7 e soube e desce sem parar o i o ai', value: 7},
-        {label: '8 e soube e desce sem parar o i o ai', value: 7}
+        {label: 'value', value: 20},
+        {label: 'max', value: 50}
     ];
 
     /*
@@ -79,7 +73,7 @@
 
     var chart;
     nv.addGraph(function () {
-        chart = nv.models.pieChart()
+        chart = nv.models.gaugeChart()
             .x(function (d) {
                 return d.label
             })
@@ -90,14 +84,6 @@
         d3.select("#chart svg")
             .datum(data)
             .call(chart);
-
-        chart.pie.dispatch.on('elementTouchstart.tooltip', function () {
-            console.log('elementTouchstart.tooltip');
-        });
-
-        window.addEventListener('scroll', function() {
-            chart.tooltip.hidden(true);
-        });
 
         chart.dispatch.on("viurPointSelected", function(e) {
             console.log(e);

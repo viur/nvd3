@@ -33,7 +33,7 @@ nv.models.stackedAreaChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd', 'viurPointSelected')
         , controlWidth = 250
         , controlOptions = ['Stacked','Stream','Expanded']
         , controlLabels = {}
@@ -332,6 +332,15 @@ nv.models.stackedAreaChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].key});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
             });
 

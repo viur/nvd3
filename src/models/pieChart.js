@@ -22,7 +22,7 @@ nv.models.pieChart = function() {
         , defaultState = null
         , noData = null
         , duration = 250
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd', 'viurPointSelected')
         , slices = null
         ;
 
@@ -177,7 +177,21 @@ nv.models.pieChart = function() {
                     state[key] = newState[key];
                 }
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].label});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
+            });
+
+            pie.dispatch.on('elementClick', function (d) {
+                var out = [{serie:d.data.label}];
+                dispatch.viurPointSelected(out);
             });
 
             // Update chart from a state object passed to event handler

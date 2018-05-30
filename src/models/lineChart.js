@@ -43,7 +43,7 @@ nv.models.lineChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'brush', 'stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'brush', 'stateChange', 'changeState', 'renderEnd', 'viurPointSelected')
         , duration = 250
         ;
 
@@ -392,6 +392,15 @@ nv.models.lineChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].key});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
             });
 

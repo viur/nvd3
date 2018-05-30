@@ -26,7 +26,7 @@ nv.models.funnelChart = function () {
         , x
         , y
         , noData = null
-        , dispatch = d3.dispatch('beforeUpdate','renderEnd')
+        , dispatch = d3.dispatch('beforeUpdate','renderEnd', 'viurPointSelected')
         , duration = 250
         ;
 
@@ -221,6 +221,11 @@ nv.models.funnelChart = function () {
 
     funnel.dispatch.on('elementMousemove.tooltip', function(evt) {
         tooltip();
+    });
+
+    funnel.dispatch.on('elementClick', function (d) {
+        var out = [{xValue:d.data.x}];
+        dispatch.viurPointSelected(out);
     });
 
     //============================================================

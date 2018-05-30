@@ -60,6 +60,10 @@
             .transition().duration(1200)
             .call(chart);
 
+        chart.dispatch.on("viurPointSelected", function(e) {
+            console.log(e);
+        });
+
         return chart;
     });
 
