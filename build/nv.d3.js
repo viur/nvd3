@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-05-04 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-05-30 */
 (function(){
 
 // set up main nv object
@@ -4951,7 +4951,7 @@ nv.models.funnelChart = function () {
         , x
         , y
         , noData = null
-        , dispatch = d3.dispatch('beforeUpdate','renderEnd')
+        , dispatch = d3.dispatch('beforeUpdate','renderEnd', 'viurPointSelected')
         , duration = 250
         ;
 
@@ -5146,6 +5146,11 @@ nv.models.funnelChart = function () {
 
     funnel.dispatch.on('elementMousemove.tooltip', function(evt) {
         tooltip();
+    });
+
+    funnel.dispatch.on('elementClick', function (d) {
+        var out = [{xValue:d.data.x}];
+        dispatch.viurPointSelected(out);
     });
 
     //============================================================
@@ -6352,7 +6357,7 @@ nv.models.gaugeChart = function () {
         , defaultState = null
         , noData = null
         , duration = 250
-        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'renderEnd', 'viurPointSelected')
         ;
 
     tooltip
@@ -6512,6 +6517,11 @@ nv.models.gaugeChart = function () {
                 }
                 dispatch.stateChange(state);
                 chart.update();
+            });
+
+            pie.dispatch.on('elementClick', function (d) {
+                var out = [{xValue:d.data.value}];
+                dispatch.viurPointSelected(out);
             });
 
             // Update chart from a state object passed to event handler
@@ -7959,7 +7969,7 @@ nv.models.lineChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'brush', 'stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'brush', 'stateChange', 'changeState', 'renderEnd', 'viurPointSelected')
         , duration = 250
         ;
 
@@ -8308,6 +8318,15 @@ nv.models.lineChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].key});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
             });
 
@@ -9754,7 +9773,7 @@ nv.models.multiBarChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'viurPointSelected')
         , controlWidth = function() { return showControls ? 180 : 0 }
         , duration = 250
         , useInteractiveGuideline = false
@@ -10024,8 +10043,33 @@ nv.models.multiBarChart = function() {
                 }
 
                 if (wrapLabels) {
+                    //adds a invisible text to help us obtain the font size so we can calculate free space
+                    var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
+                    var sampleTextHeight = sampleText.node().getBBox().height;
+
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand()-15);
+                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15);
+
+                    g.selectAll('.tick text').each(function (d) {
+                        var tspans = d3.select(this).selectAll('tspan');
+                        var isTickPoped = false;
+
+                        //remove tspans if there is not enough space
+                        while (tspans.size() >= margin.bottom / sampleTextHeight) {
+                            d3.select(tspans[0].pop()).remove();
+                            if (!isTickPoped) {
+                                isTickPoped = true;
+                            }
+                        }
+
+                        if (isTickPoped) {
+                            var tick = d3.select(tspans[0].pop());
+                            tick.text(tick.text() + '...');
+                        }
+                    });
+
+                    //removes the invisible text
+                    sampleText.remove();
                 }
 
 
@@ -10051,6 +10095,39 @@ nv.models.multiBarChart = function() {
 
                 g.select('.nv-x.nv-axis').selectAll('g.nv-axisMaxMin text')
                     .style('opacity', 1);
+
+                //VIUR
+                var barSize = g.select('.nv-bar').node().getBBox().width;
+                var sampleText2 = wrap.append("text").style('opacity', 0).text('Sample');
+                var sampleTextHeight2 = sampleText2.node().getBBox().height;
+
+                g.selectAll('.tick text').each(function (d) {
+                    var tspans = d3.select(this).selectAll('tspan');
+
+                    tspans.each(function (_d, _i) {
+                        var _tspan = d3.select(this);
+                        var text = _tspan.text();
+                        var isTextCut = false;
+
+                        while(_tspan.node().getComputedTextLength() > Math.hypot(barSize - sampleTextHeight2 * _i, margin.bottom - (sampleTextHeight2 * _i) - (sampleTextHeight2 * 0.8 * _i))){
+                            if (!isTextCut) {
+                                isTextCut = true;
+                            }
+                            text = text.slice(0, (text.length - 1));
+                            _tspan.text(text);
+                        }
+
+                        if(isTextCut){
+                            if(text.length === 2){
+                                text = text.slice(0, (text.length - 1));
+                            } else {
+                                text = text.slice(0, (text.length - 2));
+                            }
+                             _tspan.text(text + '...');
+                        }
+                    });
+                });
+                sampleText2.remove();
             }
 
             if (showYAxis) {
@@ -10082,7 +10159,21 @@ nv.models.multiBarChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].key});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
+            });
+
+            multibar.dispatch.on('elementClick', function (d) {
+                var out = [{xValue:d.data.x,serie:d.data.key}];
+                dispatch.viurPointSelected(out);
             });
 
             controls.dispatch.on('legendClick', function(d,i) {
@@ -10663,7 +10754,7 @@ nv.models.multiBarHorizontalChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd', 'viurPointSelected')
         , controlWidth = function() { return showControls ? 180 : 0 }
         , duration = 250
         ;
@@ -10862,18 +10953,46 @@ nv.models.multiBarHorizontalChart = function() {
                     .style('opacity', 1);
 
                 if (wrapLabels) {
+                    //adds a invisible text to help us obtain the font size so we can calculate free space
+                    var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
+                    var sampleTextHeight = sampleText.node().getBBox().height;
+
                     g.selectAll('.tick text')
                         .call(nv.utils.wrapTicks, margin.left - 15);
 
-                    g.selectAll('.tick text tspan').attr("x",-5);
-                    g.selectAll('.tick text').each(function(d) {
-                        var tspan = d3.select(this).select('tspan');
+                    g.selectAll('.tick text tspan').attr("x", -5);
+
+                    g.selectAll('.tick text').each(function (d) {
+                        var text = d3.select(this);
+                        var tspans = text.selectAll('tspan');
+                        var isTickPoped = false;
+
+                        //remove tspans if there is not enough space
+                        while (sampleTextHeight * text.selectAll('tspan').size() > chart.xAxis.rangeBand()) {
+                            d3.select(tspans[0].pop()).remove();
+                            if (!isTickPoped) {
+                                isTickPoped = true;
+                            }
+                        }
+
+                        if (isTickPoped) {
+                            var tick = d3.select(tspans[0].pop());
+                            tick.text(tick.text() + '...');
+                        }
+                    });
+
+                    //Pulls the positioning of the tspan up to center the text
+                    g.selectAll('.tick text').each(function (d) {
+                        var text = d3.select(this);
                         var tspans = d3.select(this).selectAll('tspan');
                         var size = tspans.size();
                         if (size > 1) {
-                            tspans.attr("y",tspan.node().getBBox().y*(size-1));
+                            tspans.attr("y", text.node().getBBox().y * (size - 1));
                         }
-                    })
+                    });
+
+                    //removes the invisible text
+                    sampleText.remove();
                 }
 
                 if (reduceXTicks)
@@ -10912,7 +11031,21 @@ nv.models.multiBarHorizontalChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].key});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
+            });
+
+            multibar.dispatch.on('elementClick', function (d) {
+                var out = [{xValue:d.data.x,serie:d.data.key}];
+                dispatch.viurPointSelected(out);
             });
 
             controls.dispatch.on('legendClick', function(d,i) {
@@ -12902,7 +13035,6 @@ nv.models.pie = function() {
 
                 pieLabels.enter().append("g").classed("nv-label",true).each(function(d,i) {
                     var group = d3.select(this);
-
                     group.attr('transform', function (d, i) {
                         if (labelSunbeamLayout) {
                             d.outerRadius = arcsRadiusOuter[i] + 10; // Set Outer Coordinate
@@ -12942,6 +13074,7 @@ nv.models.pie = function() {
                     return (d.endAngle - d.startAngle) / (2 * Math.PI);
                 };
 
+                var backupCenter = [];
                 pieLabels.watchTransition(renderWatch, 'pie labels').attr('transform', function (d, i) {
                     if (labelSunbeamLayout) {
                         d.outerRadius = arcsRadiusOuter[i] + 10; // Set Outer Coordinate
@@ -12971,7 +13104,36 @@ nv.models.pie = function() {
                             }
                             labelLocationHash[createHashKey(center)] = true;
                         }
-                        return 'translate(' + center + ')'
+
+                        var g = d3.select(this);
+                        var node = g.node();
+
+                        var sampleText = wrap.append("text").style('opacity', 0).text(d.data.label);
+                        var labelWidth = sampleText.node().getBBox().width;
+                        var labelHeight = sampleText.node().getBBox().height;
+
+                        backupCenter.push({
+                            "center": center,
+                            "labelWidth": labelWidth,
+                            "labelHeight": labelHeight
+                        });
+
+                        sampleText.remove();
+
+                        var index = backupCenter.length - 1;
+                        for(var c1=0; c1<backupCenter.length; c1++){
+                            if(center[0] === backupCenter[c1].center[0] && center[1] === backupCenter[c1].center[1]) {
+                            } else if (Math.abs(Math.min(center[1],backupCenter[c1].center[1]))+(backupCenter[c1].labelHeight) >= Math.abs(Math.max(center[1],backupCenter[c1].center[1]))){
+                                if(Math.abs(center[0])+Math.abs(backupCenter[c1].center[0]) <= (labelWidth+(backupCenter[c1].labelWidth))/2){
+                                    if(center[1] > 0 ){
+                                        backupCenter[index].center[1] += labelHeight;
+                                    } else {
+                                        backupCenter[index].center[1] -= labelHeight;
+                                    }
+                                }
+                            }
+                        }
+                        return 'translate(' + backupCenter[index].center + ')';
                     }
                 });
 
@@ -13121,7 +13283,7 @@ nv.models.pieChart = function() {
         , defaultState = null
         , noData = null
         , duration = 250
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd', 'viurPointSelected')
         , slices = null
         ;
 
@@ -13276,7 +13438,21 @@ nv.models.pieChart = function() {
                     state[key] = newState[key];
                 }
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].label});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
+            });
+
+            pie.dispatch.on('elementClick', function (d) {
+                var out = [{serie:d.data.label}];
+                dispatch.viurPointSelected(out);
             });
 
             // Update chart from a state object passed to event handler
@@ -15551,7 +15727,7 @@ nv.models.scatterChart = function() {
         , rightAlignYAxis = false
         , state = nv.utils.state()
         , defaultState = null
-        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'viurPointSelected')
         , noData       = null
         , duration = 250
         , showLabels    = false
@@ -15815,7 +15991,21 @@ nv.models.scatterChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].key});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
+            });
+
+            scatter.dispatch.on('elementClick', function (d) {
+                var out = [{serie:d.data.key}];
+                dispatch.viurPointSelected(out);
             });
 
             // Update chart from a state object passed to event handler
@@ -16666,7 +16856,7 @@ nv.models.stackedAreaChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd', 'viurPointSelected')
         , controlWidth = 250
         , controlOptions = ['Stacked','Stream','Expanded']
         , controlLabels = {}
@@ -16965,6 +17155,15 @@ nv.models.stackedAreaChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].key});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
             });
 
@@ -17677,7 +17876,7 @@ nv.models.stackedBarChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'viurPointSelected')
         , controlWidth = function() { return showControls ? 180 : 0 }
         , duration = 250
         , useInteractiveGuideline = false
@@ -18005,7 +18204,21 @@ nv.models.stackedBarChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+
+                var out = [];
+                for(var i in newState.disabled){
+                    if(newState.disabled[i] === false){
+                        out.push({serie:data[i].key});
+                    }
+                }
+                dispatch.viurPointSelected(out);
+
                 chart.update();
+            });
+
+            multibar.dispatch.on('elementClick', function (d) {
+                var out = [{xValue:d.data.x,serie:d.data.key}];
+                dispatch.viurPointSelected(out);
             });
 
             controls.dispatch.on('legendClick', function(d,i) {
