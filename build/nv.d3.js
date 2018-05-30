@@ -13451,7 +13451,7 @@ nv.models.pieChart = function() {
             });
 
             pie.dispatch.on('elementClick', function (d) {
-                var out = [{serie:d.data.label}];
+                var out = [{xValue:d.data.value,serie:d.data.label}];
                 dispatch.viurPointSelected(out);
             });
 
