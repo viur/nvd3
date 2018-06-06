@@ -248,14 +248,20 @@ nv.models.multiBarHorizontalChart = function() {
 
                         //remove tspans if there is not enough space
                         while (sampleTextHeight * text.selectAll('tspan').size() > chart.xAxis.rangeBand()) {
-                            d3.select(tspans[0].pop()).remove();
-                            if (!isTickPoped) {
-                                isTickPoped = true;
+
+                            if(tspans[0].length === 1){
+                                break;
                             }
+                                d3.select(tspans[0].pop()).remove();
+                                if (!isTickPoped) {
+                                    isTickPoped = true;
+                                }
+
                         }
 
                         if (isTickPoped) {
-                            var tick = d3.select(tspans[0].pop());
+                            var tspan = tspans[0].pop();
+                            var tick = d3.select(tspan);
                             tick.text(tick.text() + '...');
                         }
                     });
@@ -310,7 +316,7 @@ nv.models.multiBarHorizontalChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
-
+                /*
                 var out = [];
                 for(var i in newState.disabled){
                     if(newState.disabled[i] === false){
@@ -318,12 +324,12 @@ nv.models.multiBarHorizontalChart = function() {
                     }
                 }
                 dispatch.viurPointSelected(out);
-
+                */
                 chart.update();
             });
 
             multibar.dispatch.on('elementClick', function (d) {
-                var out = [{xValue:d.data.x,serie:d.data.key}];
+                var out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
                 dispatch.viurPointSelected(out);
             });
 

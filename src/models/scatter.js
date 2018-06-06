@@ -41,6 +41,7 @@ nv.models.scatter = function() {
         , useVoronoi   = true
         , duration     = 250
         , interactiveUpdateDelay = 300
+        , showClickable = false
         , showLabels    = false 
         ;
 
@@ -170,8 +171,10 @@ nv.models.scatter = function() {
 
             wrap.classed('nv-single-point', singlePoint);
             gEnter.append('g').attr('class', 'nv-groups');
+            //gEnter.classed('nv-cursor-pointer',true);
             gEnter.append('g').attr('class', 'nv-point-paths');
             wrapEnter.append('g').attr('class', 'nv-point-clips');
+            wrapEnter.classed('nv-cursor-pointer',true);
 
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -616,7 +619,8 @@ nv.models.scatter = function() {
             if (useVoronoi === false) {
                 clipVoronoi = false;
             }
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);

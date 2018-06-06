@@ -22,6 +22,7 @@ nv.models.funnel = function () {
         , yDomain
         , xRange
         , yRange
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
         , rectClass = 'discreteBar'
         , duration = 250
@@ -86,6 +87,7 @@ nv.models.funnel = function () {
             var gEnter = wrapEnter.append('g');
             var g = wrap.select('g');
 
+            gEnter.classed('nv-cursor-pointer',true);
             gEnter.append('g').attr('class', 'nv-groups');
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -296,7 +298,8 @@ nv.models.funnel = function () {
         duration: {get: function(){return duration;}, set: function(_){
             duration = _;
             renderWatch.reset(duration);
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);

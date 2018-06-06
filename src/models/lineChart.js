@@ -392,7 +392,7 @@ nv.models.lineChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
-
+                /*
                 var out = [];
                 for(var i in newState.disabled){
                     if(newState.disabled[i] === false){
@@ -400,7 +400,7 @@ nv.models.lineChart = function() {
                     }
                 }
                 dispatch.viurPointSelected(out);
-
+                */
                 chart.update();
             });
 

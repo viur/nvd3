@@ -313,6 +313,7 @@ nv.models.multiBarChart = function() {
                     g.selectAll('.tick text')
                         .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15);
 
+                    //Viur
                     g.selectAll('.tick text').each(function (d) {
                         var tspans = d3.select(this).selectAll('tspan');
                         var isTickPoped = false;
@@ -360,7 +361,7 @@ nv.models.multiBarChart = function() {
                     .style('opacity', 1);
 
                 //VIUR
-                var barSize = g.select('.nv-bar').node().getBBox().width;
+                var barSize = chart.xAxis.rangeBand();
                 var sampleText2 = wrap.append("text").style('opacity', 0).text('Sample');
                 var sampleTextHeight2 = sampleText2.node().getBBox().height;
 
@@ -422,7 +423,7 @@ nv.models.multiBarChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
-
+                /*
                 var out = [];
                 for(var i in newState.disabled){
                     if(newState.disabled[i] === false){
@@ -430,12 +431,12 @@ nv.models.multiBarChart = function() {
                     }
                 }
                 dispatch.viurPointSelected(out);
-
+                */
                 chart.update();
             });
 
             multibar.dispatch.on('elementClick', function (d) {
-                var out = [{xValue:d.data.x,serie:d.data.key}];
+                var out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
                 dispatch.viurPointSelected(out);
             });
 

@@ -185,7 +185,7 @@ nv.models.gaugeChart = function () {
             });
 
             pie.dispatch.on('elementClick', function (d) {
-                var out = [{xValue:d.data.label}];
+                var out = [{xValue:d.data.label,yValue:d.data.value}];
                 dispatch.viurPointSelected(out);
             });
 

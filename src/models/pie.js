@@ -32,6 +32,7 @@ nv.models.pie = function() {
         , cornerRadius = 0
         , donutRatio = 0.5
         , arcsRadius = []
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd', 'elementTouchstart')
         ;
 
@@ -160,6 +161,7 @@ nv.models.pie = function() {
 
             var ae = slices.enter().append('g');
             ae.attr('class', 'nv-slice');
+            ae.classed('nv-cursor-pointer',true);
             ae.on('mouseover', function(d, i) {
                 d3.select(this).classed('hover', true);
                 if (growOnHover) {
@@ -467,7 +469,8 @@ nv.models.pie = function() {
         }},
         labelType:          {get: function(){return labelType;}, set: function(_){
             labelType= _ || 'key';
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);

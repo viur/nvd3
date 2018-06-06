@@ -99,3 +99,7 @@ svg.nvd3-svg {
     fill-opacity: 1;
   }
 }
+
+.nvd3 .nv-cursor-pointer {
+    cursor: pointer;
+}

@@ -177,7 +177,7 @@ nv.models.pieChart = function() {
                     state[key] = newState[key];
                 }
                 dispatch.stateChange(state);
-
+                /*
                 var out = [];
                 for(var i in newState.disabled){
                     if(newState.disabled[i] === false){
@@ -185,12 +185,12 @@ nv.models.pieChart = function() {
                     }
                 }
                 dispatch.viurPointSelected(out);
-
+                */
                 chart.update();
             });
 
             pie.dispatch.on('elementClick', function (d) {
-                var out = [{xValue:d.data.value,serie:d.data.label}];
+                var out = [{xValue:d.data.label,yValue:d.data.value}];
                 dispatch.viurPointSelected(out);
             });
 

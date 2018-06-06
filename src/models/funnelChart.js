@@ -224,7 +224,7 @@ nv.models.funnelChart = function () {
     });
 
     funnel.dispatch.on('elementClick', function (d) {
-        var out = [{xValue:d.data.x}];
+        var out = [{xValue:d.data.x,yValue:d.data.y}];
         dispatch.viurPointSelected(out);
     });
 

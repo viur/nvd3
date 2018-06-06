@@ -364,7 +364,7 @@ nv.models.stackedBarChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
-
+                /*
                 var out = [];
                 for(var i in newState.disabled){
                     if(newState.disabled[i] === false){
@@ -372,12 +372,12 @@ nv.models.stackedBarChart = function() {
                     }
                 }
                 dispatch.viurPointSelected(out);
-
+                */
                 chart.update();
             });
 
             multibar.dispatch.on('elementClick', function (d) {
-                var out = [{xValue:d.data.x,serie:d.data.key}];
+                var out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
                 dispatch.viurPointSelected(out);
             });
 

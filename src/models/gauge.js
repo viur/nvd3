@@ -42,6 +42,7 @@ nv.models.gauge = function () {
         , cornerRadius = 0
         , donutRatio = 0.65
         , arcsRadius = []
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
         ;
 
@@ -308,6 +309,7 @@ nv.models.gauge = function () {
 
             var ae = slices.enter().append('g');
             ae.attr('class', 'nv-slice');
+            ae.classed('nv-cursor-pointer',true);
             ae.on('mouseover', function (d, i) {
 
                 if (d.data.label == "Max") {
@@ -770,7 +772,8 @@ nv.models.gauge = function () {
             }, set: function (_) {
                 maxValue = _;
             }
-        }
+        },
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);

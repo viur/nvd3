@@ -312,27 +312,29 @@ nv.models.stackedAreaChart = function() {
             // Event Handling/Dispatching (in chart's scope)
             //------------------------------------------------------------
 
-            stacked.dispatch.on('areaClick.toggle', function(e) {
-                if (data.filter(function(d) { return !d.disabled }).length === 1)
-                    data.forEach(function(d) {
-                        d.disabled = false;
-                    });
-                else
-                    data.forEach(function(d,i) {
-                        d.disabled = (i != e.seriesIndex);
-                    });
+            //if(clickableArea){
+                stacked.dispatch.on('areaClick.toggle', function(e) {
+                    if (data.filter(function(d) { return !d.disabled }).length === 1)
+                        data.forEach(function(d) {
+                            d.disabled = false;
+                        });
+                    else
+                        data.forEach(function(d,i) {
+                            d.disabled = (i != e.seriesIndex);
+                        });
 
-                state.disabled = data.map(function(d) { return !!d.disabled });
-                dispatch.stateChange(state);
+                    state.disabled = data.map(function(d) { return !!d.disabled });
+                    dispatch.stateChange(state);
 
-                chart.update();
-            });
+                    chart.update();
+                });
+            //}
 
             legend.dispatch.on('stateChange', function(newState) {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
-
+                /*
                 var out = [];
                 for(var i in newState.disabled){
                     if(newState.disabled[i] === false){
@@ -340,7 +342,7 @@ nv.models.stackedAreaChart = function() {
                     }
                 }
                 dispatch.viurPointSelected(out);
-
+                */
                 chart.update();
             });
 

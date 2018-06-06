@@ -32,6 +32,7 @@ nv.models.multiBarHorizontal = function() {
         , xRange
         , yRange
         , duration = 250
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
         ;
 
@@ -116,6 +117,7 @@ nv.models.multiBarHorizontal = function() {
             var g = wrap.select('g');
 
             gEnter.append('g').attr('class', 'nv-groups');
+            gEnter.classed('nv-cursor-pointer',true);
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
             var groups = wrap.select('.nv-groups').selectAll('.nv-group')
@@ -353,7 +355,8 @@ nv.models.multiBarHorizontal = function() {
         }},
         barColor:  {get: function(){return barColor;}, set: function(_){
             barColor = _ ? nv.utils.getColor(_) : null;
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);

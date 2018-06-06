@@ -24,6 +24,7 @@ nv.models.line = function() {
         , y //can be accessed via chart.yScale()
         , interpolate = "linear" // controls the line interpolation
         , duration = 250
+        , showClickable = false
         , dispatch = d3.dispatch('elementClick', 'elementMouseover', 'elementMouseout', 'renderEnd')
         ;
 
@@ -71,7 +72,6 @@ nv.models.line = function() {
 
             gEnter.append('g').attr('class', 'nv-groups');
             gEnter.append('g').attr('class', 'nv-scatterWrap');
-
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
             scatter
@@ -233,7 +233,8 @@ nv.models.line = function() {
         //connect line across null points
         connectNulls: {get: function(){return connectNulls;}, set: function(_){
             connectNulls = _;
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.inheritOptions(chart, scatter);
