@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-01-03 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-06 */
 (function(){
 
 // set up main nv object
@@ -10655,6 +10655,7 @@ nv.models.multiBarHorizontalChart = function() {
         , showYAxis = true
         , stacked = false
         , reduceXTicks = true // if false a tick will show for every data point
+        , wrapLabels = false
         , x //can be accessed via chart.xScale()
         , y //can be accessed via chart.yScale()
         , state = nv.utils.state()
@@ -10858,6 +10859,21 @@ nv.models.multiBarHorizontalChart = function() {
                     .selectAll('line, text')
                     .style('opacity', 1);
 
+                if (wrapLabels) {
+                    g.selectAll('.tick text')
+                        .call(nv.utils.wrapTicks, margin.left - 15);
+
+                    g.selectAll('.tick text tspan').attr("x",-5);
+                    g.selectAll('.tick text').each(function(d) {
+                        var tspan = d3.select(this).select('tspan');
+                        var tspans = d3.select(this).selectAll('tspan');
+                        var size = tspans.size();
+                        if (size > 1) {
+                            tspans.attr("y",tspan.node().getBBox().y*(size-1));
+                        }
+                    })
+                }
+
                 if (reduceXTicks)
                     xTicks
                         .filter(function(d,i) {
@@ -11001,6 +11017,7 @@ nv.models.multiBarHorizontalChart = function() {
         defaultState:    {get: function(){return defaultState;}, set: function(_){defaultState=_;}},
         noData:    {get: function(){return noData;}, set: function(_){noData=_;}},
         reduceXTicks:    {get: function(){return reduceXTicks;}, set: function(_){reduceXTicks=_;}},
+        wrapLabels:   {get: function(){return wrapLabels;}, set: function(_){wrapLabels=!!_;}},
 
         // options that require extra logic in the setter
         margin: {get: function(){return margin;}, set: function(_){
