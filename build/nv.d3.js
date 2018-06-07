@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-06 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-07 */
 (function(){
 
 // set up main nv object
@@ -10184,7 +10184,12 @@ nv.models.multiBarChart = function() {
             });
 
             multibar.dispatch.on('elementClick', function (d) {
-                var out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
+                var out = [];
+                if(d.data.name){
+                    out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.name}];
+                }else{
+                    out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
+                }
                 dispatch.viurPointSelected(out);
             });
 
@@ -11065,7 +11070,12 @@ nv.models.multiBarHorizontalChart = function() {
             });
 
             multibar.dispatch.on('elementClick', function (d) {
-                var out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
+                var out = [];
+                if(d.data.name){
+                    out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.name}];
+                }else{
+                    out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
+                }
                 dispatch.viurPointSelected(out);
             });
 
@@ -16032,7 +16042,12 @@ nv.models.scatterChart = function() {
             });
 
             scatter.dispatch.on('elementClick', function (d) {
-                var out = [{serie:d.data.key}];
+                var out = [];
+                if(d.data.name){
+                    out = [{serie:d.data.name}];
+                }else{
+                    out = [{serie:d.data.key}];
+                }
                 dispatch.viurPointSelected(out);
             });
 
@@ -18254,7 +18269,12 @@ nv.models.stackedBarChart = function() {
             });
 
             multibar.dispatch.on('elementClick', function (d) {
-                var out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
+                var out = [];
+                if(d.data.name){
+                    out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.name}];
+                }else{
+                    out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
+                }
                 dispatch.viurPointSelected(out);
             });
 

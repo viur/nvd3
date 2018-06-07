@@ -377,7 +377,12 @@ nv.models.stackedBarChart = function() {
             });
 
             multibar.dispatch.on('elementClick', function (d) {
-                var out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
+                var out = [];
+                if(d.data.name){
+                    out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.name}];
+                }else{
+                    out = [{xValue:d.data.x,yValue:d.data.y,serie:d.data.key}];
+                }
                 dispatch.viurPointSelected(out);
             });
 

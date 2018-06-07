@@ -307,7 +307,12 @@ nv.models.scatterChart = function() {
             });
 
             scatter.dispatch.on('elementClick', function (d) {
-                var out = [{serie:d.data.key}];
+                var out = [];
+                if(d.data.name){
+                    out = [{serie:d.data.name}];
+                }else{
+                    out = [{serie:d.data.key}];
+                }
                 dispatch.viurPointSelected(out);
             });
 
