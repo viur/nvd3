@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-07 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-08 */
 (function(){
 
 // set up main nv object
@@ -4707,7 +4707,6 @@ nv.models.funnel = function () {
             var gEnter = wrapEnter.append('g');
             var g = wrap.select('g');
 
-            gEnter.classed('nv-cursor-pointer',true);
             gEnter.append('g').attr('class', 'nv-groups');
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -4869,6 +4868,7 @@ nv.models.funnel = function () {
                     return  Math.max(Math.abs(y(getY(d,i)) - y(0)), 1)
                 });
 
+            bars.classed('nv-cursor-pointer', showClickable);
 
             //store old scales for use in transitions on update
             x0 = x.copy();
@@ -5869,7 +5869,6 @@ nv.models.gauge = function () {
 
             var ae = slices.enter().append('g');
             ae.attr('class', 'nv-slice');
-            ae.classed('nv-cursor-pointer',true);
             ae.on('mouseover', function (d, i) {
 
                 if (d.data.label == "Max") {
@@ -5924,6 +5923,7 @@ nv.models.gauge = function () {
             slices.attr('stroke', function (d, i) {
                 return color(d.data, i);
             });
+            slices.classed('nv-cursor-pointer',showClickable);
 
             var paths = ae.append('path')
             //Viur - For PNG Export purposes
@@ -9480,8 +9480,6 @@ nv.models.multiBar = function() {
             var g = wrap.select('g');
 
             gEnter.append('g').attr('class', 'nv-groups');
-            gEnter.classed('nv-cursor-pointer',true);
-
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
             defsEnter.append('clipPath')
@@ -9592,7 +9590,9 @@ nv.models.multiBar = function() {
                 });
             bars
                 .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
-                .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; })
+                .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; });
+
+            bars.classed('nv-cursor-pointer',showClickable);
 
             if (barColor) {
                 if (!disabled) disabled = data.map(function() { return true });
@@ -10493,7 +10493,6 @@ nv.models.multiBarHorizontal = function() {
             var g = wrap.select('g');
 
             gEnter.append('g').attr('class', 'nv-groups');
-            gEnter.classed('nv-cursor-pointer',true);
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
             var groups = wrap.select('.nv-groups').selectAll('.nv-group')
@@ -10636,7 +10635,8 @@ nv.models.multiBarHorizontal = function() {
             }
 
             bars
-                .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
+                .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'});
+            bars.classed('nv-cursor-pointer',showClickable);
 
             if (barColor) {
                 if (!disabled) disabled = data.map(function() { return true });
@@ -12978,7 +12978,6 @@ nv.models.pie = function() {
 
             var ae = slices.enter().append('g');
             ae.attr('class', 'nv-slice');
-            ae.classed('nv-cursor-pointer',true);
             ae.on('mouseover', function(d, i) {
                 d3.select(this).classed('hover', true);
                 if (growOnHover) {
@@ -13034,6 +13033,7 @@ nv.models.pie = function() {
 
             slices.attr('fill', function(d,i) { return color(d.data, i); });
             slices.attr('stroke', function(d,i) { return color(d.data, i); });
+            slices.classed('nv-cursor-pointer',showClickable);
 
             var paths = ae.append('path')
                 //Viur - For PNG Export purposes
@@ -13287,7 +13287,13 @@ nv.models.pie = function() {
         labelType:          {get: function(){return labelType;}, set: function(_){
             labelType= _ || 'key';
         }},
-        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
+        showClickable:  {
+            get: function(){
+                return showClickable;
+                },
+            set: function(_){
+                showClickable=_;
+            }}
     });
 
     nv.utils.initOptions(chart);
@@ -17625,7 +17631,6 @@ nv.models.stackedBar = function() {
             var g = wrap.select('g');
 
             gEnter.append('g').attr('class', 'nv-groups');
-            gEnter.classed('nv-cursor-pointer',true);
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
             defsEnter.append('clipPath')
@@ -17736,7 +17741,8 @@ nv.models.stackedBar = function() {
                 });
             bars
                 .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
-                .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; })
+                .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; });
+            bars.classed('nv-cursor-pointer',showClickable);
 
             if (barColor) {
                 if (!disabled) disabled = data.map(function() { return true });

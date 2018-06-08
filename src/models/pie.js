@@ -161,7 +161,6 @@ nv.models.pie = function() {
 
             var ae = slices.enter().append('g');
             ae.attr('class', 'nv-slice');
-            ae.classed('nv-cursor-pointer',true);
             ae.on('mouseover', function(d, i) {
                 d3.select(this).classed('hover', true);
                 if (growOnHover) {
@@ -217,6 +216,7 @@ nv.models.pie = function() {
 
             slices.attr('fill', function(d,i) { return color(d.data, i); });
             slices.attr('stroke', function(d,i) { return color(d.data, i); });
+            slices.classed('nv-cursor-pointer',showClickable);
 
             var paths = ae.append('path')
                 //Viur - For PNG Export purposes
@@ -470,7 +470,13 @@ nv.models.pie = function() {
         labelType:          {get: function(){return labelType;}, set: function(_){
             labelType= _ || 'key';
         }},
-        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
+        showClickable:  {
+            get: function(){
+                return showClickable;
+                },
+            set: function(_){
+                showClickable=_;
+            }}
     });
 
     nv.utils.initOptions(chart);

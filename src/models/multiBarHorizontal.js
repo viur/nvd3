@@ -117,7 +117,6 @@ nv.models.multiBarHorizontal = function() {
             var g = wrap.select('g');
 
             gEnter.append('g').attr('class', 'nv-groups');
-            gEnter.classed('nv-cursor-pointer',true);
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
             var groups = wrap.select('.nv-groups').selectAll('.nv-group')
@@ -260,7 +259,8 @@ nv.models.multiBarHorizontal = function() {
             }
 
             bars
-                .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
+                .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'});
+            bars.classed('nv-cursor-pointer',showClickable);
 
             if (barColor) {
                 if (!disabled) disabled = data.map(function() { return true });

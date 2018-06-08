@@ -87,7 +87,6 @@ nv.models.funnel = function () {
             var gEnter = wrapEnter.append('g');
             var g = wrap.select('g');
 
-            gEnter.classed('nv-cursor-pointer',true);
             gEnter.append('g').attr('class', 'nv-groups');
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -249,6 +248,7 @@ nv.models.funnel = function () {
                     return  Math.max(Math.abs(y(getY(d,i)) - y(0)), 1)
                 });
 
+            bars.classed('nv-cursor-pointer', showClickable);
 
             //store old scales for use in transitions on update
             x0 = x.copy();
