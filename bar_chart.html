@@ -34,7 +34,7 @@
 <body>
 
 <div id="chart"
-     style="height: 300px; width: 5000px;border: 1px solid">
+     style="height: 400px; width: 800px;border: 1px solid">
     <svg></svg>
 </div>
 <script>
@@ -162,7 +162,7 @@
                 {x: "WOLZA", y: 7}
             ]
         }
-        ];
+    ];
 
 
     var chart;
@@ -182,9 +182,11 @@
             .transition().duration(1200)
             .call(chart);
 
-        chart.dispatch.on("viurPointSelected", function(e) {
+        chart.dispatch.on("viurPointSelected", function (e) {
             console.log(e);
         });
+
+        //chart.xAxis.axisLabel('nome grande e com muito texto para ver se cabe');
 
         chart.showClickable(false);
         chart.update();

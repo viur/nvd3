@@ -313,13 +313,26 @@ nv.models.multiBarChart = function() {
                     g.selectAll('.tick text')
                         .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15);
 
+                    var marginBottomSpace = margin.bottom;
+
+                    g.selectAll('.nv-axislabel').each(function (d) {
+                        if(d !== null){
+                            marginBottomSpace = marginBottomSpace - 15 - sampleTextHeight;
+                        }
+                    });
+
                     //Viur
                     g.selectAll('.tick text').each(function (d) {
                         var tspans = d3.select(this).selectAll('tspan');
                         var isTickPoped = false;
 
                         //remove tspans if there is not enough space
-                        while (tspans.size() >= margin.bottom / sampleTextHeight) {
+                        while (tspans.size() >= marginBottomSpace / sampleTextHeight) {
+
+                            if (tspans[0].length === 1) {
+                                break;
+                            }
+
                             d3.select(tspans[0].pop()).remove();
                             if (!isTickPoped) {
                                 isTickPoped = true;
@@ -373,10 +386,12 @@ nv.models.multiBarChart = function() {
                         var text = _tspan.text();
                         var isTextCut = false;
 
-                        while(_tspan.node().getComputedTextLength() > Math.hypot(barSize - sampleTextHeight2 * _i, margin.bottom - (sampleTextHeight2 * _i) - (sampleTextHeight2 * 0.8 * _i))){
+                        while(_tspan.node().getComputedTextLength() > Math.hypot(barSize - sampleTextHeight2 * _i, marginBottomSpace - (sampleTextHeight2 * _i) - (sampleTextHeight2 * 0.8 * _i))){
+
                             if (!isTextCut) {
                                 isTextCut = true;
                             }
+
                             text = text.slice(0, (text.length - 1));
                             _tspan.text(text);
                         }
