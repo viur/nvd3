@@ -253,8 +253,16 @@ nv.models.multiBarHorizontalChart = function () {
                     var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
                     var sampleTextHeight = sampleText.node().getBBox().height;
 
+                    var marginLeftSpace = margin.left;
+
+                    g.selectAll('.nv-axislabel').each(function (d) {
+                        if(d !== null){
+                            marginLeftSpace = marginLeftSpace - sampleTextHeight - 5;
+                        }
+                    });
+
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, margin.left - 15);
+                        .call(nv.utils.wrapTicks, marginLeftSpace - 15);
 
                     g.selectAll('.tick text tspan').attr("x", -5);
 
@@ -277,11 +285,28 @@ nv.models.multiBarHorizontalChart = function () {
 
                         }
 
+
                         if (isTickPoped) {
                             var tspan = tspans[0].pop();
                             var tick = d3.select(tspan);
                             tick.text(tick.text() + '...');
                         }
+                    });
+
+                    g.selectAll('.tick text').each(function (d) {
+                        var tspans = d3.select(this).selectAll('tspan');
+
+                        tspans.each(function (_d) {
+                            var _tspan = d3.select(this);
+                            var _text = _tspan.text();
+
+                            while(_tspan.node().getComputedTextLength() > marginLeftSpace){
+
+                                _text = _text.substring(1);
+                                _tspan.text(_text);
+                            }
+
+                        });
                     });
 
                     //Pulls the positioning of the tspan up to center the text
