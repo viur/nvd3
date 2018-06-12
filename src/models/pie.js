@@ -321,9 +321,6 @@ nv.models.pie = function() {
                             labelLocationHash[createHashKey(center)] = true;
                         }
 
-                        var g = d3.select(this);
-                        var node = g.node();
-
                         var sampleText = wrap.append("text").style('opacity', 0).text(d.data.label);
                         var labelWidth = sampleText.node().getBBox().width;
                         var labelHeight = sampleText.node().getBBox().height;
@@ -344,11 +341,12 @@ nv.models.pie = function() {
                                     if(center[1] > 0 ){
                                         backupCenter[index].center[1] += labelHeight;
                                     } else {
-                                        backupCenter[index].center[1] -= labelHeight;
+                                        backupCenter[index].center[1] -= labelHeight/(.75 * index);
                                     }
                                 }
                             }
                         }
+
                         return 'translate(' + backupCenter[index].center + ')';
                     }
                 });

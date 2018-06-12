@@ -13286,9 +13286,6 @@ nv.models.pie = function() {
                             labelLocationHash[createHashKey(center)] = true;
                         }
 
-                        var g = d3.select(this);
-                        var node = g.node();
-
                         var sampleText = wrap.append("text").style('opacity', 0).text(d.data.label);
                         var labelWidth = sampleText.node().getBBox().width;
                         var labelHeight = sampleText.node().getBBox().height;
@@ -13302,13 +13299,6 @@ nv.models.pie = function() {
                         sampleText.remove();
 
                         var index = backupCenter.length - 1;
-
-                        var semafero = false;
-
-                        if(!semafero) {
-                            console.log('run');
-                        }
-
                         for(var c1=0; c1<backupCenter.length; c1++){
                             if(center[0] === backupCenter[c1].center[0] && center[1] === backupCenter[c1].center[1]) {
                             } else if (Math.abs(Math.min(center[1],backupCenter[c1].center[1]))+(backupCenter[c1].labelHeight) >= Math.abs(Math.max(center[1],backupCenter[c1].center[1]))){
@@ -13316,18 +13306,11 @@ nv.models.pie = function() {
                                     if(center[1] > 0 ){
                                         backupCenter[index].center[1] += labelHeight;
                                     } else {
-                                        backupCenter[index].center[1] -= labelHeight;
+                                        backupCenter[index].center[1] -= labelHeight/(.75 * index);
                                     }
                                 }
                             }
                         }
-
-                        /*
-                        for(var c2=0; c2<backupCenter.length; c2++){
-                            console.log(c2);
-                            console.log(backupCenter[c2].center);
-                        }
-                        */
 
                         return 'translate(' + backupCenter[index].center + ')';
                     }
