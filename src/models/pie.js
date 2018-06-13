@@ -32,6 +32,7 @@ nv.models.pie = function() {
         , cornerRadius = 0
         , donutRatio = 0.5
         , arcsRadius = []
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd', 'elementTouchstart')
         ;
 
@@ -215,6 +216,7 @@ nv.models.pie = function() {
 
             slices.attr('fill', function(d,i) { return color(d.data, i); });
             slices.attr('stroke', function(d,i) { return color(d.data, i); });
+            slices.classed('nv-cursor-pointer',showClickable);
 
             var paths = ae.append('path')
                 //Viur - For PNG Export purposes
@@ -438,7 +440,8 @@ nv.models.pie = function() {
         }},
         labelType:          {get: function(){return labelType;}, set: function(_){
             labelType= _ || 'key';
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);

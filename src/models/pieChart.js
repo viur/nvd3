@@ -22,7 +22,7 @@ nv.models.pieChart = function() {
         , defaultState = null
         , noData = null
         , duration = 250
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd', 'pointClick')
         , slices = null
         ;
 
@@ -178,6 +178,13 @@ nv.models.pieChart = function() {
                 }
                 dispatch.stateChange(state);
                 chart.update();
+            });
+
+            pie.dispatch.on('elementClick', function (d) {
+                dispatch.pointClick({
+                    xValue:d.data.label,
+                    yValue:d.data.value
+                });
             });
 
             // Update chart from a state object passed to event handler

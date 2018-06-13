@@ -36,7 +36,7 @@ nv.models.multiBarChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'pointClick')
         , controlWidth = function() { return showControls ? 180 : 0 }
         , duration = 250
         , useInteractiveGuideline = false
@@ -365,6 +365,14 @@ nv.models.multiBarChart = function() {
                     state[key] = newState[key];
                 dispatch.stateChange(state);
                 chart.update();
+            });
+
+            multibar.dispatch.on('elementClick', function (d) {
+                dispatch.pointClick({
+                    xValue: d.data.x,
+                    yValue: d.data.y,
+                    series: d.data.name ? d.data.name : d.data.key
+                });
             });
 
             controls.dispatch.on('legendClick', function(d,i) {

@@ -41,7 +41,8 @@ nv.models.scatter = function() {
         , useVoronoi   = true
         , duration     = 250
         , interactiveUpdateDelay = 300
-        , showLabels    = false 
+        , showLabels    = false
+        , showClickable = false
         ;
 
 
@@ -590,6 +591,7 @@ nv.models.scatter = function() {
         id:           {get: function(){return id;}, set: function(_){id=_;}},
         interactiveUpdateDelay: {get:function(){return interactiveUpdateDelay;}, set: function(_){interactiveUpdateDelay=_;}},
         showLabels: {get: function(){return showLabels;}, set: function(_){ showLabels = _;}},
+        showClickable: {get: function(){return showClickable;}, set: function(_){ showClickable = _;}},
 
         // simple functor options
         x:     {get: function(){return getX;}, set: function(_){getX = d3.functor(_);}},

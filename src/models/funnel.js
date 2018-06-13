@@ -22,6 +22,7 @@ nv.models.funnel = function () {
         , yDomain
         , xRange
         , yRange
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
         , rectClass = 'discreteBar'
         , duration = 250
@@ -247,6 +248,7 @@ nv.models.funnel = function () {
                     return  Math.max(Math.abs(y(getY(d,i)) - y(0)), 1)
                 });
 
+            bars.classed('nv-cursor-pointer', showClickable);
 
             //store old scales for use in transitions on update
             x0 = x.copy();
@@ -296,7 +298,8 @@ nv.models.funnel = function () {
         duration: {get: function(){return duration;}, set: function(_){
             duration = _;
             renderWatch.reset(duration);
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);

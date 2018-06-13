@@ -22,7 +22,7 @@ nv.models.gaugeChart = function () {
         , defaultState = null
         , noData = null
         , duration = 250
-        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'renderEnd', 'pointClick')
         ;
 
     tooltip
@@ -182,6 +182,13 @@ nv.models.gaugeChart = function () {
                 }
                 dispatch.stateChange(state);
                 chart.update();
+            });
+
+            pie.dispatch.on('elementClick', function (d) {
+               dispatch.pointClick({
+                   xValue: d.data.label,
+                   yValue: d.data.value
+               });
             });
 
             // Update chart from a state object passed to event handler

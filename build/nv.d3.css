@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-06 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-13 */
 .nvd3 .nv-axis {
     pointer-events:none;
     opacity: 1;
@@ -342,6 +342,10 @@ svg.nvd3-svg {
     stroke-width: 0;
     fill-opacity: 1;
   }
+}
+
+.nvd3 .nv-cursor-pointer {
+    cursor: pointer;
 }
 
 .nvd3.nv-ohlcBar .nv-ticks .nv-tick {

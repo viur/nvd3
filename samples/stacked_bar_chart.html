@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <head>
     <meta charset="utf-8">
-    <link href="build/nv.d3.css" rel="stylesheet" type="text/css">
+    <link href="../build/nv.d3.css" rel="stylesheet" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js" charset="utf-8"></script>
-    <script src="src/core.js"></script>
-    <script src="src/interactiveLayer.js"></script>
-    <script src="src/tooltip.js"></script>
-    <script src="src/utils.js"></script>
-    <script src="src/dom.js"></script>
-    <script src="src/models/axis.js"></script>
-    <script src="src/models/legend.js"></script>
-    <script src="src/models/multiBarHorizontal.js"></script>
-    <script src="src/models/multiBarHorizontalChart.js"></script>
+    <script src="../src/core.js"></script>
+    <script src="../src/interactiveLayer.js"></script>
+    <script src="../src/tooltip.js"></script>
+    <script src="../src/utils.js"></script>
+    <script src="../src/dom.js"></script>
+    <script src="../src/models/axis.js"></script>
+    <script src="../src/models/legend.js"></script>
+    <script src="../src/models/stackedBar.js"></script>
+    <script src="../src/models/stackedBarChart.js"></script>
 
     <style>
         text {
@@ -34,7 +34,7 @@
 <body>
 
 <div id="chart"
-     style="height: 517px; width: 1591px;">
+     style="height: 217px; width: 491px;">
     <svg></svg>
 </div>
 <script>
@@ -64,16 +64,20 @@
     var chart;
     nv.addGraph(function () {
 
-        chart = nv.models.multiBarHorizontalChart()
-            .stacked(true);
-
-        chart.yAxis.tickFormat(d3.format('%'));
-        chart.tooltip.valueFormatter(d3.format('.2%'));
+        chart = nv.models
+            .stackedBarChart();
 
         d3.select("#chart svg")
             .datum(data)
             .transition().duration(1200)
             .call(chart);
+
+        chart.dispatch.on("pointClick", function(e) {
+            console.log(e);
+        });
+
+        chart.showClickable(true);
+        chart.update();
 
         return chart;
     });

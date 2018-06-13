@@ -33,7 +33,7 @@ nv.models.multiBarHorizontalChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'pointClick')
         , controlWidth = function() { return showControls ? 180 : 0 }
         , duration = 250
         ;
@@ -285,7 +285,15 @@ nv.models.multiBarHorizontalChart = function() {
                 chart.update();
             });
 
-            controls.dispatch.on('legendClick', function(d,i) {
+            multibar.dispatch.on('elementClick', function (d) {
+                dispatch.pointClick({
+                    xValue: d.data.x,
+                    yValue: d.data.y,
+                    series: d.data.name ? d.data.name : d.data.key
+                });
+            });
+
+            controls.dispatch.on('legendClick', function (d, i) {
                 if (!d.disabled) return;
                 controlsData = controlsData.map(function(s) {
                     s.disabled = true;

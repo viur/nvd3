@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <link href="../build/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js" charset="utf-8"></script>
+    <script src="../src/core.js"></script>
+    <script src="../src/interactiveLayer.js"></script>
+    <script src="../src/tooltip.js"></script>
+    <script src="../src/utils.js"></script>
+    <script src="../src/dom.js"></script>
+    <script src="../src/models/axis.js"></script>
+    <script src="../src/models/legend.js"></script>
+    <script src="../src/models/multiBarHorizontal.js"></script>
+    <script src="../src/models/multiBarHorizontalChart.js"></script>
+
+    <style>
+        .nvd3 text {
+            font: 12px sans-serif;
+        }
+
+        svg {
+            display: block;
+        }
+
+        html, body, #chart, svg {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="chart"
+     style="height: 400px; width: 500px;padding-left:200px;">
+    <svg style="border: 1px solid"></svg>
+</div>
+<script>
+
+    var data = [
+        {
+            key: 'AL', values: [
+                {x: 'Under 5 Years asasdasdas huehue zaza', y: 5},
+                {x: '5 to 13 Years boatarde bomdia', y: 10},
+                {x: 'texto', y: 10},
+                {x: 'outra textograndenemcabeoqueequeacontece', y: 10}
+            ]
+        },
+        {
+            key: 'AK', values: [
+                {x: 'Under 5 Years asasdasdas huehue zaza', y: 4},
+                {x: '5 to 13 Years boatarde bomdia', y: 8},
+                {x: 'texto', y: 8},
+                {x: 'outra textograndenemcabeoqueequeacontece', y: 8}
+            ]
+        },
+        {
+            key: 'AZ', values: [
+                {x: 'Under 5 Years asasdasdas huehue zaza', y: 11},
+                {x: '5 to 13 Years boatarde bomdia', y: 5},
+                {x: 'texto', y: 5},
+                {x: 'outra textograndenemcabeoqueequeacontece', y: 5}
+            ]
+        }
+    ];
+
+
+    var chart;
+    nv.addGraph(function () {
+
+        chart = nv.models.multiBarHorizontalChart()
+            .stacked(true);
+
+        chart.yAxis.tickFormat(d3.format('%'));
+        chart.tooltip.valueFormatter(d3.format('.2%'));
+        chart.wrapLabels(true);
+
+        d3.select("#chart svg")
+            .datum(data)
+            .transition().duration(1200)
+            .call(chart);
+
+        chart.dispatch.on("pointClick", function(e) {
+            console.log(e);
+        });
+
+        //chart.xAxis.axisLabel('nome grande e com muito texto para ver se cabe');
+
+        chart.showClickable(false);
+        chart.update();
+
+        return chart;
+    });
+
+</script>
+</body>
+</html>

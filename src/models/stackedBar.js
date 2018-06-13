@@ -30,6 +30,7 @@ nv.models.stackedBar = function() {
         , yRange
         , groupSpacing = 0.1
         , fillOpacity = 0.75
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
     ;
 
@@ -290,7 +291,9 @@ nv.models.stackedBar = function() {
                 });
             bars
                 .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
-                .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; })
+                .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; });
+
+            bars.classed('nv-cursor-pointer',showClickable);
 
             if (barColor) {
                 if (!disabled) disabled = data.map(function() { return true });
@@ -436,7 +439,8 @@ nv.models.stackedBar = function() {
             }},
         barColor:  {get: function(){return barColor;}, set: function(_){
                 barColor = _ ? nv.utils.getColor(_) : null;
-            }}
+            }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);

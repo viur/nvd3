@@ -42,6 +42,7 @@ nv.models.gauge = function () {
         , cornerRadius = 0
         , donutRatio = 0.65
         , arcsRadius = []
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
         ;
 
@@ -362,6 +363,7 @@ nv.models.gauge = function () {
             slices.attr('stroke', function (d, i) {
                 return color(d.data, i);
             });
+            slices.classed('nv-cursor-pointer',showClickable);
 
             var paths = ae.append('path')
             //Viur - For PNG Export purposes
@@ -770,7 +772,8 @@ nv.models.gauge = function () {
             }, set: function (_) {
                 maxValue = _;
             }
-        }
+        },
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);

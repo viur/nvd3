@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-06 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-13 */
 (function(){
 
 // set up main nv object
@@ -1553,15 +1553,17 @@ nv.utils.wrapTicks = function (text, width) {
             y = text.attr("y"),
             dy = parseFloat(text.attr("dy")),
             tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        var first = true;
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
+            if (tspan.node().getComputedTextLength() > width && !first) {
                 line.pop();
                 tspan.text(line.join(" "));
                 line = [word];
                 tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
             }
+            first = false;
         }
     });
 };
@@ -4640,6 +4642,7 @@ nv.models.funnel = function () {
         , yDomain
         , xRange
         , yRange
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
         , rectClass = 'discreteBar'
         , duration = 250
@@ -4865,6 +4868,7 @@ nv.models.funnel = function () {
                     return  Math.max(Math.abs(y(getY(d,i)) - y(0)), 1)
                 });
 
+            bars.classed('nv-cursor-pointer', showClickable);
 
             //store old scales for use in transitions on update
             x0 = x.copy();
@@ -4914,7 +4918,8 @@ nv.models.funnel = function () {
         duration: {get: function(){return duration;}, set: function(_){
             duration = _;
             renderWatch.reset(duration);
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);
@@ -4949,7 +4954,7 @@ nv.models.funnelChart = function () {
         , x
         , y
         , noData = null
-        , dispatch = d3.dispatch('beforeUpdate','renderEnd')
+        , dispatch = d3.dispatch('beforeUpdate','renderEnd', 'pointClick')
         , duration = 250
         ;
 
@@ -5144,6 +5149,13 @@ nv.models.funnelChart = function () {
 
     funnel.dispatch.on('elementMousemove.tooltip', function(evt) {
         tooltip();
+    });
+
+    funnel.dispatch.on('elementClick', function (d) {
+        dispatch.pointClick({
+            xValue: d.data.x,
+            yValue: d.data.y
+        });
     });
 
     //============================================================
@@ -5592,6 +5604,7 @@ nv.models.gauge = function () {
         , cornerRadius = 0
         , donutRatio = 0.65
         , arcsRadius = []
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
         ;
 
@@ -5912,6 +5925,7 @@ nv.models.gauge = function () {
             slices.attr('stroke', function (d, i) {
                 return color(d.data, i);
             });
+            slices.classed('nv-cursor-pointer',showClickable);
 
             var paths = ae.append('path')
             //Viur - For PNG Export purposes
@@ -6320,7 +6334,8 @@ nv.models.gauge = function () {
             }, set: function (_) {
                 maxValue = _;
             }
-        }
+        },
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);
@@ -6350,7 +6365,7 @@ nv.models.gaugeChart = function () {
         , defaultState = null
         , noData = null
         , duration = 250
-        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'renderEnd', 'pointClick')
         ;
 
     tooltip
@@ -6510,6 +6525,13 @@ nv.models.gaugeChart = function () {
                 }
                 dispatch.stateChange(state);
                 chart.update();
+            });
+
+            pie.dispatch.on('elementClick', function (d) {
+               dispatch.pointClick({
+                   xValue: d.data.label,
+                   yValue: d.data.value
+               });
             });
 
             // Update chart from a state object passed to event handler
@@ -7957,7 +7979,7 @@ nv.models.lineChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'brush', 'stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'brush', 'stateChange', 'changeState', 'renderEnd', 'pointClick')
         , duration = 250
         ;
 
@@ -8387,6 +8409,18 @@ nv.models.lineChart = function() {
                         series: series
                     });
                 });
+
+                var yValue = chart.yScale().invert(e.mouseY);
+                var domainExtent = Math.abs(chart.yScale().domain()[0] - chart.yScale().domain()[1]);
+                var threshold = 0.03 * domainExtent;
+                var indexToHighlight = nv.nearestValueIndex(allData.map(function(d){return d.point.y;}),yValue,threshold);
+                if(indexToHighlight !== null){
+                    dispatch.pointClick({
+                        xValue: allData[indexToHighlight].point.x,
+                        yValue: allData[indexToHighlight].point.y,
+                        series: allData[indexToHighlight].series.name ? allData[indexToHighlight].series.name : allData[indexToHighlight].series.key
+                    });
+                }
 
                 lines.dispatch.elementClick(allData);
             });
@@ -9309,6 +9343,7 @@ nv.models.multiBar = function() {
         , yRange
         , groupSpacing = 0.1
         , fillOpacity = 0.75
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
         ;
 
@@ -9561,7 +9596,9 @@ nv.models.multiBar = function() {
                 });
             bars
                 .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
-                .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; })
+                .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; });
+
+            bars.classed('nv-cursor-pointer',showClickable);
 
             if (barColor) {
                 if (!disabled) disabled = data.map(function() { return true });
@@ -9707,7 +9744,8 @@ nv.models.multiBar = function() {
         }},
         barColor:  {get: function(){return barColor;}, set: function(_){
             barColor = _ ? nv.utils.getColor(_) : null;
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);
@@ -9752,7 +9790,7 @@ nv.models.multiBarChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'pointClick')
         , controlWidth = function() { return showControls ? 180 : 0 }
         , duration = 250
         , useInteractiveGuideline = false
@@ -10083,6 +10121,14 @@ nv.models.multiBarChart = function() {
                 chart.update();
             });
 
+            multibar.dispatch.on('elementClick', function (d) {
+                dispatch.pointClick({
+                    xValue: d.data.x,
+                    yValue: d.data.y,
+                    series: d.data.name ? d.data.name : d.data.key
+                });
+            });
+
             controls.dispatch.on('legendClick', function(d,i) {
                 if (!d.disabled) return;
                 controlsData = controlsData.map(function(s) {
@@ -10298,6 +10344,7 @@ nv.models.multiBarHorizontal = function() {
         , xRange
         , yRange
         , duration = 250
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
         ;
 
@@ -10524,7 +10571,9 @@ nv.models.multiBarHorizontal = function() {
             }
 
             bars
-                .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
+                .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'});
+
+            bars.classed('nv-cursor-pointer',showClickable);
 
             if (barColor) {
                 if (!disabled) disabled = data.map(function() { return true });
@@ -10619,7 +10668,8 @@ nv.models.multiBarHorizontal = function() {
         }},
         barColor:  {get: function(){return barColor;}, set: function(_){
             barColor = _ ? nv.utils.getColor(_) : null;
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);
@@ -10661,7 +10711,7 @@ nv.models.multiBarHorizontalChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'pointClick')
         , controlWidth = function() { return showControls ? 180 : 0 }
         , duration = 250
         ;
@@ -10913,7 +10963,15 @@ nv.models.multiBarHorizontalChart = function() {
                 chart.update();
             });
 
-            controls.dispatch.on('legendClick', function(d,i) {
+            multibar.dispatch.on('elementClick', function (d) {
+                dispatch.pointClick({
+                    xValue: d.data.x,
+                    yValue: d.data.y,
+                    series: d.data.name ? d.data.name : d.data.key
+                });
+            });
+
+            controls.dispatch.on('legendClick', function (d, i) {
                 if (!d.disabled) return;
                 controlsData = controlsData.map(function(s) {
                     s.disabled = true;
@@ -12683,6 +12741,7 @@ nv.models.pie = function() {
         , cornerRadius = 0
         , donutRatio = 0.5
         , arcsRadius = []
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd', 'elementTouchstart')
         ;
 
@@ -12866,6 +12925,7 @@ nv.models.pie = function() {
 
             slices.attr('fill', function(d,i) { return color(d.data, i); });
             slices.attr('stroke', function(d,i) { return color(d.data, i); });
+            slices.classed('nv-cursor-pointer',showClickable);
 
             var paths = ae.append('path')
                 //Viur - For PNG Export purposes
@@ -13089,7 +13149,8 @@ nv.models.pie = function() {
         }},
         labelType:          {get: function(){return labelType;}, set: function(_){
             labelType= _ || 'key';
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);
@@ -13119,7 +13180,7 @@ nv.models.pieChart = function() {
         , defaultState = null
         , noData = null
         , duration = 250
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd', 'pointClick')
         , slices = null
         ;
 
@@ -13275,6 +13336,13 @@ nv.models.pieChart = function() {
                 }
                 dispatch.stateChange(state);
                 chart.update();
+            });
+
+            pie.dispatch.on('elementClick', function (d) {
+                dispatch.pointClick({
+                    xValue:d.data.label,
+                    yValue:d.data.value
+                });
             });
 
             // Update chart from a state object passed to event handler
@@ -14936,7 +15004,8 @@ nv.models.scatter = function() {
         , useVoronoi   = true
         , duration     = 250
         , interactiveUpdateDelay = 300
-        , showLabels    = false 
+        , showLabels    = false
+        , showClickable = false
         ;
 
 
@@ -15485,6 +15554,7 @@ nv.models.scatter = function() {
         id:           {get: function(){return id;}, set: function(_){id=_;}},
         interactiveUpdateDelay: {get:function(){return interactiveUpdateDelay;}, set: function(_){interactiveUpdateDelay=_;}},
         showLabels: {get: function(){return showLabels;}, set: function(_){ showLabels = _;}},
+        showClickable: {get: function(){return showClickable;}, set: function(_){ showClickable = _;}},
 
         // simple functor options
         x:     {get: function(){return getX;}, set: function(_){getX = d3.functor(_);}},
@@ -15549,7 +15619,7 @@ nv.models.scatterChart = function() {
         , rightAlignYAxis = false
         , state = nv.utils.state()
         , defaultState = null
-        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'pointClick')
         , noData       = null
         , duration = 250
         , showLabels    = false
@@ -15814,6 +15884,14 @@ nv.models.scatterChart = function() {
                     state[key] = newState[key];
                 dispatch.stateChange(state);
                 chart.update();
+            });
+
+            scatter.dispatch.on('elementClick', function (d) {
+                dispatch.pointClick({
+                    xValue: d.point.x,
+                    yValue: d.point.y,
+                    series: d.series.name ? d.series.name : d.series.key
+                });
             });
 
             // Update chart from a state object passed to event handler
@@ -16315,6 +16393,7 @@ nv.models.stackedArea = function() {
         , y //can be accessed via chart.yScale()
         , scatter = nv.models.scatter()
         , duration = 250
+        , showClickable = false
         , dispatch =  d3.dispatch('areaClick', 'areaMouseover', 'areaMouseout','renderEnd', 'elementClick', 'elementMouseover', 'elementMouseout')
         ;
 
@@ -16621,7 +16700,8 @@ nv.models.stackedArea = function() {
                 connectNulls = false;
                 defined = function(d,i) { return !isNaN(getY(d,i)) && getY(d,i) !== null }
             }
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.inheritOptions(chart, scatter);
@@ -16664,7 +16744,7 @@ nv.models.stackedAreaChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd', 'pointClick')
         , controlWidth = 250
         , controlOptions = ['Stacked','Stream','Expanded']
         , controlLabels = {}
@@ -16944,19 +17024,24 @@ nv.models.stackedAreaChart = function() {
             //------------------------------------------------------------
 
             stacked.dispatch.on('areaClick.toggle', function(e) {
-                if (data.filter(function(d) { return !d.disabled }).length === 1)
-                    data.forEach(function(d) {
-                        d.disabled = false;
-                    });
-                else
-                    data.forEach(function(d,i) {
-                        d.disabled = (i != e.seriesIndex);
-                    });
+                if(!chart.showClickable()) {
+                    if (data.filter(function (d) {
+                        return !d.disabled
+                    }).length === 1)
+                        data.forEach(function (d) {
+                            d.disabled = false;
+                        });
+                    else
+                        data.forEach(function (d, i) {
+                            d.disabled = (i != e.seriesIndex);
+                        });
 
-                state.disabled = data.map(function(d) { return !!d.disabled });
-                dispatch.stateChange(state);
-
-                chart.update();
+                    state.disabled = data.map(function (d) {
+                        return !!d.disabled
+                    });
+                    dispatch.stateChange(state);
+                    chart.update();
+                }
             });
 
             legend.dispatch.on('stateChange', function(newState) {
@@ -16982,6 +17067,41 @@ nv.models.stackedAreaChart = function() {
                 dispatch.stateChange(state);
 
                 chart.update();
+            });
+
+            interactiveLayer.dispatch.on('elementClick', function(e) {
+                var singlePoint, pointIndex, pointXLocation, allData = [], valueSum = 0;
+                data
+                    .filter(function(series, i) {
+                        series.seriesIndex = i;
+                        return !series.disabled;
+                    })
+                    .forEach(function(series,i) {
+                        pointIndex = nv.interactiveBisect(series.values, e.pointXValue, chart.x());
+                        var point = series.values[pointIndex];
+                        if (typeof point === 'undefined') return;
+                        if (typeof singlePoint === 'undefined') singlePoint = point;
+                        if (typeof pointXLocation === 'undefined') pointXLocation = chart.xScale()(chart.x()(point,pointIndex));
+                        allData.push({
+                            color: color(series,series.seriesIndex),
+                            point: point,
+                            series: series
+                        });
+                    });
+
+                allData.reverse();
+
+                var yValue = chart.yScale().invert(e.mouseY);
+                var domainExtent = Math.abs(chart.yScale().domain()[0] - chart.yScale().domain()[1]);
+                var threshold = 0.03 * domainExtent;
+                var indexToHighlight = nv.nearestValueIndex(allData.map(function(d){return Math.abs(d.point.display.y) + Math.abs(d.point.display.y0);}),yValue,threshold);
+                if(indexToHighlight !== null){
+                    dispatch.pointClick({
+                        xValue: allData[indexToHighlight].point.x,
+                        yValue: allData[indexToHighlight].point.y,
+                        series: allData[indexToHighlight].series.name ? allData[indexToHighlight].series.name : allData[indexToHighlight].series.key
+                    });
+                }
             });
 
             interactiveLayer.dispatch.on('elementMousemove', function(e) {
@@ -17224,6 +17344,7 @@ nv.models.stackedBar = function() {
         , yRange
         , groupSpacing = 0.1
         , fillOpacity = 0.75
+        , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
     ;
 
@@ -17484,7 +17605,9 @@ nv.models.stackedBar = function() {
                 });
             bars
                 .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
-                .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; })
+                .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; });
+
+            bars.classed('nv-cursor-pointer',showClickable);
 
             if (barColor) {
                 if (!disabled) disabled = data.map(function() { return true });
@@ -17630,7 +17753,8 @@ nv.models.stackedBar = function() {
             }},
         barColor:  {get: function(){return barColor;}, set: function(_){
                 barColor = _ ? nv.utils.getColor(_) : null;
-            }}
+            }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.initOptions(chart);
@@ -17675,7 +17799,7 @@ nv.models.stackedBarChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'pointClick')
         , controlWidth = function() { return showControls ? 180 : 0 }
         , duration = 250
         , useInteractiveGuideline = false
@@ -18004,6 +18128,14 @@ nv.models.stackedBarChart = function() {
                     state[key] = newState[key];
                 dispatch.stateChange(state);
                 chart.update();
+            });
+
+            multibar.dispatch.on('elementClick', function (d) {
+                dispatch.pointClick({
+                    xValue: d.data.x,
+                    yValue: d.data.y,
+                    series: d.series.name ?  d.series.name : d.series.key
+                });
             });
 
             controls.dispatch.on('legendClick', function(d,i) {

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <link href="../build/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js" charset="utf-8"></script>
+    <script src="../src/core.js"></script>
+    <script src="../src/interactiveLayer.js"></script>
+    <script src="../src/tooltip.js"></script>
+    <script src="../src/utils.js"></script>
+    <script src="../src/dom.js"></script>
+    <script src="../src/models/axis.js"></script>
+    <script src="../src/models/legend.js"></script>
+    <script src="../src/models/gauge.js"></script>
+    <script src="../src/models/gaugeChart.js"></script>
+
+    <style>
+        text {
+            font: 12px sans-serif;
+        }
+
+        svg {
+            display: block;
+        }
+
+        html, body, #chart, svg {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="chart">
+    <svg></svg>
+</div>
+<script>
+
+    /*
+    var data = [
+        {label: '1 tao mas que brincadeira vem a ser esta', value: 50},
+        {label: '2222222222222 colidam para ai', value: 50},
+        {label: '333333333333333333333333 textos grandes', value: 50},
+        {label: '4 e soube e desce sem parar o i o ai', value: 50}
+    ];
+    */
+
+    /*
+    var data = [
+        {label: '1 tao mas que brincadeira vem a ser esta', value: 50},
+        {label: '2222222222222 colidam para ai', value: 50},
+        {label: '333333333333333333333333 textos grandes', value: 50},
+        {label: '4 e soube e desce sem parar o i o ai', value: 50},
+        {label: '5 ai o vida minha', value: 50},
+        {label: '6 e soube e desce sem parar o i o ai', value: 50}
+    ];
+    */
+
+    var data = [
+        {label: 'value', value: 20},
+        {label: 'max', value: 50}
+    ];
+
+    /*
+    var data = [
+        {label: '4', value: 24},
+        {label: 'ffff', value: 45},
+        {label: 'fddddfff', value: 24}
+    ];
+    */
+
+    var chart;
+    nv.addGraph(function () {
+        chart = nv.models.gaugeChart()
+            .x(function (d) {
+                return d.label
+            })
+            .y(function (d) {
+                return d.value
+            });
+
+        d3.select("#chart svg")
+            .datum(data)
+            .call(chart);
+
+        chart.dispatch.on("pointClick", function (e) {
+            console.log(e);
+        });
+
+        chart.showClickable(true);
+        chart.update();
+
+        return chart;
+    });
+
+
+</script>
+</body>
+</html>

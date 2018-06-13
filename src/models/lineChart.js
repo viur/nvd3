@@ -43,7 +43,7 @@ nv.models.lineChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'brush', 'stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'brush', 'stateChange', 'changeState', 'renderEnd', 'pointClick')
         , duration = 250
         ;
 
@@ -473,6 +473,18 @@ nv.models.lineChart = function() {
                         series: series
                     });
                 });
+
+                var yValue = chart.yScale().invert(e.mouseY);
+                var domainExtent = Math.abs(chart.yScale().domain()[0] - chart.yScale().domain()[1]);
+                var threshold = 0.03 * domainExtent;
+                var indexToHighlight = nv.nearestValueIndex(allData.map(function(d){return d.point.y;}),yValue,threshold);
+                if(indexToHighlight !== null){
+                    dispatch.pointClick({
+                        xValue: allData[indexToHighlight].point.x,
+                        yValue: allData[indexToHighlight].point.y,
+                        series: allData[indexToHighlight].series.name ? allData[indexToHighlight].series.name : allData[indexToHighlight].series.key
+                    });
+                }
 
                 lines.dispatch.elementClick(allData);
             });

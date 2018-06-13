@@ -25,6 +25,7 @@ nv.models.stackedArea = function() {
         , y //can be accessed via chart.yScale()
         , scatter = nv.models.scatter()
         , duration = 250
+        , showClickable = false
         , dispatch =  d3.dispatch('areaClick', 'areaMouseover', 'areaMouseout','renderEnd', 'elementClick', 'elementMouseover', 'elementMouseout')
         ;
 
@@ -331,7 +332,8 @@ nv.models.stackedArea = function() {
                 connectNulls = false;
                 defined = function(d,i) { return !isNaN(getY(d,i)) && getY(d,i) !== null }
             }
-        }}
+        }},
+        showClickable:  {get: function(){return showClickable;}, set: function(_){showClickable=_;}}
     });
 
     nv.utils.inheritOptions(chart, scatter);

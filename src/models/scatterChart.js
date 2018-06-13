@@ -30,7 +30,7 @@ nv.models.scatterChart = function() {
         , rightAlignYAxis = false
         , state = nv.utils.state()
         , defaultState = null
-        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd', 'pointClick')
         , noData       = null
         , duration = 250
         , showLabels    = false
@@ -295,6 +295,14 @@ nv.models.scatterChart = function() {
                     state[key] = newState[key];
                 dispatch.stateChange(state);
                 chart.update();
+            });
+
+            scatter.dispatch.on('elementClick', function (d) {
+                dispatch.pointClick({
+                    xValue: d.point.x,
+                    yValue: d.point.y,
+                    series: d.series.name ? d.series.name : d.series.key
+                });
             });
 
             // Update chart from a state object passed to event handler

@@ -33,7 +33,7 @@ nv.models.stackedAreaChart = function() {
         , state = nv.utils.state()
         , defaultState = null
         , noData = null
-        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd')
+        , dispatch = d3.dispatch('stateChange', 'changeState','renderEnd', 'pointClick')
         , controlWidth = 250
         , controlOptions = ['Stacked','Stream','Expanded']
         , controlLabels = {}
@@ -313,19 +313,24 @@ nv.models.stackedAreaChart = function() {
             //------------------------------------------------------------
 
             stacked.dispatch.on('areaClick.toggle', function(e) {
-                if (data.filter(function(d) { return !d.disabled }).length === 1)
-                    data.forEach(function(d) {
-                        d.disabled = false;
-                    });
-                else
-                    data.forEach(function(d,i) {
-                        d.disabled = (i != e.seriesIndex);
-                    });
+                if(!chart.showClickable()) {
+                    if (data.filter(function (d) {
+                        return !d.disabled
+                    }).length === 1)
+                        data.forEach(function (d) {
+                            d.disabled = false;
+                        });
+                    else
+                        data.forEach(function (d, i) {
+                            d.disabled = (i != e.seriesIndex);
+                        });
 
-                state.disabled = data.map(function(d) { return !!d.disabled });
-                dispatch.stateChange(state);
-
-                chart.update();
+                    state.disabled = data.map(function (d) {
+                        return !!d.disabled
+                    });
+                    dispatch.stateChange(state);
+                    chart.update();
+                }
             });
 
             legend.dispatch.on('stateChange', function(newState) {
@@ -351,6 +356,41 @@ nv.models.stackedAreaChart = function() {
                 dispatch.stateChange(state);
 
                 chart.update();
+            });
+
+            interactiveLayer.dispatch.on('elementClick', function(e) {
+                var singlePoint, pointIndex, pointXLocation, allData = [], valueSum = 0;
+                data
+                    .filter(function(series, i) {
+                        series.seriesIndex = i;
+                        return !series.disabled;
+                    })
+                    .forEach(function(series,i) {
+                        pointIndex = nv.interactiveBisect(series.values, e.pointXValue, chart.x());
+                        var point = series.values[pointIndex];
+                        if (typeof point === 'undefined') return;
+                        if (typeof singlePoint === 'undefined') singlePoint = point;
+                        if (typeof pointXLocation === 'undefined') pointXLocation = chart.xScale()(chart.x()(point,pointIndex));
+                        allData.push({
+                            color: color(series,series.seriesIndex),
+                            point: point,
+                            series: series
+                        });
+                    });
+
+                allData.reverse();
+
+                var yValue = chart.yScale().invert(e.mouseY);
+                var domainExtent = Math.abs(chart.yScale().domain()[0] - chart.yScale().domain()[1]);
+                var threshold = 0.03 * domainExtent;
+                var indexToHighlight = nv.nearestValueIndex(allData.map(function(d){return Math.abs(d.point.display.y) + Math.abs(d.point.display.y0);}),yValue,threshold);
+                if(indexToHighlight !== null){
+                    dispatch.pointClick({
+                        xValue: allData[indexToHighlight].point.x,
+                        yValue: allData[indexToHighlight].point.y,
+                        series: allData[indexToHighlight].series.name ? allData[indexToHighlight].series.name : allData[indexToHighlight].series.key
+                    });
+                }
             });
 
             interactiveLayer.dispatch.on('elementMousemove', function(e) {
