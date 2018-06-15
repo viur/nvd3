@@ -1542,9 +1542,11 @@ nv.utils.noData = function(chart, container) {
 /*
  Wrap long labels.
  */
-nv.utils.wrapTicks = function (text, width) {
+nv.utils.wrapTicks = function (text, width, height) {
     text.each(function() {
+
         var text = d3.select(this),
+            textHeight = text.node().getBBox().height,
             words = text.text().split(/\s+/).reverse(),
             word,
             line = [],
@@ -1552,16 +1554,28 @@ nv.utils.wrapTicks = function (text, width) {
             lineHeight = 1.1,
             y = text.attr("y"),
             dy = parseFloat(text.attr("dy")),
-            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-        var first = true;
+            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em"),
+            first = true;
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width && !first) {
-                line.pop();
-                tspan.text(line.join(" "));
-                line = [word];
-                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+            if (tspan.node().getComputedTextLength() > width) {
+                var tSpans = text.selectAll('tspan');
+                if((height && (tSpans.size()+1) >= height / textHeight) || first){
+                    var _text = tspan.text();
+                    var textLength = tspan.node().getComputedTextLength();
+                    while (textLength > width && text.length > 0) {
+                        _text = _text.slice(0, -1);
+                        tspan.text(_text + '..');
+                        textLength = tspan.node().getComputedTextLength();
+                    }
+                    break;
+                }else {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                }
             }
             first = false;
         }
@@ -10043,8 +10057,11 @@ nv.models.multiBarChart = function() {
                 //adds a invisible text to help us obtain the font size so we can calculate free space
                 var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
                 var sampleTextHeight = sampleText.node().getBBox().height;
-
                 var availableBottom = margin.bottom;
+
+                if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
+                    availableBottom = chart.xAxis.axisLabelDistance() + 36 - (sampleTextHeight * 1.05); //36 is set by nvd3 in axis
+                }
 
                 if (staggerLabels) {
                     var getTranslate = function(x,y) {
@@ -10067,48 +10084,18 @@ nv.models.multiBarChart = function() {
                 }
 
                 if (wrapLabels && !rotateLabels) {
-
-                    xTicks
-                        .selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15);
-
-                    availableBottom = margin.bottom;
-
-                    if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
-                        availableBottom = chart.xAxis.axisLabelDistance() + 36 - (sampleTextHeight * 1.5); //36 is set by nvd3 in axis
-                    }
-
-                    xTicks
-                        .selectAll('.tick text')
-                        .each(function (d) {
-                            var tSpans = d3.select(this).selectAll('tspan');
-                            var isTickPopped = false;
-
-                            //remove tspans if there is not enough space
-                            while (tSpans.size() >= availableBottom / sampleTextHeight) {
-
-                                if (tSpans[0].length === 1) {
-                                    break;
-                                }
-
-                                d3.select(tSpans[0].pop()).remove();
-                                isTickPopped = true;
-                            }
-
-                            if (isTickPopped) {
-                                var tick = d3.select(tSpans[0].pop());
-                                tick.text(tick.text() + '..');
-                            }
-                    });
-                }
-
-                //Viur
-                var reduceValue = 100;
-                if(rotateLabels && Math.abs(rotateLabels) > 20){
-                    reduceValue = 30;
+                    g.selectAll('.tick text')
+                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15, availableBottom);
                 }
 
                 if (reduceXTicks) {
+
+                    var reduceValue = 100;
+
+                    if(rotateLabels && Math.abs(rotateLabels) > 20){
+                        reduceValue = 30;
+                    }
+
                     xTicks
                         .filter(function (d, i) {
                             return i % Math.ceil(data[0].values.length / (availableWidth / reduceValue)) !== 0;
@@ -10121,24 +10108,16 @@ nv.models.multiBarChart = function() {
 
                     xTicks
                         .selectAll('.tick text')
-                        .filter(function() {
-                            return d3.select(this).style("opacity") !== 0;
-                        })
                         .attr('transform', 'rotate(' + rotateLabels + ' 0,0)')
                         .style('text-anchor', rotateLabels > 0 ? 'start' : 'end');
 
-                    availableBottom = margin.bottom;
-
-                    if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
-                        availableBottom = chart.xAxis.axisLabelDistance() + 36 - (sampleTextHeight * 1.05); //36 is set by nvd3 in axis
-                    }
-
                     var available = availableBottom / Math.sin((90 - Math.abs(rotateLabels)) * (180 / Math.PI));
 
-                    xTicks
-                        .selectAll('.tick text')
+                    g.selectAll('.tick text')
+                        .filter(function() {
+                            return d3.select(this).style("opacity") !== 0;
+                        })
                         .each(function (d) {
-
                             var self = d3.select(this);
                             var text = self.text();
                             var textLength = self.node().getComputedTextLength();
@@ -10148,9 +10127,7 @@ nv.models.multiBarChart = function() {
                                 self.text(text + '..');
                                 textLength = self.node().getComputedTextLength();
                             }
-
                         });
-
                 }
 
                 g.select('.nv-x.nv-axis').selectAll('g.nv-axisMaxMin text')
