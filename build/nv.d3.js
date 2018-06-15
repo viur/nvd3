@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-13 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-15 */
 (function(){
 
 // set up main nv object
@@ -10023,6 +10023,7 @@ nv.models.multiBarChart = function() {
 
             // Setup Axes
             if (showXAxis) {
+
                 xAxis
                     .scale(x)
                     ._ticks( nv.utils.calcTicksX(availableWidth/100, data) )
@@ -10037,7 +10038,13 @@ nv.models.multiBarChart = function() {
 
                 xTicks
                     .selectAll('line, text')
-                    .style('opacity', 1)
+                    .style('opacity', 1);
+
+                //adds a invisible text to help us obtain the font size so we can calculate free space
+                var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
+                var sampleTextHeight = sampleText.node().getBBox().height;
+
+                var availableBottom = margin.bottom;
 
                 if (staggerLabels) {
                     var getTranslate = function(x,y) {
@@ -10059,11 +10066,41 @@ nv.models.multiBarChart = function() {
                         });
                 }
 
-                if (wrapLabels) {
-                    g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand())
-                }
+                if (wrapLabels && !rotateLabels) {
 
+                    xTicks
+                        .selectAll('.tick text')
+                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15);
+
+                    availableBottom = margin.bottom;
+
+                    if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
+                        availableBottom = chart.xAxis.axisLabelDistance() + 36 - (sampleTextHeight * 1.5); //36 is set by nvd3 in axis
+                    }
+
+                    xTicks
+                        .selectAll('.tick text')
+                        .each(function (d) {
+                            var tSpans = d3.select(this).selectAll('tspan');
+                            var isTickPopped = false;
+
+                            //remove tspans if there is not enough space
+                            while (tSpans.size() >= availableBottom / sampleTextHeight) {
+
+                                if (tSpans[0].length === 1) {
+                                    break;
+                                }
+
+                                d3.select(tSpans[0].pop()).remove();
+                                isTickPopped = true;
+                            }
+
+                            if (isTickPopped) {
+                                var tick = d3.select(tSpans[0].pop());
+                                tick.text(tick.text() + '...');
+                            }
+                    });
+                }
 
                 //Viur
                 var reduceValue = 100;
@@ -10071,22 +10108,56 @@ nv.models.multiBarChart = function() {
                     reduceValue = 30;
                 }
 
-                if (reduceXTicks)
+                if (reduceXTicks) {
                     xTicks
-                        .filter(function(d,i) {
+                        .filter(function (d, i) {
                             return i % Math.ceil(data[0].values.length / (availableWidth / reduceValue)) !== 0;
                         })
                         .selectAll('text, line')
                         .style('opacity', 0);
+                }
 
-                if(rotateLabels)
+                if(rotateLabels) {
+
                     xTicks
                         .selectAll('.tick text')
+                        .filter(function() {
+                            return d3.select(this).style("opacity") !== 0;
+                        })
                         .attr('transform', 'rotate(' + rotateLabels + ' 0,0)')
                         .style('text-anchor', rotateLabels > 0 ? 'start' : 'end');
 
+                    availableBottom = margin.bottom;
+
+                    if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
+                        availableBottom = chart.xAxis.axisLabelDistance() + 36 - (sampleTextHeight * 1.5); //36 is set by nvd3 in axis
+                    }
+
+                    var available = availableBottom / Math.sin((90 - Math.abs(rotateLabels)) * (180 / Math.PI));
+
+                    xTicks
+                        .selectAll('.tick text')
+                        .each(function (d) {
+
+                            var self = d3.select(this);
+                            var text = self.text();
+                            var textLength = self.node().getComputedTextLength();
+
+                            while (textLength > available && text.length > 0) {
+                                text = text.slice(0, -1);
+                                self.text(text + '...');
+                                textLength = self.node().getComputedTextLength();
+                            }
+
+                        });
+
+                }
+
                 g.select('.nv-x.nv-axis').selectAll('g.nv-axisMaxMin text')
                     .style('opacity', 1);
+
+                //removes the invisible text
+                sampleText.remove();
             }
 
             if (showYAxis) {
