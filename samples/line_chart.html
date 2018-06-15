@@ -118,6 +118,8 @@
 
         chart.showClickable(true);
 
+        chart.wrapLabels(true)
+
         d3.select('#chart1').append('svg')
             .datum(data)
             .call(chart);

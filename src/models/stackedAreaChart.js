@@ -305,7 +305,7 @@ nv.models.stackedAreaChart = function() {
 
             if (wrapLabels) {
                 g.select('.nv-x').selectAll('.tick text')
-                    .call(nv.utils.wrapTicks, 10);
+                    .call(nv.utils.wrapTicks, 70);
             }
 
             //============================================================
