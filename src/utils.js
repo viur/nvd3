@@ -656,9 +656,11 @@ nv.utils.noData = function(chart, container) {
 /*
  Wrap long labels.
  */
-nv.utils.wrapTicks = function (text, width) {
+nv.utils.wrapTicks = function (text, width, height) {
     text.each(function() {
+
         var text = d3.select(this),
+            textHeight = text.node().getBBox().height,
             words = text.text().split(/\s+/).reverse(),
             word,
             line = [],
@@ -666,16 +668,28 @@ nv.utils.wrapTicks = function (text, width) {
             lineHeight = 1.1,
             y = text.attr("y"),
             dy = parseFloat(text.attr("dy")),
-            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-        var first = true;
+            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em"),
+            first = true;
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width && !first) {
-                line.pop();
-                tspan.text(line.join(" "));
-                line = [word];
-                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+            if (tspan.node().getComputedTextLength() > width) {
+                var tSpans = text.selectAll('tspan');
+                if((height && (tSpans.size()+1) >= height / textHeight) || first){
+                    var _text = tspan.text();
+                    var textLength = tspan.node().getComputedTextLength();
+                    while (textLength > width && text.length > 0) {
+                        _text = _text.slice(0, -1);
+                        tspan.text(_text + '..');
+                        textLength = tspan.node().getComputedTextLength();
+                    }
+                    break;
+                }else {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                }
             }
             first = false;
         }

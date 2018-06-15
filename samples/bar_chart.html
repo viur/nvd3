@@ -34,7 +34,7 @@
 <body>
 
 <div id="chart"
-     style="height: 400px; width: 800px;border: 1px solid">
+     style="height: 400px; width: 400px;border: 1px solid">
     <svg></svg>
 </div>
 <script>
@@ -70,99 +70,19 @@
 
     var data = [
         {
-            name: 'ArigaTo', key: 'AL', values: [
-                {x: "ALFKIyeee", y: 6},
-                {x: "ALFKIsssssss ss", y: 6},
-                {x: "ANATRsssss", y: 4},
-                {x: "AROUTSD", y: 13},
-                {x: "BERGSssssss", y: 18},
-                {x: "BLAUSsssss", y: 7},
-                {x: "BLONP ssss x x", y: 11},
-                {x: "BOLID ssss xxxxx fffffff", y: 3},
-                {x: "BONAP ssss xxx", y: 17},
-                {x: "BOTTM", y: 14},
-                {x: "BSBEV", y: 10},
-                {x: "CACTU dd", y: 6},
-                {x: "CENTC LOL passa asdsds", y: 1},
-                {x: "CHOPSasdsadasdasdasdasdasd", y: 8},
-                {x: "COMMI", y: 5},
-                {x: "CONSH", y: 3},
-                {x: "DRACD", y: 6},
-                {x: "dumon", y: 4},
-                {x: "eastc", y: 8},
-                {x: "ernsh", y: 30},
-                {x: "FAMIA", y: 7},
-                {x: "FOLIG", y: 5},
-                {x: "FOLKO", y: 19},
-                {x: "FRANK", y: 15},
-                {x: "FRANR", y: 3},
-                {x: "FRANS", y: 6},
-                {x: "FURIB", y: 8},
-                {x: "GALED", y: 5},
-                {x: "GODOS", y: 10},
-                {x: "GOURL", y: 9},
-                {x: "GREAL", y: 11},
-                {x: "GROSR", y: 2},
-                {x: "HANAR", y: 14},
-                {x: "HILAA", y: 18},
-                {x: "HUNGC", y: 5},
-                {x: "HUNGO", y: 19},
-                {x: "ISLAT", y: 10},
-                {x: "KOENE", y: 14},
-                {x: "LACOR", y: 4},
-                {x: "LAMAI", y: 14},
-                {x: "LAUGB", y: 3},
-                {x: "LAZYK", y: 2},
-                {x: "LEHMS", y: 15},
-                {x: "LETSS", y: 4},
-                {x: "LILAS", y: 14},
-                {x: "LINOD", y: 12},
-                {x: "LONEP", y: 8},
-                {x: "MAGAA", y: 10},
-                {x: "MAISD", y: 7},
-                {x: "MEREP", y: 13},
-                {x: "MORGK", y: 5},
-                {x: "NORTS", y: 3},
-                {x: "OCEAN", y: 5},
-                {x: "OLDWO", y: 10},
-                {x: "OTTIK", y: 10},
-                {x: "PERIC", y: 6},
-                {x: "PICCO", y: 10},
-                {x: "PRINI", y: 5},
-                {x: "QUEDE", y: 9},
-                {x: "QUEEN", y: 13},
-                {x: "QUICK", y: 28},
-                {x: "RANCH", y: 5},
-                {x: "RATTC", y: 18},
-                {x: "REGGC", y: 12},
-                {x: "RICAR", y: 11},
-                {x: "RICSU", y: 10},
-                {x: "ROMEY", y: 5},
-                {x: "SANTG", y: 6},
-                {x: "SAVEA", y: 31},
-                {x: "SEVES", y: 9},
-                {x: "SIMOB", y: 7},
-                {x: "SPECD", y: 4},
-                {x: "SPLIR", y: 9},
-                {x: "SUPRD", y: 12},
-                {x: "THEBI", y: 4},
-                {x: "THECR", y: 3},
-                {x: "TOMSP", y: 6},
-                {x: "TORTU", y: 10},
-                {x: "TRADH", y: 6},
-                {x: "TRAIH", y: 3},
-                {x: "VAFFE", y: 11},
-                {x: "VICTE", y: 10},
-                {x: "VINET", y: 5},
-                {x: "WANDK", y: 10},
-                {x: "WARTH", y: 15},
-                {x: "WELLI", y: 9},
-                {x: "WHITC", y: 14},
-                {x: "WILMK", y: 7},
-                {x: "WOLZA", y: 7}
+            "key": "col2",
+            "name": "CategoryID",
+            "values": [
+                {"x": "B rages lol a b c der per asd vfrt sdsd dsd dsds", "y": 1},
+                {"x": "Condiments", "y": 1},
+                {"x": "Confections", "y": 1},
+                {"x": "Dairy Products", "y": 1},
+                {"x": "Grains/Cereals lol", "y": 1},
+                {"x": "Meat/Poultry", "y": 1},
+                {"x": "Produce", "y": 1},
+                {"x": "Seafood", "y": 1}
             ]
-        }
-    ];
+        }];
 
 
     var chart;
@@ -181,6 +101,7 @@
         chart.xAxis.axisLabelDistance(10);
         chart.yAxis.axisLabelDistance(-10);
 
+        chart.reduceXTicks(false);
 
         chart.rotateLabels(-28);
 
@@ -199,7 +120,7 @@
         //chart.xAxis.axisLabel('nome grande e com muito texto para ver se cabe');
 
         chart.showClickable(false);
-        chart.update();
+        //chart.update();
 
         return chart;
     });
