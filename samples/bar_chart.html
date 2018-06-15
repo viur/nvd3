@@ -175,13 +175,17 @@
         chart.wrapLabels(true);
         //chart.rotateLabels(-28);
 
-        chart.xAxis.axisLabel("teste");
+        //chart.xAxis.axisLabel("teste");
+        chart.yAxis.axisLabel("teste");
+
         chart.xAxis.axisLabelDistance(10);
+        chart.yAxis.axisLabelDistance(-10);
+
 
         chart.rotateLabels(-28);
 
 
-        chart.margin({bottom:'65'})
+        chart.margin({"left": 50, "bottom": 70})
 
         d3.select("#chart svg")
             .datum(data)
