@@ -83,7 +83,7 @@
                 {x: "BOTTM", y: 14},
                 {x: "BSBEV", y: 10},
                 {x: "CACTU dd", y: 6},
-                {x: "CENTC", y: 1},
+                {x: "CENTC LOL passa asdsds", y: 1},
                 {x: "CHOPSasdsadasdasdasdasdasd", y: 8},
                 {x: "COMMI", y: 5},
                 {x: "CONSH", y: 3},
@@ -173,9 +173,15 @@
         chart.yAxis.tickFormat(d3.format('%'));
         chart.tooltip.valueFormatter(d3.format('.2%'));
         chart.wrapLabels(true);
+        //chart.rotateLabels(-28);
+
+        chart.xAxis.axisLabel("teste");
+        chart.xAxis.axisLabelDistance(10);
+
         chart.rotateLabels(-28);
 
-        <!-- chart.margin({bottom:'200'}) -->
+
+        chart.margin({bottom:'65'})
 
         d3.select("#chart svg")
             .datum(data)
