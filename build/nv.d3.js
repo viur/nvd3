@@ -10097,7 +10097,7 @@ nv.models.multiBarChart = function() {
 
                             if (isTickPopped) {
                                 var tick = d3.select(tSpans[0].pop());
-                                tick.text(tick.text() + '...');
+                                tick.text(tick.text() + '..');
                             }
                     });
                 }
@@ -10130,7 +10130,7 @@ nv.models.multiBarChart = function() {
                     availableBottom = margin.bottom;
 
                     if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
-                        availableBottom = chart.xAxis.axisLabelDistance() + 36 - (sampleTextHeight * 1.5); //36 is set by nvd3 in axis
+                        availableBottom = chart.xAxis.axisLabelDistance() + 36 - (sampleTextHeight * 1.05); //36 is set by nvd3 in axis
                     }
 
                     var available = availableBottom / Math.sin((90 - Math.abs(rotateLabels)) * (180 / Math.PI));
@@ -10145,7 +10145,7 @@ nv.models.multiBarChart = function() {
 
                             while (textLength > available && text.length > 0) {
                                 text = text.slice(0, -1);
-                                self.text(text + '...');
+                                self.text(text + '..');
                                 textLength = self.node().getComputedTextLength();
                             }
 
