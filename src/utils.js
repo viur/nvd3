@@ -658,7 +658,6 @@ nv.utils.noData = function(chart, container) {
  */
 nv.utils.wrapTicks = function (text, width, height) {
     text.each(function() {
-
         var text = d3.select(this),
             textHeight = text.node().getBBox().height,
             words = text.text().split(/\s+/).reverse(),
@@ -676,24 +675,36 @@ nv.utils.wrapTicks = function (text, width, height) {
             if (tspan.node().getComputedTextLength() > width) {
                 var tSpans = text.selectAll('tspan');
                 if((height && (tSpans.size()+1) >= height / textHeight) || first){
-                    var _text = tspan.text();
-                    var textLength = tspan.node().getComputedTextLength();
-                    while (textLength > width && text.length > 0) {
-                        _text = _text.slice(0, -1);
-                        tspan.text(_text + '..');
-                        textLength = tspan.node().getComputedTextLength();
-                    }
+                    nv.utils.truncateText(tspan,width);
                     break;
                 }else {
                     line.pop();
                     tspan.text(line.join(" "));
+                    if (tspan.node().getComputedTextLength() > width) {
+                        nv.utils.truncateText(tspan,width);
+                        break;
+                    }
                     line = [word];
                     tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                    if (tspan.node().getComputedTextLength() > width) {
+                        nv.utils.truncateText(tspan,width);
+                        break;
+                    }
                 }
             }
             first = false;
         }
     });
+};
+
+nv.utils.truncateText = function(text,width){
+    var _text = text.text();
+    var textLength = text.node().getComputedTextLength();
+    while (textLength > width && _text.length > 0) {
+        _text = _text.slice(0, -1);
+        text.text(_text + '..');
+        textLength = text.node().getComputedTextLength();
+    }
 };
 
 /*

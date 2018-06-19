@@ -232,10 +232,23 @@ nv.models.multiBarHorizontalChart = function() {
                     .style('opacity', 1);
 
                 if (wrapLabels) {
+
+                    //adds a invisible text to help us obtain the font size so we can calculate free space
+                    var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
+                    var sampleTextHeight = sampleText.node().getBBox().height;
+
+                    var availableLeft = margin.left;
+
+                    if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
+                        availableLeft = margin.left - chart.xAxis.axisLabelDistance() - (sampleTextHeight * 1.50); //36 is set by nvd3 in axis
+                    }
+
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, margin.left - 15);
+                        .call(nv.utils.wrapTicks, availableLeft, chart.xAxis.rangeBand());
 
                     g.selectAll('.tick text tspan').attr("x",-5);
+
+                    //Pulls the positioning of the tspan up to center the text
                     g.selectAll('.tick text').each(function(d) {
                         var tspan = d3.select(this).select('tspan');
                         var tspans = d3.select(this).selectAll('tspan');
@@ -243,16 +256,20 @@ nv.models.multiBarHorizontalChart = function() {
                         if (size > 1) {
                             tspans.attr("y",tspan.node().getBBox().y*(size-1));
                         }
-                    })
+                    });
+
+                    //removes the invisible text
+                    sampleText.remove();
                 }
 
-                if (reduceXTicks)
+                if (reduceXTicks) {
                     xTicks
-                        .filter(function(d,i) {
+                        .filter(function (d, i) {
                             return i % Math.ceil(data[0].values.length / (availableHeight / 10)) !== 0;
                         })
                         .selectAll('text, line')
                         .style('opacity', 0);
+                }
             }
 
             if (showYAxis) {
