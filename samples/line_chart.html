@@ -111,7 +111,10 @@
         });
 
         chart.xAxis.tickFormat(function (x) {
-            return moment(new Date(x)).format("YYYY-MM-DD");
+            return moment(new Date(x)).format("MMM YYYY");
+            //return moment(new Date(x)).format("[Week] WW, YYYY");
+            //return moment(new Date(x)).format("MMM DD, YYYY");
+            //return moment(new Date(x)).format("YYYY-MM-DD HH");
         });
 
         chart.xScale(d3.time.scale());

@@ -381,7 +381,7 @@ nv.models.lineChart = function() {
 
             if (wrapLabels) {
                 g.select('.nv-x').selectAll('.tick text')
-                    .call(nv.utils.wrapTicks, 70);
+                    .call(nv.utils.wrapTicks, 62);
             }
 
             //============================================================
