@@ -1544,7 +1544,6 @@ nv.utils.noData = function(chart, container) {
  */
 nv.utils.wrapTicks = function (text, width, height) {
     text.each(function() {
-
         var text = d3.select(this),
             textHeight = text.node().getBBox().height,
             words = text.text().split(/\s+/).reverse(),
@@ -1562,24 +1561,36 @@ nv.utils.wrapTicks = function (text, width, height) {
             if (tspan.node().getComputedTextLength() > width) {
                 var tSpans = text.selectAll('tspan');
                 if((height && (tSpans.size()+1) >= height / textHeight) || first){
-                    var _text = tspan.text();
-                    var textLength = tspan.node().getComputedTextLength();
-                    while (textLength > width && text.length > 0) {
-                        _text = _text.slice(0, -1);
-                        tspan.text(_text + '..');
-                        textLength = tspan.node().getComputedTextLength();
-                    }
+                    nv.utils.truncateText(tspan,width);
                     break;
                 }else {
                     line.pop();
                     tspan.text(line.join(" "));
+                    if (tspan.node().getComputedTextLength() > width) {
+                        nv.utils.truncateText(tspan,width);
+                        break;
+                    }
                     line = [word];
                     tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                    if (tspan.node().getComputedTextLength() > width) {
+                        nv.utils.truncateText(tspan,width);
+                        break;
+                    }
                 }
             }
             first = false;
         }
     });
+};
+
+nv.utils.truncateText = function(text,width){
+    var _text = text.text();
+    var textLength = text.node().getComputedTextLength();
+    while (textLength > width && _text.length > 0) {
+        _text = _text.slice(0, -1);
+        text.text(_text + '..');
+        textLength = text.node().getComputedTextLength();
+    }
 };
 
 /*
@@ -10958,10 +10969,23 @@ nv.models.multiBarHorizontalChart = function() {
                     .style('opacity', 1);
 
                 if (wrapLabels) {
+
+                    //adds a invisible text to help us obtain the font size so we can calculate free space
+                    var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
+                    var sampleTextHeight = sampleText.node().getBBox().height;
+
+                    var availableLeft = margin.left;
+
+                    if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
+                        availableLeft = margin.left - chart.xAxis.axisLabelDistance() - (sampleTextHeight * 1.50); //36 is set by nvd3 in axis
+                    }
+
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, margin.left - 15);
+                        .call(nv.utils.wrapTicks, availableLeft, chart.xAxis.rangeBand());
 
                     g.selectAll('.tick text tspan').attr("x",-5);
+
+                    //Pulls the positioning of the tspan up to center the text
                     g.selectAll('.tick text').each(function(d) {
                         var tspan = d3.select(this).select('tspan');
                         var tspans = d3.select(this).selectAll('tspan');
@@ -10969,16 +10993,20 @@ nv.models.multiBarHorizontalChart = function() {
                         if (size > 1) {
                             tspans.attr("y",tspan.node().getBBox().y*(size-1));
                         }
-                    })
+                    });
+
+                    //removes the invisible text
+                    sampleText.remove();
                 }
 
-                if (reduceXTicks)
+                if (reduceXTicks) {
                     xTicks
-                        .filter(function(d,i) {
+                        .filter(function (d, i) {
                             return i % Math.ceil(data[0].values.length / (availableHeight / 10)) !== 0;
                         })
                         .selectAll('text, line')
                         .style('opacity', 0);
+                }
             }
 
             if (showYAxis) {
