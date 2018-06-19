@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-15 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-19 */
 (function(){
 
 // set up main nv object
@@ -8331,7 +8331,7 @@ nv.models.lineChart = function() {
 
             if (wrapLabels) {
                 g.select('.nv-x').selectAll('.tick text')
-                    .call(nv.utils.wrapTicks, 70);
+                    .call(nv.utils.wrapTicks, 62);
             }
 
             //============================================================
