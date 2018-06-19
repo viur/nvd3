@@ -10974,7 +10974,7 @@ nv.models.multiBarHorizontalChart = function() {
                     var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
                     var sampleTextHeight = sampleText.node().getBBox().height;
 
-                    var availableLeft = margin.left;
+                    var availableLeft = margin.left - 15;
 
                     if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
                         availableLeft = margin.left - chart.xAxis.axisLabelDistance() - (sampleTextHeight * 1.50); //36 is set by nvd3 in axis
