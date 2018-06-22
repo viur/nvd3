@@ -185,9 +185,8 @@ nv.models.gaugeChart = function () {
             });
 
             pie.dispatch.on('elementClick', function (d) {
-               dispatch.pointClick({
-                   xValue: d.data.label,
-                   yValue: d.data.value
+                dispatch.pointClick({
+                   xValue: d.data.value
                });
             });
 

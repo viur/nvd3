@@ -246,6 +246,12 @@ nv.models.gauge = function () {
             var gText = g.append("g").attr("class", "nv-pie-text");
 
             gText.append("text").attr('class', 'nv-pie-title');
+            gText.classed('nv-cursor-pointer',showClickable);
+            gText.on('click', function (d) {
+                dispatch.elementClick({
+                    data: d[0]
+                });
+            });
 
             var valueText = function (d) {
 
@@ -339,13 +345,6 @@ nv.models.gauge = function () {
             ae.on('mousemove', function (d, i) {
                 dispatch.elementMousemove({data: d.data, index: i});
             });
-            ae.on('click', function (d, i) {
-                dispatch.elementClick({
-                    data: d.data,
-                    index: i,
-                    color: d3.select(this).style("fill")
-                });
-            });
             ae.on('dblclick', function (d, i) {
                 dispatch.elementDblClick({
                     data: d.data,
@@ -363,7 +362,6 @@ nv.models.gauge = function () {
             slices.attr('stroke', function (d, i) {
                 return color(d.data, i);
             });
-            slices.classed('nv-cursor-pointer',showClickable);
 
             var paths = ae.append('path')
             //Viur - For PNG Export purposes
