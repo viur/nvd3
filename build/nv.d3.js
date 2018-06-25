@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-22 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-25 */
 (function(){
 
 // set up main nv object
@@ -1591,6 +1591,18 @@ nv.utils.truncateText = function(text,width){
         text.text(_text + '..');
         textLength = text.node().getComputedTextLength();
     }
+};
+
+nv.utils.shrinkText = function(text,width){
+    text.each(function() {
+        var size = 12;
+        var text = d3.select(this);
+        var textLength = text.node().getComputedTextLength();
+        while (textLength > width && size > 1) {
+            text.style("font-size", --size + 'px');
+            textLength = text.node().getComputedTextLength();
+        }
+    });
 };
 
 /*
@@ -4760,8 +4772,6 @@ nv.models.funnel = function () {
 
             //Percents
 
-            var max = data[0].values[0];
-
             var part = bars.enter().append('g')
                 .attr("class", "nv-percentage")
                 .filter(function (d, i) {
@@ -4793,10 +4803,14 @@ nv.models.funnel = function () {
                 })
                 .style("text-anchor", "middle")
                 .attr('transform', "scale(1.1)")
-                .attr("fill", "white")
+                .style("fill", "white")
+                .style("font-weight", "normal")
                 .text(function (d, i) {
-                    return d3.round(d.percent, 2) + '%';
+                    return d3.round(d.percent, 1) + '%';
                 });
+
+            part.selectAll('text')
+                .call(nv.utils.shrinkText, (x.rangeBand() * .5) - 8);
 
             ////////////////////////////////////////////////////////////////
 
@@ -5114,6 +5128,16 @@ nv.models.funnelChart = function () {
                 g.select('.nv-x.nv-axis').call(xAxis);
 
                 var xTicks = g.select('.nv-x.nv-axis').selectAll('g');
+
+                 //adds a invisible text to help us obtain the font size so we can calculate free space
+                var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
+                var sampleTextHeight = sampleText.node().getBBox().height;
+                var availableBottom = margin.bottom;
+
+                if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
+                    availableBottom = chart.xAxis.axisLabelDistance() + 36 - (sampleTextHeight * 1.05); //36 is set by nvd3 in axis
+                }
+
                 if (staggerLabels) {
                     xTicks
                         .selectAll('text')
@@ -5127,10 +5151,13 @@ nv.models.funnelChart = function () {
                         .style('text-anchor', rotateLabels > 0 ? 'start' : 'end');
                 }
 
-                if (wrapLabels) {
+                if (wrapLabels && !rotateLabels) {
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand())
+                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15, availableBottom);
                 }
+
+                //removes the invisible text
+                sampleText.remove();
             }
 
             if (showYAxis) {
