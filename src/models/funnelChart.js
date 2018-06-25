@@ -161,6 +161,16 @@ nv.models.funnelChart = function () {
                 g.select('.nv-x.nv-axis').call(xAxis);
 
                 var xTicks = g.select('.nv-x.nv-axis').selectAll('g');
+
+                 //adds a invisible text to help us obtain the font size so we can calculate free space
+                var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
+                var sampleTextHeight = sampleText.node().getBBox().height;
+                var availableBottom = margin.bottom;
+
+                if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
+                    availableBottom = chart.xAxis.axisLabelDistance() + 36 - (sampleTextHeight * 1.05); //36 is set by nvd3 in axis
+                }
+
                 if (staggerLabels) {
                     xTicks
                         .selectAll('text')
@@ -174,10 +184,13 @@ nv.models.funnelChart = function () {
                         .style('text-anchor', rotateLabels > 0 ? 'start' : 'end');
                 }
 
-                if (wrapLabels) {
+                if (wrapLabels && !rotateLabels) {
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand())
+                        .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15, availableBottom);
                 }
+
+                //removes the invisible text
+                sampleText.remove();
             }
 
             if (showYAxis) {

@@ -115,8 +115,6 @@ nv.models.funnel = function () {
 
             //Percents
 
-            var max = data[0].values[0];
-
             var part = bars.enter().append('g')
                 .attr("class", "nv-percentage")
                 .filter(function (d, i) {
@@ -148,10 +146,14 @@ nv.models.funnel = function () {
                 })
                 .style("text-anchor", "middle")
                 .attr('transform', "scale(1.1)")
-                .attr("fill", "white")
+                .style("fill", "white")
+                .style("font-weight", "normal")
                 .text(function (d, i) {
-                    return d3.round(d.percent, 2) + '%';
+                    return d3.round(d.percent, 1) + '%';
                 });
+
+            part.selectAll('text')
+                .call(nv.utils.shrinkText, (x.rangeBand() * .5) - 8);
 
             ////////////////////////////////////////////////////////////////
 

@@ -34,7 +34,7 @@
 <body>
 
 <div id="chart"
-     style="height: 517px; width: 1591px;">
+     style="height: 600px; width: 300px;">
     <svg></svg>
 </div>
 <script>
@@ -42,10 +42,10 @@
     var data = [
         {
             key: 'A', values: [
-            {x: 'A', y: 50},
-            {x: 'B', y: 25},
-            {x: 'C', y: 15},
-            {x: 'D', y: 5}
+            {x: 'Teste Bastante Grande', y: 50},
+            {x: 'Outro Texto', y: 25},
+            {x: 'Ainda outro agora', y: 15},
+            {x: 'mais mais mais', y: 5}
         ]
         }
     ];
@@ -64,6 +64,7 @@
             console.log(e);
         });
 
+        chart.wrapLabels(true);
         chart.showClickable(false);
         chart.update();
 

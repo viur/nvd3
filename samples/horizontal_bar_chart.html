@@ -77,6 +77,10 @@
         chart.tooltip.valueFormatter(d3.format('.2%'));
         chart.wrapLabels(true);
 
+        chart.margin({"left": 90, "right": 30, "top": 20, "bottom": 35});
+
+        chart.xAxis.axisLabelDistance(20);
+
         d3.select("#chart svg")
             .datum(data)
             .transition().duration(1200)

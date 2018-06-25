@@ -707,6 +707,18 @@ nv.utils.truncateText = function(text,width){
     }
 };
 
+nv.utils.shrinkText = function(text,width){
+    text.each(function() {
+        var size = 12;
+        var text = d3.select(this);
+        var textLength = text.node().getComputedTextLength();
+        while (textLength > width && size > 1) {
+            text.style("font-size", --size + 'px');
+            textLength = text.node().getComputedTextLength();
+        }
+    });
+};
+
 /*
 Check equality of 2 array
 */
