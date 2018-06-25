@@ -261,6 +261,8 @@ nv.models.scatter = function() {
                         .attr("clip-path", function(d,i) { return "url(#nv-clip-"+id+"-"+i+")"; })
                         ;
 
+                    vPointPaths.classed('nv-cursor-pointer',showClickable);
+
                     // good for debugging point hover issues
                     if (showVoronoi) {
                         vPointPaths.style("fill", d3.rgb(230, 230, 230))

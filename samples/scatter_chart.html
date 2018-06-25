@@ -43,7 +43,8 @@
             .margin({top: 20, right: 20, bottom: 20, left: 20})
             .pointSize(function (d) {
                 return d.z
-            });
+            })
+            .showClickable(true);
 
         d3.select('#test1')
             .datum(randomData())
