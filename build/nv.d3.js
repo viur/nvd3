@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-25 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-26 */
 (function(){
 
 // set up main nv object
@@ -8413,13 +8413,17 @@ nv.models.lineChart = function() {
                         });
                     });
                 //Highlight the tooltip entry based on which point the mouse is closest to.
-                if (allData.length > 2) {
-                    var yValue = chart.yScale().invert(e.mouseY);
-                    var domainExtent = Math.abs(chart.yScale().domain()[0] - chart.yScale().domain()[1]);
-                    var threshold = 0.03 * domainExtent;
-                    var indexToHighlight = nv.nearestValueIndex(allData.map(function(d){return d.value;}),yValue,threshold);
-                    if (indexToHighlight !== null)
+                var yValue = chart.yScale().invert(e.mouseY);
+                var domainExtent = Math.abs(chart.yScale().domain()[0] - chart.yScale().domain()[1]);
+                var threshold = 0.03 * domainExtent;
+                var indexToHighlight = nv.nearestValueIndex(allData.map(function(d){return d.value;}),yValue,threshold);
+                if (indexToHighlight !== null) {
+                    if (allData.length > 2) {
                         allData[indexToHighlight].highlight = true;
+                    }
+                    container.style('cursor',chart.showClickable() ? "pointer" : "auto");
+                }else{
+                    container.style('cursor',"auto");
                 }
 
                 var defaultValueFormatter = function(d,i) {
@@ -8476,6 +8480,7 @@ nv.models.lineChart = function() {
 
             interactiveLayer.dispatch.on("elementMouseout",function(e) {
                 lines.clearHighlights();
+                container.style('cursor',"auto");
             });
 
             dispatch.on('changeState', function(e) {
@@ -15323,6 +15328,8 @@ nv.models.scatter = function() {
                             return "nv-path-"+i; })
                         .attr("clip-path", function(d,i) { return "url(#nv-clip-"+id+"-"+i+")"; })
                         ;
+
+                    vPointPaths.classed('nv-cursor-pointer',showClickable);
 
                     // good for debugging point hover issues
                     if (showVoronoi) {
