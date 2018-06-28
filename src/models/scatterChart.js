@@ -302,7 +302,7 @@ nv.models.scatterChart = function() {
                     xValue: d.point.x,
                     yValue: d.point.y,
                     series: d.series.name ? d.series.name : d.series.key,
-                    size: d.point.z ? d.point.z : undefined
+                    size: scatter.pointSize()(d.point)
                 });
             });
 
