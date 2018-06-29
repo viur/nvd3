@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-28 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-29 */
 (function(){
 
 // set up main nv object
@@ -11006,7 +11006,7 @@ nv.models.multiBarHorizontalChart = function() {
                     var availableLeft = margin.left - 20;
 
                     if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
-                        availableLeft = margin.left - chart.xAxis.axisLabelDistance() - (sampleTextHeight * 1.50); //36 is set by nvd3 in axis
+                        availableLeft = (Math.max(margin.left, chart.xAxis.width()) - 25) - (sampleTextHeight * 1.70) - (chart.xAxis.axisLabelDistance()*-1);
                     }
 
                     g.selectAll('.tick text')
