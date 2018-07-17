@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-06-29 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-07-17 */
 (function(){
 
 // set up main nv object
@@ -17242,30 +17242,40 @@ nv.models.stackedAreaChart = function() {
 
                         if (showTotalInTooltip && stacked.style() != 'expand') {
                           valueSum += tooltipValue;
-                        };
+                        }
                     });
 
                 allData.reverse();
 
                 //Highlight the tooltip entry based on which stack the mouse is closest to.
+
+                var yValue = chart.yScale().invert(e.mouseY);
+                var yDistMax = Infinity, indexToHighlight = null;
+
                 if (allData.length > 2) {
-                    var yValue = chart.yScale().invert(e.mouseY);
-                    var yDistMax = Infinity, indexToHighlight = null;
-                    allData.forEach(function(series,i) {
+                    allData.forEach(function (series, i) {
 
                         //To handle situation where the stacked area chart is negative, we need to use absolute values
                         //when checking if the mouse Y value is within the stack area.
                         yValue = Math.abs(yValue);
                         var stackedY0 = Math.abs(series.point.display.y0);
                         var stackedY = Math.abs(series.point.display.y);
-                        if ( yValue >= stackedY0 && yValue <= (stackedY + stackedY0))
-                        {
+                        if (yValue >= stackedY0 && yValue <= (stackedY + stackedY0)) {
                             indexToHighlight = i;
                             return;
                         }
                     });
                     if (indexToHighlight != null)
                         allData[indexToHighlight].highlight = true;
+                }
+
+                var domainExtent = Math.abs(chart.yScale().domain()[0] - chart.yScale().domain()[1]);
+                var threshold = 0.03 * domainExtent;
+                indexToHighlight = nv.nearestValueIndex(allData.map(function(series){return Math.abs(series.point.display.y) + Math.abs(series.point.display.y0);}),yValue,threshold);
+                if (indexToHighlight !== null) {
+                    container.style('cursor',chart.showClickable() ? "pointer" : "auto");
+                }else{
+                    container.style('cursor',"auto");
                 }
 
                 //If we are not in 'expand' mode, add a 'Total' row to the tooltip.
@@ -17310,6 +17320,7 @@ nv.models.stackedAreaChart = function() {
 
             interactiveLayer.dispatch.on("elementMouseout",function(e) {
                 stacked.clearHighlights();
+                container.style('cursor',"auto");
             });
 
             // Update chart from a state object passed to event handler
