@@ -181,10 +181,14 @@ nv.models.pieChart = function() {
             });
 
             pie.dispatch.on('elementClick', function (d) {
-                dispatch.pointClick({
-                    xValue:d.data.label,
-                    yValue:d.data.value
-                });
+                var point = {
+                    xValue: d.data.label,
+                    yValue: d.data.value
+                };
+                if(d.data.id){
+                    point.id = d.data.id;
+                }
+                dispatch.pointClick(point);
             });
 
             // Update chart from a state object passed to event handler
