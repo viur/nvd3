@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-07-17 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-10-07 */
 (function(){
 
 // set up main nv object
@@ -13444,10 +13444,14 @@ nv.models.pieChart = function() {
             });
 
             pie.dispatch.on('elementClick', function (d) {
-                dispatch.pointClick({
-                    xValue:d.data.label,
-                    yValue:d.data.value
-                });
+                var point = {
+                    xValue: d.data.label,
+                    yValue: d.data.value
+                };
+                if(d.data.id){
+                    point.id = d.data.id;
+                }
+                dispatch.pointClick(point);
             });
 
             // Update chart from a state object passed to event handler
