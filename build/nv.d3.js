@@ -6041,6 +6041,8 @@ nv.models.gauge = function () {
                             }
                         }
                     });
+            }else{
+                pieLabels.remove();
             }
 
 
