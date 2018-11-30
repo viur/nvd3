@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-10-07 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-11-30 */
 (function(){
 
 // set up main nv object
@@ -5635,7 +5635,8 @@ nv.models.gauge = function () {
         , labelFormat = function (d) {
             return d;
         }
-        , showLabels = false
+        , showLabels = true
+        , showTicks = true
         , labelsOutside = false
         , labelType = "key"
         , valueType = "absolute"
@@ -5993,42 +5994,21 @@ nv.models.gauge = function () {
                 })
                 .attrTween('d', arcTween);
 
-            if (showLabels) {
-                // This does the normal label
-                var labelsArc = [];
-                for (var i = 0; i < data[0].length; i++) {
-                    labelsArc.push(arcs[i]);
+            if (showTicks) {
 
-                    if (labelsOutside) {
-                        if (donut) {
-                            labelsArc[i] = d3.svg.arc().outerRadius(arcs[i].outerRadius());
-                            if (startAngle !== false) labelsArc[i].startAngle(startAngle);
-                            if (endAngle !== false) labelsArc[i].endAngle(endAngle);
-                        }
-                    } else if (!donut) {
-                        labelsArc[i].innerRadius(0);
-                    }
-                }
-
-                pieLabels.enter().append("g").classed("nv-label", true).each(function (d, i) {
+                pieLabels.enter().append("g").classed("nv-label", true).each(function (d, index) {
                     var group = d3.select(this);
-
                     group.attr('transform', function (d, i) {
-                        if (labelSunbeamLayout) {
-                            d.outerRadius = arcsRadiusOuter[i] + 10; // Set Outer Coordinate
-                            d.innerRadius = arcsRadiusOuter[i] + 15; // Set Inner Coordinate
-                            var rotateAngle = (d.startAngle + d.endAngle) / 2 * (180 / Math.PI);
-                            if ((d.startAngle + d.endAngle) / 2 < Math.PI) {
-                                rotateAngle -= 90;
-                            } else {
-                                rotateAngle += 90;
-                            }
-                            return 'translate(' + labelsArc[i].centroid(d) + ') rotate(' + rotateAngle + ')';
-                        } else {
-                            d.outerRadius = radius + 10; // Set Outer Coordinate
-                            d.innerRadius = radius + 15; // Set Inner Coordinate
-                            return 'translate(' + labelsArc[i].centroid(d) + ')'
+                        d.outerRadius = radius + 10 ; // Set Outer Coordinate
+                        d.innerRadius = radius + 15; // Set Inner Coordinate
+                        var dist= arcsRadiusInner[i] - 10;
+                        var winkel=d.startAngle;
+                        if(index!==0){
+                            winkel=d.endAngle;
                         }
+                        var x=dist*Math.sin(winkel);
+                        var y=-dist*Math.cos(winkel);
+                        return "translate(" + x + "," + y + ")";
                     });
 
                     group.append('rect')
@@ -6038,84 +6018,31 @@ nv.models.gauge = function () {
                         .attr("ry", 3);
 
                     group.append('text')
-                        .style('text-anchor', labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle') //center the text on it's origin or begin/end if orthogonal aligned
+                        .style('text-anchor', 'middle')
                         .style('fill', '#000')
                 });
 
-                var labelLocationHash = {};
-                var avgHeight = 14;
-                var avgWidth = 140;
-                var createHashKey = function (coordinates) {
-                    return Math.floor(coordinates[0] / avgWidth) * avgWidth + ',' + Math.floor(coordinates[1] / avgHeight) * avgHeight;
-                };
-                var getSlicePercentage = function (d) {
-                    return (d.endAngle - d.startAngle) / (2 * Math.PI);
-                };
-
-                pieLabels.watchTransition(renderWatch, 'pie labels').attr('transform', function (d, i) {
-                    if (labelSunbeamLayout) {
-                        d.outerRadius = arcsRadiusOuter[i] + 10; // Set Outer Coordinate
-                        d.innerRadius = arcsRadiusOuter[i] + 15; // Set Inner Coordinate
-                        var rotateAngle = (d.startAngle + d.endAngle) / 2 * (180 / Math.PI);
-                        if ((d.startAngle + d.endAngle) / 2 < Math.PI) {
-                            rotateAngle -= 90;
-                        } else {
-                            rotateAngle += 90;
-                        }
-                        return 'translate(' + labelsArc[i].centroid(d) + ') rotate(' + rotateAngle + ')';
-                    } else {
-                        d.outerRadius = radius + 10; // Set Outer Coordinate
-                        d.innerRadius = radius + 15; // Set Inner Coordinate
-
-                        /*
-                         Overlapping pie labels are not good. What this attempts to do is, prevent overlapping.
-                         Each label location is hashed, and if a hash collision occurs, we assume an overlap.
-                         Adjust the label's y-position to remove the overlap.
-                         */
-                        var center = labelsArc[i].centroid(d);
-                        if (d.value) {
-                            var hashKey = createHashKey(center);
-                            if (labelLocationHash[hashKey]) {
-                                center[1] -= avgHeight;
-                            }
-                            labelLocationHash[createHashKey(center)] = true;
-                        }
-                        return 'translate(' + center + ')'
-                    }
-                });
-
                 pieLabels.select(".nv-label text")
-                    .style('text-anchor', function (d, i) {
-                        //center the text on it's origin or begin/end if orthogonal aligned
-                        return labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle';
-                    })
+                    .style('text-anchor', 'middle')
                     .text(function (d, i) {
-                        var percent = getSlicePercentage(d);
-                        var label = '';
-                        if (!d.value || percent < labelThreshold) return '';
-
-                        if (typeof labelType === 'function') {
-                            label = labelType(d, i, {
-                                'key': getX(d.data),
-                                'value': getY(d.data),
-                                'percent': valueFormat(percent)
-                            });
-                        } else {
+                        if(i===0){
                             switch (labelType) {
                                 case 'key':
-                                    label = labelFormat(getX(d.data));
-                                    break;
                                 case 'value':
-                                    label = valueFormat(getY(d.data));
-                                    break;
+                                    return '0';
                                 case 'percent':
-                                    label = d3.format('%')(percent);
-                                    break;
+                                    return d3.format('%')(0);
+                            }
+                        }else{
+                            switch (labelType) {
+                                case 'key':
+                                case 'value':
+                                    return max;
+                                case 'percent':
+                                    return d3.format('%')(1);
                             }
                         }
-                        return label;
-                    })
-                ;
+                    });
             }
 
 
@@ -6176,6 +6103,13 @@ nv.models.gauge = function () {
                 return showLabels;
             }, set: function (_) {
                 showLabels = _;
+            }
+        },
+        showTicks: {
+            get: function () {
+                return showTicks;
+            }, set: function (_) {
+                showTicks = _;
             }
         },
         value: {
@@ -6517,7 +6451,7 @@ nv.models.gaugeChart = function () {
                 //Viur
                 legend.key(getLegendKey);
 
-                if (legendPosition === "top" || legendPosition == "left") {
+                if (legendPosition === "top" || legendPosition === "left") {
                     legend.width(availableWidth).key(pie.x());
 
                     //Viur
@@ -6529,7 +6463,7 @@ nv.models.gaugeChart = function () {
                         .datum(data)
                         .call(legend);
 
-                    if (margin.top != legend.height()) {
+                    if (margin.top !== legend.height()) {
                         margin.top = legend.height();
                         availableHeight = nv.utils.availableHeight(height, container, margin);
                     }
