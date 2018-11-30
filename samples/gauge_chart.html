@@ -60,7 +60,7 @@
 
     var data = [
         {label: 'value', value: 20},
-        {label: 'max', value: 50}
+        {label: 'max', value: 30000}
     ];
 
     /*
@@ -81,6 +81,8 @@
                 return d.value
             });
 
+        chart.showTicks(false);
+
         d3.select("#chart svg")
             .datum(data)
             .call(chart);
@@ -89,7 +91,10 @@
             console.log(e);
         });
 
-        chart.showClickable(true);
+        //chart.labelType('percent');
+
+
+        chart.showClickable(false);
         chart.update();
 
         return chart;

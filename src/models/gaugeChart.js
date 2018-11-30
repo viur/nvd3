@@ -124,7 +124,7 @@ nv.models.gaugeChart = function () {
                 //Viur
                 legend.key(getLegendKey);
 
-                if (legendPosition === "top" || legendPosition == "left") {
+                if (legendPosition === "top" || legendPosition === "left") {
                     legend.width(availableWidth).key(pie.x());
 
                     //Viur
@@ -136,7 +136,7 @@ nv.models.gaugeChart = function () {
                         .datum(data)
                         .call(legend);
 
-                    if (margin.top != legend.height()) {
+                    if (margin.top !== legend.height()) {
                         margin.top = legend.height();
                         availableHeight = nv.utils.availableHeight(height, container, margin);
                     }
