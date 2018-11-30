@@ -81,8 +81,6 @@
                 return d.value
             });
 
-        chart.showTicks(false);
-
         d3.select("#chart svg")
             .datum(data)
             .call(chart);
@@ -93,6 +91,9 @@
 
         //chart.labelType('percent');
 
+        //chart.maxValue(50000);
+
+        chart.showTicks(false);
 
         chart.showClickable(false);
         chart.update();
