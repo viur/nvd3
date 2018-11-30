@@ -421,7 +421,7 @@ nv.models.gauge = function () {
                         }else{
                             switch (valueType) {
                                 case 'absolute':
-                                    return valueFormat(value);
+                                    return valueFormat(max);
                                 case 'percent':
                                     return d3.format('%')(1);
                             }
