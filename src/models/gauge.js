@@ -412,17 +412,15 @@ nv.models.gauge = function () {
                     .style('text-anchor', 'middle')
                     .text(function (d, i) {
                         if(i===0){
-                            switch (labelType) {
-                                case 'key':
-                                case 'value':
+                            switch (valueType) {
+                                case 'absolute':
                                     return '0';
                                 case 'percent':
                                     return d3.format('%')(0);
                             }
                         }else{
-                            switch (labelType) {
-                                case 'key':
-                                case 'value':
+                            switch (valueType) {
+                                case 'absolute':
                                     return max;
                                 case 'percent':
                                     return d3.format('%')(1);
