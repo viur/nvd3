@@ -240,7 +240,7 @@ nv.models.multiBarHorizontalChart = function() {
                     var availableLeft = margin.left - 20;
 
                     if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
-                        availableLeft = (Math.max(margin.left, chart.xAxis.width()) - 25) - (sampleTextHeight * 1.70) - (chart.xAxis.axisLabelDistance()*-1);
+                        availableLeft = (Math.max(availableLeft, chart.xAxis.width()) - 25) - (sampleTextHeight * 1.70) - (chart.xAxis.axisLabelDistance()*-1);
                     }
 
                     g.selectAll('.tick text')
