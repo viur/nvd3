@@ -14,6 +14,11 @@
     <script src="../src/models/multiBarHorizontalChart.js"></script>
 
     <style>
+
+        @import url(https://fonts.googleapis.com/earlyaccess/amiri.css);
+
+        .amiri{font-family: 'Amiri', serif;}
+
         .nvd3 text {
             font: 12px sans-serif;
         }
@@ -42,26 +47,8 @@
     var data = [
         {
             key: 'AL', values: [
-                {x: 'Under 5 Years asasdasdas huehue zaza', y: 5},
-                {x: '5 to 13 Years boatarde bomdia', y: 10},
-                {x: 'texto', y: 10},
-                {x: 'outra texto grande nem cabe o que e que acontece', y: 10}
-            ]
-        },
-        {
-            key: 'AK', values: [
-                {x: 'Under 5 Years asasdasdas huehue zaza', y: 4},
-                {x: '5 to 13 Years boatarde bomdia', y: 8},
-                {x: 'texto', y: 8},
-                {x: 'outra texto grande nem cabe o que e que acontece', y: 8}
-            ]
-        },
-        {
-            key: 'AZ', values: [
-                {x: 'Under 5 Years asasdasdas huehue zaza', y: 11},
-                {x: '5 to 13 Years boatarde bomdia', y: 5},
-                {x: 'texto', y: 5},
-                {x: 'outra texto grande nem cabe o que e que acontece', y: 5}
+                {x: 'إنشاء حساب و إجراءات', y: 21},
+                {x: 'Pedro Jorge Almeida', y: 21}
             ]
         }
     ];
@@ -79,7 +66,7 @@
 
         chart.margin({"left": 90, "right": 30, "top": 20, "bottom": 35});
 
-        chart.xAxis.axisLabelDistance(-30);
+        chart.xAxis.axisLabelDistance(0);
 
 
         d3.select("#chart svg")
@@ -87,11 +74,11 @@
             .transition().duration(1200)
             .call(chart);
 
-        chart.dispatch.on("pointClick", function(e) {
+        chart.dispatch.on("pointClick", function (e) {
             console.log(e);
         });
 
-        chart.xAxis.axisLabel('nome grande e com muito texto');
+        //chart.xAxis.axisLabel('Reason of Rejections');
 
         chart.showClickable(false);
         chart.update();
