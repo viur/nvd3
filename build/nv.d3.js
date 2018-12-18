@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-12-07 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-12-18 */
 (function(){
 
 // set up main nv object
@@ -1544,8 +1544,12 @@ nv.utils.noData = function(chart, container) {
  */
 nv.utils.wrapTicks = function (text, width, height) {
     text.each(function() {
-        var text = d3.select(this),
-            textHeight = text.node().getBBox().height,
+        var text = d3.select(this);
+        if(nv.utils.isArabic(text.text())){
+            nv.utils.truncateText(text,width);
+            return;
+        }
+        var textHeight = text.node().getBBox().height,
             words = text.text().split(/\s+/).reverse(),
             word,
             line = [],
@@ -1632,6 +1636,11 @@ nv.utils.arrayEquals = function (array1, array2) {
         }
     }
     return true;
+};
+
+nv.utils.isArabic = function (text) {
+    var arabic = /[\u0600-\u06FF]/;
+    return arabic.test(text);
 };nv.models.axis = function() {
     "use strict";
 
