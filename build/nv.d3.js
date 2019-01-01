@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2018-12-18 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-01-01 */
 (function(){
 
 // set up main nv object
@@ -1555,7 +1555,7 @@ nv.utils.wrapTicks = function (text, width, height) {
             line = [],
             lineNumber = 0,
             lineHeight = 1.1,
-            y = text.attr("y"),
+            y = text.attr("y") ? text.attr("y") : 0,
             dy = parseFloat(text.attr("dy")),
             tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em"),
             first = true;
@@ -10959,12 +10959,8 @@ nv.models.multiBarHorizontalChart = function() {
 
                     //Pulls the positioning of the tspan up to center the text
                     g.selectAll('.tick text').each(function(d) {
-                        var tspan = d3.select(this).select('tspan');
-                        var tspans = d3.select(this).selectAll('tspan');
-                        var size = tspans.size();
-                        if (size > 1) {
-                            tspans.attr("y",tspan.node().getBBox().y*(size-1));
-                        }
+                        var text = d3.select(this);
+                        d3.select(this).attr("y",-(text.node().getBBox().height / 2) + (sampleTextHeight/2));
                     });
 
                     //removes the invisible text
