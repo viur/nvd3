@@ -250,12 +250,8 @@ nv.models.multiBarHorizontalChart = function() {
 
                     //Pulls the positioning of the tspan up to center the text
                     g.selectAll('.tick text').each(function(d) {
-                        var tspan = d3.select(this).select('tspan');
-                        var tspans = d3.select(this).selectAll('tspan');
-                        var size = tspans.size();
-                        if (size > 1) {
-                            tspans.attr("y",tspan.node().getBBox().y*(size-1));
-                        }
+                        var text = d3.select(this);
+                        d3.select(this).attr("y",-(text.node().getBBox().height / 2) + (sampleTextHeight/2));
                     });
 
                     //removes the invisible text
