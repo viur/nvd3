@@ -656,7 +656,8 @@ nv.utils.noData = function(chart, container) {
 /*
  Wrap long labels.
  */
-nv.utils.wrapTicks = function (text, width, height) {
+nv.utils.wrapTicks = function (text, width, height, verticalAlign) {
+    verticalAlign = verticalAlign ? verticalAlign : false;
     text.each(function() {
         var text = d3.select(this);
         if(nv.utils.isArabic(text.text())){
@@ -671,7 +672,7 @@ nv.utils.wrapTicks = function (text, width, height) {
             lineHeight = 1.1,
             y = text.attr("y") ? text.attr("y") : 0,
             dy = parseFloat(text.attr("dy")),
-            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em"),
+            tspan = text.text(null).append("tspan").attr("x", 0).attr("dy", dy + "em"),
             first = true;
         while (word = words.pop()) {
             line.push(word);
@@ -689,7 +690,7 @@ nv.utils.wrapTicks = function (text, width, height) {
                         break;
                     }
                     line = [word];
-                    tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                    tspan = text.append("tspan").attr("x", 0).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
                     if (tspan.node().getComputedTextLength() > width) {
                         nv.utils.truncateText(tspan,width);
                         break;
@@ -698,6 +699,15 @@ nv.utils.wrapTicks = function (text, width, height) {
             }
             first = false;
         }
+        var tspans = text.selectAll('tspan');
+        var nTspans = tspans.size();
+        text.selectAll('tspan').attr("y",function(){
+            if(verticalAlign) {
+                return -((textHeight * nTspans) / 2) + (textHeight / 2);
+            }else{
+                return y;
+            }
+        });
     });
 };
 

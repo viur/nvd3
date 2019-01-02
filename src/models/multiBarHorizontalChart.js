@@ -244,15 +244,9 @@ nv.models.multiBarHorizontalChart = function() {
                     }
 
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, availableLeft, chart.xAxis.rangeBand());
+                        .call(nv.utils.wrapTicks, availableLeft, chart.xAxis.rangeBand(), true);
 
                     g.selectAll('.tick text tspan').attr("x",-5);
-
-                    //Pulls the positioning of the tspan up to center the text
-                    g.selectAll('.tick text').each(function(d) {
-                        var text = d3.select(this);
-                        d3.select(this).attr("y",-(text.node().getBBox().height / 2) + (sampleTextHeight/2));
-                    });
 
                     //removes the invisible text
                     sampleText.remove();
