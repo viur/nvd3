@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-01-01 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-01-02 */
 (function(){
 
 // set up main nv object
@@ -1542,7 +1542,8 @@ nv.utils.noData = function(chart, container) {
 /*
  Wrap long labels.
  */
-nv.utils.wrapTicks = function (text, width, height) {
+nv.utils.wrapTicks = function (text, width, height, verticalAlign) {
+    verticalAlign = verticalAlign ? verticalAlign : false;
     text.each(function() {
         var text = d3.select(this);
         if(nv.utils.isArabic(text.text())){
@@ -1557,7 +1558,7 @@ nv.utils.wrapTicks = function (text, width, height) {
             lineHeight = 1.1,
             y = text.attr("y") ? text.attr("y") : 0,
             dy = parseFloat(text.attr("dy")),
-            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em"),
+            tspan = text.text(null).append("tspan").attr("x", 0).attr("dy", dy + "em"),
             first = true;
         while (word = words.pop()) {
             line.push(word);
@@ -1575,7 +1576,7 @@ nv.utils.wrapTicks = function (text, width, height) {
                         break;
                     }
                     line = [word];
-                    tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                    tspan = text.append("tspan").attr("x", 0).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
                     if (tspan.node().getComputedTextLength() > width) {
                         nv.utils.truncateText(tspan,width);
                         break;
@@ -1584,6 +1585,15 @@ nv.utils.wrapTicks = function (text, width, height) {
             }
             first = false;
         }
+        var tspans = text.selectAll('tspan');
+        var nTspans = tspans.size();
+        text.selectAll('tspan').attr("y",function(){
+            if(verticalAlign) {
+                return -((textHeight * nTspans) / 2) + (textHeight / 2);
+            }else{
+                return y;
+            }
+        });
     });
 };
 
@@ -10953,15 +10963,9 @@ nv.models.multiBarHorizontalChart = function() {
                     }
 
                     g.selectAll('.tick text')
-                        .call(nv.utils.wrapTicks, availableLeft, chart.xAxis.rangeBand());
+                        .call(nv.utils.wrapTicks, availableLeft, chart.xAxis.rangeBand(), true);
 
                     g.selectAll('.tick text tspan').attr("x",-5);
-
-                    //Pulls the positioning of the tspan up to center the text
-                    g.selectAll('.tick text').each(function(d) {
-                        var text = d3.select(this);
-                        d3.select(this).attr("y",-(text.node().getBBox().height / 2) + (sampleTextHeight/2));
-                    });
 
                     //removes the invisible text
                     sampleText.remove();
