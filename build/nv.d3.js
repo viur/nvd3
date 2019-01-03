@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-01-02 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-01-03 */
 (function(){
 
 // set up main nv object
@@ -1550,7 +1550,7 @@ nv.utils.wrapTicks = function (text, width, height, verticalAlign) {
             nv.utils.truncateText(text,width);
             return;
         }
-        var textHeight = text.node().getBBox().height,
+        var textHeight = nv.utils.textHeight(text),
             words = text.text().split(/\s+/).reverse(),
             word,
             line = [],
@@ -1587,10 +1587,10 @@ nv.utils.wrapTicks = function (text, width, height, verticalAlign) {
         }
         var tspans = text.selectAll('tspan');
         var nTspans = tspans.size();
-        text.selectAll('tspan').attr("y",function(){
-            if(verticalAlign) {
+        text.selectAll('tspan').attr("y",function() {
+            if (verticalAlign) {
                 return -((textHeight * nTspans) / 2) + (textHeight / 2);
-            }else{
+            } else {
                 return y;
             }
         });
@@ -1651,6 +1651,15 @@ nv.utils.arrayEquals = function (array1, array2) {
 nv.utils.isArabic = function (text) {
     var arabic = /[\u0600-\u06FF]/;
     return arabic.test(text);
+};
+
+nv.utils.textHeight = function (text) {
+    //getBBbox fails in Firefox when the svg is hidden
+    try {
+        return text.node().getBBox().height;
+    } catch (e) {
+        return 0;
+    }
 };nv.models.axis = function() {
     "use strict";
 
@@ -5150,7 +5159,7 @@ nv.models.funnelChart = function () {
 
                  //adds a invisible text to help us obtain the font size so we can calculate free space
                 var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
-                var sampleTextHeight = sampleText.node().getBBox().height;
+                var sampleTextHeight = nv.utils.textHeight(sampleText);
                 var availableBottom = margin.bottom;
 
                 if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
@@ -10049,7 +10058,7 @@ nv.models.multiBarChart = function() {
 
                 //adds a invisible text to help us obtain the font size so we can calculate free space
                 var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
-                var sampleTextHeight = sampleText.node().getBBox().height;
+                var sampleTextHeight = nv.utils.textHeight(sampleText);
                 var availableBottom = margin.bottom;
 
                 if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
@@ -10954,7 +10963,7 @@ nv.models.multiBarHorizontalChart = function() {
 
                     //adds a invisible text to help us obtain the font size so we can calculate free space
                     var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
-                    var sampleTextHeight = sampleText.node().getBBox().height;
+                    var sampleTextHeight = nv.utils.textHeight(sampleText);
 
                     var availableLeft = margin.left - 20;
 
