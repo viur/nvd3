@@ -664,7 +664,7 @@ nv.utils.wrapTicks = function (text, width, height, verticalAlign) {
             nv.utils.truncateText(text,width);
             return;
         }
-        var textHeight = text.node().getBBox().height,
+        var textHeight = nv.utils.textHeight(text),
             words = text.text().split(/\s+/).reverse(),
             word,
             line = [],
@@ -701,10 +701,10 @@ nv.utils.wrapTicks = function (text, width, height, verticalAlign) {
         }
         var tspans = text.selectAll('tspan');
         var nTspans = tspans.size();
-        text.selectAll('tspan').attr("y",function(){
-            if(verticalAlign) {
+        text.selectAll('tspan').attr("y",function() {
+            if (verticalAlign) {
                 return -((textHeight * nTspans) / 2) + (textHeight / 2);
-            }else{
+            } else {
                 return y;
             }
         });
@@ -765,4 +765,13 @@ nv.utils.arrayEquals = function (array1, array2) {
 nv.utils.isArabic = function (text) {
     var arabic = /[\u0600-\u06FF]/;
     return arabic.test(text);
+};
+
+nv.utils.textHeight = function (text) {
+    //getBBbox fails in Firefox when the svg is hidden
+    try {
+        return text.node().getBBox().height;
+    } catch (e) {
+        return 0;
+    }
 };

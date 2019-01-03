@@ -288,7 +288,7 @@ nv.models.multiBarChart = function() {
 
                 //adds a invisible text to help us obtain the font size so we can calculate free space
                 var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
-                var sampleTextHeight = sampleText.node().getBBox().height;
+                var sampleTextHeight = nv.utils.textHeight(sampleText);
                 var availableBottom = margin.bottom;
 
                 if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
