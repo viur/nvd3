@@ -677,7 +677,7 @@ nv.utils.wrapTicks = function (text, width, height, verticalAlign) {
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
+            if (nv.utils.textLength(tspan) > width) {
                 var tSpans = text.selectAll('tspan');
                 if((height && (tSpans.size()+1) >= height / textHeight) || first){
                     nv.utils.truncateText(tspan,width);
@@ -685,13 +685,13 @@ nv.utils.wrapTicks = function (text, width, height, verticalAlign) {
                 }else {
                     line.pop();
                     tspan.text(line.join(" "));
-                    if (tspan.node().getComputedTextLength() > width) {
+                    if (nv.utils.textLength(tspan) > width) {
                         nv.utils.truncateText(tspan,width);
                         break;
                     }
                     line = [word];
                     tspan = text.append("tspan").attr("x", 0).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-                    if (tspan.node().getComputedTextLength() > width) {
+                    if (nv.utils.textLength(tspan) > width) {
                         nv.utils.truncateText(tspan,width);
                         break;
                     }
@@ -713,11 +713,11 @@ nv.utils.wrapTicks = function (text, width, height, verticalAlign) {
 
 nv.utils.truncateText = function(text,width){
     var _text = text.text();
-    var textLength = text.node().getComputedTextLength();
+    var textLength = nv.utils.textLength(text);
     while (textLength > width && _text.length > 0) {
         _text = _text.slice(0, -1);
         text.text(_text + '..');
-        textLength = text.node().getComputedTextLength();
+        textLength = nv.utils.textLength(text);
     }
 };
 
@@ -725,10 +725,10 @@ nv.utils.shrinkText = function(text,width){
     text.each(function() {
         var size = 12;
         var text = d3.select(this);
-        var textLength = text.node().getComputedTextLength();
+        var textLength = nv.utils.textLength(text);
         while (textLength > width && size > 1) {
             text.style("font-size", --size + 'px');
-            textLength = text.node().getComputedTextLength();
+            textLength = nv.utils.textLength(text);
         }
     });
 };
@@ -771,6 +771,15 @@ nv.utils.textHeight = function (text) {
     //getBBbox fails in Firefox when the svg is hidden
     try {
         return text.node().getBBox().height;
+    } catch (e) {
+        return 0;
+    }
+};
+
+nv.utils.textLength = function (text) {
+    //getComputedTextLength fails in IE 11 when the svg is hidden
+    try {
+        return text.node().getComputedTextLength();
     } catch (e) {
         return 0;
     }

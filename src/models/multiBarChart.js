@@ -352,12 +352,12 @@ nv.models.multiBarChart = function() {
                         .each(function (d) {
                             var self = d3.select(this);
                             var text = self.text();
-                            var textLength = self.node().getComputedTextLength();
+                            var textLength = nv.utils.textLength(self);
 
                             while (textLength > available && text.length > 0) {
                                 text = text.slice(0, -1);
                                 self.text(text + '..');
-                                textLength = self.node().getComputedTextLength();
+                                textLength = nv.utils.textLength(self);
                             }
                         });
                 }
