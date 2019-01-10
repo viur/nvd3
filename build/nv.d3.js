@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-01-04 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-01-10 */
 (function(){
 
 // set up main nv object
@@ -18310,7 +18310,8 @@ nv.models.stackedBarChart = function() {
                         key: evt.data.key,
                         //Viur - Support for Serie name
                         name: evt.data.name,
-                        value: chart.y()(evt.data),
+                        value: evt.data.y,
+                        percent: chart.y()(evt.data),
                         color: evt.color
                     };
                     tooltip.data(evt).hidden(false);
