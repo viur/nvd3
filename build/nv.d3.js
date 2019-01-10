@@ -563,6 +563,10 @@ nv.models.tooltip = function() {
         return d;
     };
 
+    var valuePercentFormatter = function(d, i, p) {
+        return d3.format('%')(d);
+    };
+
     // Format function for the tooltip header value.
     var headerFormatter = function(d) {
         return d;
@@ -626,7 +630,7 @@ nv.models.tooltip = function() {
 
         trowEnter.filter(function (p,i) { return p.percent !== undefined }).append("td")
             .classed("percent", true)
-            .html(function(p, i) { return "(" + d3.format('%')(p.percent) + ")" });
+            .html(function(p, i) { return "(" + valuePercentFormatter(p.percent) + ")" });
 
         trowEnter.selectAll("td").each(function(p) {
             if (p.highlight) {
@@ -839,6 +843,7 @@ nv.models.tooltip = function() {
         hideDelay: {get: function(){return hideDelay;}, set: function(_){hideDelay=_;}},
         contentGenerator: {get: function(){return contentGenerator;}, set: function(_){contentGenerator=_;}},
         valueFormatter: {get: function(){return valueFormatter;}, set: function(_){valueFormatter=_;}},
+        valuePercentFormatter: {get: function(){return valuePercentFormatter;}, set: function(_){valuePercentFormatter=_;}},
         headerFormatter: {get: function(){return headerFormatter;}, set: function(_){headerFormatter=_;}},
         keyFormatter: {get: function(){return keyFormatter;}, set: function(_){keyFormatter=_;}},
         headerEnabled: {get: function(){return headerEnabled;}, set: function(_){headerEnabled=_;}},
