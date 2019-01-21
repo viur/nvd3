@@ -237,7 +237,7 @@ nv.models.multiBarHorizontalChart = function() {
                     var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
                     var sampleTextHeight = nv.utils.textHeight(sampleText);
 
-                    var availableLeft = margin.left - 20;
+                    var availableLeft = margin.left - 25;
 
                     if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
                         availableLeft = (Math.max(availableLeft, chart.xAxis.width()) - 25) - (sampleTextHeight * 1.70) - (chart.xAxis.axisLabelDistance()*-1);
