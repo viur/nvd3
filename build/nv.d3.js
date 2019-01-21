@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-01-10 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-01-21 */
 (function(){
 
 // set up main nv object
@@ -10979,7 +10979,7 @@ nv.models.multiBarHorizontalChart = function() {
                     var sampleText = wrap.append("text").style('opacity', 0).text('Sample');
                     var sampleTextHeight = nv.utils.textHeight(sampleText);
 
-                    var availableLeft = margin.left - 20;
+                    var availableLeft = margin.left - 25;
 
                     if(chart.xAxis.axisLabel() !== null && chart.xAxis.axisLabel() !== ""){
                         availableLeft = (Math.max(availableLeft, chart.xAxis.width()) - 25) - (sampleTextHeight * 1.70) - (chart.xAxis.axisLabelDistance()*-1);
