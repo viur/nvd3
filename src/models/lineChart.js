@@ -381,6 +381,7 @@ nv.models.lineChart = function() {
 
             if (wrapLabels) {
 
+                //TODO find a better way
                 var width = 62, first, second;
                 g.select('.nv-x').selectAll('.tick').each(function (d,i) {
                     try {
@@ -394,7 +395,7 @@ nv.models.lineChart = function() {
                 });
 
                 if (first && second) {
-                    width = second - first;
+                    width = (second - first) - 15;
                 }
 
                 g.select('.nv-x').selectAll('.tick text')
