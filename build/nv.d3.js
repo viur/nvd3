@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-01-21 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-02-07 */
 (function(){
 
 // set up main nv object
@@ -8208,7 +8208,7 @@ nv.models.lineChart = function() {
             if (showXAxis) {
                 xAxis
                     .scale(x)
-                    ._ticks(nv.utils.calcTicksX(availableWidth/120, data) )
+                    ._ticks(nv.utils.calcTicksX(availableWidth/100, data) )
                     .tickSize(-availableHeight1, 0);
 
             }
