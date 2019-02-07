@@ -8342,6 +8342,7 @@ nv.models.lineChart = function() {
 
             if (wrapLabels) {
 
+                //TODO find a better way
                 var width = 62, first, second;
                 g.select('.nv-x').selectAll('.tick').each(function (d,i) {
                     try {
@@ -8355,7 +8356,7 @@ nv.models.lineChart = function() {
                 });
 
                 if (first && second) {
-                    width = second - first;
+                    width = (second - first) - 15;
                 }
 
                 g.select('.nv-x').selectAll('.tick text')
@@ -17110,8 +17111,26 @@ nv.models.stackedAreaChart = function() {
             }
 
             if (wrapLabels) {
+
+                //TODO find a better way
+                var width = 70, first, second;
+                g.select('.nv-x').selectAll('.tick').each(function (d,i) {
+                    try {
+                        if (i === 0) {
+                            first = d3.transform(d3.select(this).attr("transform")).translate[0];
+                        } else if (i === 1) {
+                            second = d3.transform(d3.select(this).attr("transform")).translate[0];
+                        }
+                    } catch (e) {
+                    }
+                });
+
+                if (first && second) {
+                    width = (second - first) - 15;
+                }
+
                 g.select('.nv-x').selectAll('.tick text')
-                    .call(nv.utils.wrapTicks, 70);
+                    .call(nv.utils.wrapTicks, width);
             }
 
             //============================================================
