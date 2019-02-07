@@ -17048,7 +17048,7 @@ nv.models.stackedAreaChart = function() {
             // Setup Axes
             if (showXAxis) {
                 xAxis.scale(x)
-                    ._ticks( nv.utils.calcTicksX(availableWidth/120, data) )
+                    ._ticks( nv.utils.calcTicksX(availableWidth/100, data) )
                     .tickSize( -availableHeight, 0);
 
                 g.select('.nv-x.nv-axis')
