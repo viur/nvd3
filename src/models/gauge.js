@@ -404,8 +404,7 @@ nv.models.gauge = function () {
                         .attr("ry", 3);
 
                     group.append('text')
-                        .style('text-anchor', 'middle')
-                        .style('fill', '#000')
+                        .style('text-anchor', 'middle');
                 });
 
                 pieLabels.select(".nv-label text")
@@ -450,7 +449,7 @@ nv.models.gauge = function () {
             }
         });
 
-        renderWatch.renderEnd('pie immediate');
+        renderWatch.renderEnd('gauge immediate');
         return chart;
     }
 

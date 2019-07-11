@@ -277,8 +277,7 @@ nv.models.pie = function() {
                         .attr("ry", 3);
 
                     group.append('text')
-                        .style('text-anchor', labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle') //center the text on it's origin or begin/end if orthogonal aligned
-                        .style('fill', '#000')
+                        .style('text-anchor', labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle'); //center the text on it's origin or begin/end if orthogonal aligned
                 });
 
                 var labelLocationHash = {};

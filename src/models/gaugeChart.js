@@ -202,7 +202,7 @@ nv.models.gaugeChart = function () {
             });
         });
 
-        renderWatch.renderEnd('pieChart immediate');
+        renderWatch.renderEnd('gaugeChart immediate');
         return chart;
     }
 

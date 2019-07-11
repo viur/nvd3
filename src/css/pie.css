@@ -8,7 +8,7 @@
 
 .nvd3.nv-pie .nv-pie-title {
     font-size: 24px;
-    fill: rgba(19, 196, 249, 0.59);
+    fill: black;
 }
 
 .nvd3.nv-pie .nv-slice text {
