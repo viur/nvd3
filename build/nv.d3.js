@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-02-07 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-07-11 */
 (function(){
 
 // set up main nv object
@@ -6060,8 +6060,7 @@ nv.models.gauge = function () {
                         .attr("ry", 3);
 
                     group.append('text')
-                        .style('text-anchor', 'middle')
-                        .style('fill', '#000')
+                        .style('text-anchor', 'middle');
                 });
 
                 pieLabels.select(".nv-label text")
@@ -6106,7 +6105,7 @@ nv.models.gauge = function () {
             }
         });
 
-        renderWatch.renderEnd('pie immediate');
+        renderWatch.renderEnd('gauge immediate');
         return chart;
     }
 
@@ -6571,7 +6570,7 @@ nv.models.gaugeChart = function () {
             });
         });
 
-        renderWatch.renderEnd('pieChart immediate');
+        renderWatch.renderEnd('gaugeChart immediate');
         return chart;
     }
 
@@ -13075,8 +13074,7 @@ nv.models.pie = function() {
                         .attr("ry", 3);
 
                     group.append('text')
-                        .style('text-anchor', labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle') //center the text on it's origin or begin/end if orthogonal aligned
-                        .style('fill', '#000')
+                        .style('text-anchor', labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle'); //center the text on it's origin or begin/end if orthogonal aligned
                 });
 
                 var labelLocationHash = {};
