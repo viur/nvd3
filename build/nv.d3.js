@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-07-11 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-09-16 */
 (function(){
 
 // set up main nv object
@@ -979,6 +979,10 @@ nv.utils.getColor = function(color) {
     //if passed an array, turn it into a color scale
     } else if(nv.utils.isArray(color)) {
         var color_scale = d3.scale.ordinal().range(color);
+        //FIXME Why this solves the problem? Reference is lost?
+        color_scale.range().forEach(function (color,index) {
+            color_scale(index);
+        });
         return function(d, i) {
             var key = i === undefined ? d : i;
             return d.color || color_scale(key);
