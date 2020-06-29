@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2019-09-16 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2020-06-29 */
 (function(){
 
 // set up main nv object
@@ -10548,6 +10548,8 @@ nv.models.multiBarHorizontal = function() {
                 .attr('height', x.rangeBand() / (stacked ? 1 : data.length) )
 
             bars
+                .style('fill', function(d,i,j){ return color(d, j, i);  })
+                .style('stroke', function(d,i,j){ return color(d, j, i); })
                 .on('mouseover', function(d,i) { //TODO: figure out why j works above, but not here
                     d3.select(this).classed('hover', true);
                     dispatch.elementMouseover({
