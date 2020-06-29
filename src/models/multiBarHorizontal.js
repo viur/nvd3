@@ -151,6 +151,8 @@ nv.models.multiBarHorizontal = function() {
                 .attr('height', x.rangeBand() / (stacked ? 1 : data.length) )
 
             bars
+                .style('fill', function(d,i,j){ return color(d, j, i);  })
+                .style('stroke', function(d,i,j){ return color(d, j, i); })
                 .on('mouseover', function(d,i) { //TODO: figure out why j works above, but not here
                     d3.select(this).classed('hover', true);
                     dispatch.elementMouseover({
