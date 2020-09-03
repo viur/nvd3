@@ -324,7 +324,10 @@ nv.models.multiBar = function() {
                         return getY(d, i)
                     })
                     .watchTransition(renderWatch, 'multibar: bars text')
-                    .attr('x', 0.9 * x.rangeBand() / 2)
+                    //.attr('x', 0.9 * x.rangeBand() / 2)
+                    .attr('x', function(d,i,j) {
+                        return (j * x.rangeBand() / data.length )
+                    })
                     .attr('y', function (d, i) {
                         return getY(d, i) < 0 ? y(getY(d, i)) + 10 :
                             y(0) - y(getY(d, i)) < 1 ? y(0) - 1 : y(getY(d, i)) - 5 || 0;
