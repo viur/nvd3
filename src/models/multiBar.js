@@ -30,6 +30,7 @@ nv.models.multiBar = function() {
         , xRange
         , yRange
         , groupSpacing = 0.1
+        , valueFormat = d3.format(',.2f')
         , fillOpacity = 0.75
         , showClickable = false
         , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout', 'elementMousemove', 'renderEnd')
@@ -311,14 +312,14 @@ nv.models.multiBar = function() {
                     })
                     .attr('dy', '.32em')
                     .text(function (d, i) {
-                        return getY(d, i)
+                        return valueFormat(getY(d, i));
                     });
 
                 bars.watchTransition(renderWatch, 'multibar')
                     .select('text')
-                .attr('x', function(d,i,j) {
-                    return (j * x.rangeBand() / data.length ) + (x.rangeBand() / data.length / 2);
-                });
+                    .attr('x', function(d,i,j) {
+                        return (j * x.rangeBand() / data.length ) + (x.rangeBand() / data.length / 2);
+                    });
 
                 //Viur
                 bars.select('text')
@@ -451,6 +452,7 @@ nv.models.multiBar = function() {
         clipEdge:    {get: function(){return clipEdge;}, set: function(_){clipEdge=_;}},
         disabled:    {get: function(){return disabled;}, set: function(_){disabled=_;}},
         id:          {get: function(){return id;}, set: function(_){id=_;}},
+        valueFormat:  {get: function(){return valueFormat;}, set: function(_){valueFormat=_;}},
         hideable:    {get: function(){return hideable;}, set: function(_){hideable=_;}},
         groupSpacing:{get: function(){return groupSpacing;}, set: function(_){groupSpacing=_;}},
         fillOpacity: {get: function(){return fillOpacity;}, set: function(_){fillOpacity=_;}},
