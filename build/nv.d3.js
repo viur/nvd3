@@ -9515,9 +9515,6 @@ nv.models.multiBar = function() {
             }).concat(forceY)));
 
             // If showValues, pad the Y axis range to account for label height
-            console.log(y.domain()[0])
-            console.log(y.domain()[1])
-
             if (!stacked) {
                 y.range(yRange || [availableHeight - (y.domain()[0] < 0 ? 13 : 0), y.domain()[1] > 0 ? 13 : 0]);
             }else{
@@ -9565,7 +9562,7 @@ nv.models.multiBar = function() {
                 .style('fill-opacity', 1e-6);
 
             var exitTransition = renderWatch
-                .transition(groups.exit().selectAll('rect.nv-bar'), 'multibarExit', Math.min(100, duration))
+                .transition(groups.exit().selectAll('g.nv-bar'), 'multibarExit', Math.min(100, duration))
                 .attr('y', function(d, i, j) {
                     var yVal = y0(0) || 0;
                     if (stacked) {
@@ -9591,7 +9588,7 @@ nv.models.multiBar = function() {
                 .style('stroke-opacity', 1)
                 .style('fill-opacity', fillOpacity);
 
-            var bars = groups.selectAll('rect.nv-bar')
+            var bars = groups.selectAll('g.nv-bar')
                 .data(function(d) { return (hideable && !data.length) ? hideable.values : d.values });
             bars.exit().remove();
 
@@ -9679,7 +9676,7 @@ nv.models.multiBar = function() {
             }
 
             if (!stacked) {
-
+                console.log('update non stacked')
                 barsEnter.append('text')
                     .attr('text-anchor', 'middle');
 
@@ -9688,9 +9685,8 @@ nv.models.multiBar = function() {
                         return getY(d, i)
                     })
                     .watchTransition(renderWatch, 'multibar: bars text')
-                    //.attr('x', 0.9 * x.rangeBand() / 2)
                     .attr('x', function(d,i,j) {
-                        return (j * x.rangeBand() / data.length )
+                        return (j * x.rangeBand() / data.length ) + (x.rangeBand() / data.length / 2);
                     })
                     .attr('y', function (d, i) {
                         return getY(d, i) < 0 ? y(getY(d, i)) + 10 :
@@ -9701,6 +9697,9 @@ nv.models.multiBar = function() {
                 bars.select('text')
                     .style("fill", "#000000")
                     .style("stroke", "#000000");
+            } else {
+                console.log('update')
+                bars.selectAll('text').remove();
             }
 
             var barSelection =
