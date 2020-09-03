@@ -86,6 +86,7 @@
 }
 
 .nvd3 .nv-discretebar .nv-groups text,
+.nvd3 .nv-multibar .nv-groups text,
 .nvd3 .nv-multibarHorizontal .nv-groups text {
     font-weight: bold;
     fill: rgba(0,0,0,1);
