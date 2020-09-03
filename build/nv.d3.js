@@ -4172,8 +4172,7 @@ nv.models.discreteBar = function() {
 
                 //Viur
                 bars.select('text')
-                    .style("fill", "#000000")
-                    .style("stroke", "#000000");
+                    .style("fill", "#000000");
 
             } else {
                 bars.selectAll('text').remove();
@@ -9382,6 +9381,7 @@ nv.models.multiBar = function() {
         , forceY = [0] // 0 is forced by default.. this makes sense for the majority of bar graphs... user can always do chart.forceY([]) to remove
         , clipEdge = true
         , stacked = false
+        , showValues = false
         , stackOffset = 'zero' // options include 'silhouette', 'wiggle', 'expand', 'zero', or a custom function
         , color = nv.utils.defaultColor()
         , hideable = false
@@ -9514,14 +9514,6 @@ nv.models.multiBar = function() {
                 return domain;
             }).concat(forceY)));
 
-            // If showValues, pad the Y axis range to account for label height
-            if (!stacked) {
-                y.range(yRange || [availableHeight - (y.domain()[0] < 0 ? 13 : 0), y.domain()[1] > 0 ? 13 : 0]);
-            }else{
-                y.range(yRange || [availableHeight, 0]);
-            }
-            //y.range(yRange || [availableHeight - (y.domain()[0] < 20 ? 0 : 0), y.domain()[1] > 0 ? 20 : 0]);
-
             // If scale's domain don't have a range, slightly adjust to make one... so a chart can show a single data point
             if (x.domain()[0] === x.domain()[1])
                 x.domain()[0] ?
@@ -9532,6 +9524,12 @@ nv.models.multiBar = function() {
                 y.domain()[0] ?
                     y.domain([y.domain()[0] + y.domain()[0] * 0.01, y.domain()[1] - y.domain()[1] * 0.01])
                     : y.domain([-1,1]);
+
+            // If showValues, pad the Y axis range to account for label height
+            if (showValues && !stacked)
+                y.range(yRange || [availableHeight - (y.domain()[0] < 0 ? 13 : 0), y.domain()[1] > 0 ? 13 : 0]);
+            else
+                y.range(yRange || [availableHeight, 0]);
 
             x0 = x0 || x;
             y0 = y0 || y;
@@ -9650,16 +9648,6 @@ nv.models.multiBar = function() {
                 })
                 .attr('y', function(d,i,j) { return y0(stacked && !data[j].nonStackable ? d.y0 : 0) || 0 });
 
-            /*var barsEnter = bars.enter().append('rect')
-                    .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
-                    .attr('x', function(d,i,j) {
-                        return stacked && !data[j].nonStackable ? 0 : (j * x.rangeBand() / data.length )
-                    })
-                    .attr('y', function(d,i,j) { return y0(stacked && !data[j].nonStackable ? d.y0 : 0) || 0 })
-                    .attr('height', 0)
-                    .attr('width', function(d,i,j) { return x.rangeBand() / (stacked && !data[j].nonStackable ? 1 : data.length) })
-                    .attr('transform', function(d,i) { return 'translate(' + x(getX(d,i)) + ',0)'; })
-                ;*/
             bars
                 .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
                 .style('fill', function(d,i,j){ return color(d, j, i);  })
@@ -9675,31 +9663,32 @@ nv.models.multiBar = function() {
                     .style('stroke', function(d,i,j) { return d3.rgb(barColor(d,i)).darker(  disabled.map(function(d,i) { return i }).filter(function(d,i){ return !disabled[i]  })[j]   ).toString(); });
             }
 
-            if (!stacked) {
-                console.log('update non stacked')
-                barsEnter.append('text')
-                    .attr('text-anchor', 'middle');
+            barsEnter.append('text')
 
+            if (showValues && !stacked) {
                 bars.select('text')
-                    .text(function (d, i) {
-                        return getY(d, i)
-                    })
-                    .watchTransition(renderWatch, 'multibar: bars text')
-                    .attr('x', function(d,i,j) {
-                        return (j * x.rangeBand() / data.length ) + (x.rangeBand() / data.length / 2);
-                    })
+                    .attr('text-anchor', 'middle')
                     .attr('y', function (d, i) {
                         return getY(d, i) < 0 ? y(getY(d, i)) + 10 :
                             y(0) - y(getY(d, i)) < 1 ? y(0) - 1 : y(getY(d, i)) - 5 || 0;
+                    })
+                    .attr('dy', '.32em')
+                    .text(function (d, i) {
+                        return getY(d, i)
                     });
+
+                bars.watchTransition(renderWatch, 'multibar')
+                    .select('text')
+                .attr('x', function(d,i,j) {
+                    return (j * x.rangeBand() / data.length ) + (x.rangeBand() / data.length / 2);
+                });
 
                 //Viur
                 bars.select('text')
-                    .style("fill", "#000000")
-                    .style("stroke", "#000000");
+                    .style("fill", "#000000");
+
             } else {
-                console.log('update')
-                bars.selectAll('text').remove();
+                bars.selectAll('text').text('');
             }
 
             var barSelection =
@@ -9820,6 +9809,7 @@ nv.models.multiBar = function() {
         forceY:  {get: function(){return forceY;}, set: function(_){forceY=_;}},
         stacked: {get: function(){return stacked;}, set: function(_){stacked=_;}},
         stackOffset: {get: function(){return stackOffset;}, set: function(_){stackOffset=_;}},
+        showValues: {get: function(){return showValues;}, set: function(_){showValues=_;}},
         clipEdge:    {get: function(){return clipEdge;}, set: function(_){clipEdge=_;}},
         disabled:    {get: function(){return disabled;}, set: function(_){disabled=_;}},
         id:          {get: function(){return id;}, set: function(_){id=_;}},
@@ -10686,6 +10676,11 @@ nv.models.multiBarHorizontal = function() {
                 bars.watchTransition(renderWatch, 'multibarhorizontal: bars')
                     .select('text')
                     .attr('x', function(d,i) { return getY(d,i) < 0 ? -4 : y(getY(d,i)) - y(0) + 4 })
+
+                //Viur
+                bars.select('text')
+                    .style("fill", "#000000");
+
             } else {
                 bars.selectAll('text').text('');
             }

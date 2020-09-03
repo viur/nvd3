@@ -241,6 +241,11 @@ nv.models.multiBarHorizontal = function() {
                 bars.watchTransition(renderWatch, 'multibarhorizontal: bars')
                     .select('text')
                     .attr('x', function(d,i) { return getY(d,i) < 0 ? -4 : y(getY(d,i)) - y(0) + 4 })
+
+                //Viur
+                bars.select('text')
+                    .style("fill", "#000000");
+
             } else {
                 bars.selectAll('text').text('');
             }
