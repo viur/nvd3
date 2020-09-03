@@ -79,8 +79,8 @@
                 {"x": "Dairy Products", "y": 1},
                 {"x": "Grains/Cereals lol", "y": 1},
                 {"x": "Meat/Poultry", "y": 1},
-                {"x": "Produce", "y": 1},
-                {"x": "Seafood", "y": 1}
+                {"x": "Produce", "y": 5},
+                {"x": "Seafood", "y": -0.61}
             ]
         }];
 
@@ -90,7 +90,7 @@
 
         chart = nv.models.multiBarChart();
 
-        chart.yAxis.tickFormat(d3.format('%'));
+        chart.yAxis.tickFormat(d3.format('.2'));
         chart.tooltip.valueFormatter(d3.format('.2%'));
         chart.wrapLabels(true);
         //chart.rotateLabels(-28);
@@ -106,6 +106,7 @@
         chart.rotateLabels(-28);
 
 
+        chart.showClickable(true);
         chart.margin({"left": 50, "bottom": 70})
 
         d3.select("#chart svg")
@@ -119,7 +120,7 @@
 
         //chart.xAxis.axisLabel('nome grande e com muito texto para ver se cabe');
 
-        chart.showClickable(false);
+        chart.showClickable(true);
         //chart.update();
 
         return chart;
