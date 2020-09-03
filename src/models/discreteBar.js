@@ -170,7 +170,8 @@ nv.models.discreteBar = function() {
 
                 //Viur
                 bars.select('text')
-                    .style("fill", "#000000");
+                    .style("fill", "#000000")
+                    .style("stroke", "#000000");
 
             } else {
                 bars.selectAll('text').remove();
