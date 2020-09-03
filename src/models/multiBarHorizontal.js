@@ -245,7 +245,7 @@ nv.models.multiBarHorizontal = function() {
                 //Viur
                 bars.select('text')
                     .style("fill", "#000000")
-                    .style("stroke", "#000000");
+                    .style("stroke", "none");
 
             } else {
                 bars.selectAll('text').text('');
