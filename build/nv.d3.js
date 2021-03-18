@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2020-09-03 */
+/* nvd3 version 1.8.3 (https://github.com/novus/nvd3) 2021-03-18 */
 (function(){
 
 // set up main nv object
@@ -9671,7 +9671,7 @@ nv.models.multiBar = function() {
                 bars.select('text')
                     .attr('text-anchor', 'middle')
                     .attr('y', function (d, i) {
-                        return getY(d, i) < 0 ? y(getY(d, i)) + 10 :
+                        return getY(d, i) < 0 ? y(getY(d, i)) + 6 :
                             y(0) - y(getY(d, i)) < 1 ? y(0) - 1 : y(getY(d, i)) - 5 || 0;
                     })
                     .attr('dy', '.32em')
@@ -10163,6 +10163,14 @@ nv.models.multiBarChart = function() {
                 }
 
                 if (wrapLabels && !rotateLabels) {
+                    if (multibar.showValues()){
+                        g.selectAll('.tick text')
+                            .each(function (d) {
+                                var self = d3.select(this);
+                                var dy = parseFloat(self.attr("dy")) + 0.5;
+                                self.attr("dy", dy + "em");
+                            });
+                    }
                     g.selectAll('.tick text')
                         .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15, availableBottom);
                 }
@@ -10206,6 +10214,9 @@ nv.models.multiBarChart = function() {
                                 self.text(text + '..');
                                 textLength = nv.utils.textLength(self);
                             }
+
+                            var dy = parseFloat(self.attr("dy")) + 0.3;
+                            self.attr("dy", dy + "em");
                         });
                 }
 
