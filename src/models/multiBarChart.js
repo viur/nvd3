@@ -368,8 +368,10 @@ nv.models.multiBarChart = function() {
                                 textLength = nv.utils.textLength(self);
                             }
 
-                            var dy = parseFloat(self.attr("dy")) + 0.3;
-                            self.attr("dy", dy + "em");
+                            if (multibar.showValues()){
+                                var dy = parseFloat(self.attr("dy")) + 0.3;
+                                self.attr("dy", dy + "em");
+                            }
                         });
                 }
 
