@@ -316,6 +316,14 @@ nv.models.multiBarChart = function() {
                 }
 
                 if (wrapLabels && !rotateLabels) {
+                    if (multibar.showValues()){
+                        g.selectAll('.tick text')
+                            .each(function (d) {
+                                var self = d3.select(this);
+                                var dy = parseFloat(self.attr("dy")) + 0.5;
+                                self.attr("dy", dy + "em");
+                            });
+                    }
                     g.selectAll('.tick text')
                         .call(nv.utils.wrapTicks, chart.xAxis.rangeBand() - 15, availableBottom);
                 }
@@ -359,6 +367,9 @@ nv.models.multiBarChart = function() {
                                 self.text(text + '..');
                                 textLength = nv.utils.textLength(self);
                             }
+
+                            var dy = parseFloat(self.attr("dy")) + 0.3;
+                            self.attr("dy", dy + "em");
                         });
                 }
 
