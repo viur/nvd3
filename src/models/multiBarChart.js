@@ -316,7 +316,7 @@ nv.models.multiBarChart = function() {
                 }
 
                 if (wrapLabels && !rotateLabels) {
-                    if (multibar.showValues()){
+                    if (multibar.showValues() && multibar.yScale().domain()[0] < 0){
                         g.selectAll('.tick text')
                             .each(function (d) {
                                 var self = d3.select(this);
@@ -368,7 +368,7 @@ nv.models.multiBarChart = function() {
                                 textLength = nv.utils.textLength(self);
                             }
 
-                            if (multibar.showValues()){
+                            if (multibar.showValues() && multibar.yScale().domain()[0] < 0){
                                 var dy = parseFloat(self.attr("dy")) + 0.3;
                                 self.attr("dy", dy + "em");
                             }

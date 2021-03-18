@@ -308,7 +308,7 @@ nv.models.multiBar = function() {
                     .attr('text-anchor', 'middle')
                     .attr('y', function (d, i) {
                         return getY(d, i) < 0 ? y(getY(d, i)) + 6 :
-                            y(0) - y(getY(d, i)) < 1 ? y(0) - 1 : y(getY(d, i)) - 5 || 0;
+                            y(0) - y(getY(d, i)) < 1 ? y(0) - 5 : y(getY(d, i)) - 5 || 0;
                     })
                     .attr('dy', '.32em')
                     .text(function (d, i) {
