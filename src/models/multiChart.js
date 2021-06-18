@@ -6,6 +6,7 @@ nv.models.multiChart = function() {
     //------------------------------------------------------------
 
     var margin = {top: 30, right: 20, bottom: 50, left: 60},
+        marginTop = null,
         color = nv.utils.defaultColor(),
         width = null,
         height = null,
@@ -19,7 +20,8 @@ nv.models.multiChart = function() {
         useVoronoi = true,
         interactiveLayer = nv.interactiveGuideline(),
         useInteractiveGuideline = false,
-        legendRightAxisHint = ' (right axis)'
+        legendRightAxisHint = ' (right axis)',
+        duration = 250
         ;
 
     //============================================================
@@ -30,21 +32,21 @@ nv.models.multiChart = function() {
         yScale1 = d3.scale.linear(),
         yScale2 = d3.scale.linear(),
 
-        lines1 = nv.models.line().yScale(yScale1),
-        lines2 = nv.models.line().yScale(yScale2),
+        lines1 = nv.models.line().yScale(yScale1).duration(duration),
+        lines2 = nv.models.line().yScale(yScale2).duration(duration),
 
-        scatters1 = nv.models.scatter().yScale(yScale1),
-        scatters2 = nv.models.scatter().yScale(yScale2),
+        scatters1 = nv.models.scatter().yScale(yScale1).duration(duration),
+        scatters2 = nv.models.scatter().yScale(yScale2).duration(duration),
 
-        bars1 = nv.models.multiBar().stacked(false).yScale(yScale1),
-        bars2 = nv.models.multiBar().stacked(false).yScale(yScale2),
+        bars1 = nv.models.multiBar().stacked(false).yScale(yScale1).duration(duration),
+        bars2 = nv.models.multiBar().stacked(false).yScale(yScale2).duration(duration),
 
-        stack1 = nv.models.stackedArea().yScale(yScale1),
-        stack2 = nv.models.stackedArea().yScale(yScale2),
+        stack1 = nv.models.stackedArea().yScale(yScale1).duration(duration),
+        stack2 = nv.models.stackedArea().yScale(yScale2).duration(duration),
 
-        xAxis = nv.models.axis().scale(x).orient('bottom').tickPadding(5),
-        yAxis1 = nv.models.axis().scale(yScale1).orient('left'),
-        yAxis2 = nv.models.axis().scale(yScale2).orient('right'),
+        xAxis = nv.models.axis().scale(x).orient('bottom').tickPadding(5).duration(duration),
+        yAxis1 = nv.models.axis().scale(yScale1).orient('left').duration(duration),
+        yAxis2 = nv.models.axis().scale(yScale2).orient('right').duration(duration),
 
         legend = nv.models.legend().height(30),
         tooltip = nv.models.tooltip(),
@@ -139,7 +141,7 @@ nv.models.multiChart = function() {
                     }))
                     .call(legend);
 
-                if ( margin.top != legend.height()) {
+                if (!marginTop && legend.height() !== margin.top) {
                     margin.top = legend.height();
                     availableHeight = nv.utils.availableHeight(height, container, margin);
                 }
@@ -204,27 +206,65 @@ nv.models.multiChart = function() {
             var stack2Wrap = g.select('.stack2Wrap')
                 .datum(dataStack2.filter(function(d){return !d.disabled}));
 
-            var extraValue1 = dataStack1.length ? dataStack1.map(function(a){return a.values}).reduce(function(a,b){
-                return a.map(function(aVal,i){return {x: aVal.x, y: aVal.y + b[i].y}})
-            }).concat([{x:0, y:0}]) : [];
-            var extraValue2 = dataStack2.length ? dataStack2.map(function(a){return a.values}).reduce(function(a,b){
-                return a.map(function(aVal,i){return {x: aVal.x, y: aVal.y + b[i].y}})
-            }).concat([{x:0, y:0}]) : [];
+            var extraValue1BarStacked = [];
+            if (bars1.stacked() && dataBars1.length) {
+                var extraValue1BarStacked = dataBars1.filter(function(d){return !d.disabled}).map(function(a){return a.values});
 
-            yScale1 .domain(yDomain1 || d3.extent(d3.merge(series1).concat(extraValue1), function(d) { return d.y } ))
+                if (extraValue1BarStacked.length > 0)
+                    extraValue1BarStacked = extraValue1BarStacked.reduce(function(a,b){
+                        return a.map(function(aVal,i){return {x: aVal.x, y: aVal.y + b[i].y}})
+                    });
+            }
+            if (dataBars1.length) {
+                extraValue1BarStacked.push({x:0, y:0});
+            }
+
+            var extraValue2BarStacked = [];
+            if (bars2.stacked() && dataBars2.length) {
+                var extraValue2BarStacked = dataBars2.filter(function(d){return !d.disabled}).map(function(a){return a.values});
+
+                if (extraValue2BarStacked.length > 0)
+                    extraValue2BarStacked = extraValue2BarStacked.reduce(function(a,b){
+                        return a.map(function(aVal,i){return {x: aVal.x, y: aVal.y + b[i].y}})
+                    });
+            }
+
+            if (dataBars2.length) {
+              extraValue2BarStacked.push({x:0, y:0});
+            }
+
+            function getStackedAreaYs(series) {
+                return d3.transpose(series).map(function(x) {
+                    return x.map(function(g) {
+                        return g.y;
+                        });
+                    }).map(function(x) {return d3.sum(x);})
+            }
+
+            yScale1 .domain(yDomain1 || d3.extent(d3.merge(series1).concat(extraValue1BarStacked), function(d) { return d.y } ))
                 .range([0, availableHeight]);
 
-            yScale2 .domain(yDomain2 || d3.extent(d3.merge(series2).concat(extraValue2), function(d) { return d.y } ))
+            yScale2 .domain(yDomain2 || d3.extent(d3.merge(series2).concat(extraValue2BarStacked), function(d) { return d.y } ))
                 .range([0, availableHeight]);
 
             lines1.yDomain(yScale1.domain());
             scatters1.yDomain(yScale1.domain());
-            bars1.yDomain(yScale1.domain());
+            if(bars1.stacked()) {
+                var yStackScale1 = yScale1.domain([0, d3.max(getStackedAreaYs(series1))]).range([0, availableHeight]);
+                bars1.yDomain(yStackScale1.domain())
+            } else {
+                bars1.yDomain(yScale1.domain());
+            }
             stack1.yDomain(yScale1.domain());
 
             lines2.yDomain(yScale2.domain());
             scatters2.yDomain(yScale2.domain());
-            bars2.yDomain(yScale2.domain());
+            if(bars2.stacked()) {
+                var yStackScale2 = yScale2.domain([0, d3.max(getStackedAreaYs(series2))]).range([0, availableHeight]);
+                bars2.yDomain(yStackScale2.domain())
+            } else {
+                bars2.yDomain(yScale2.domain());
+            }
             stack2.yDomain(yScale2.domain());
 
             if(dataStack1.length){d3.transition(stack1Wrap).call(stack1);}
@@ -290,12 +330,14 @@ nv.models.multiChart = function() {
             //------------------------------------------------------------
 
             function mouseover_line(evt) {
-                var yaxis = data[evt.seriesIndex].yAxis === 2 ? yAxis2 : yAxis1;
+                var yaxis = evt.series.yAxis === 2 ? yAxis2 : yAxis1;
                 evt.value = evt.point.x;
                 evt.series = {
                     value: evt.point.y,
                     color: evt.point.color,
-                    key: evt.series.key
+                    key: evt.series.key,
+                    //Viur - Support for Serie name
+                    name: evt.series.name
                 };
                 tooltip
                     .duration(0)
@@ -310,7 +352,7 @@ nv.models.multiChart = function() {
             }
 
             function mouseover_scatter(evt) {
-                var yaxis = data[evt.seriesIndex].yAxis === 2 ? yAxis2 : yAxis1;
+                var yaxis = evt.series.yAxis === 2 ? yAxis2 : yAxis1;
                 evt.value = evt.point.x;
                 evt.series = {
                     value: evt.point.y,
@@ -330,7 +372,7 @@ nv.models.multiChart = function() {
             }
 
             function mouseover_stack(evt) {
-                var yaxis = data[evt.seriesIndex].yAxis === 2 ? yAxis2 : yAxis1;
+                var yaxis = evt.series.yAxis === 2 ? yAxis2 : yAxis1;
                 evt.point['x'] = stack1.x()(evt.point);
                 evt.point['y'] = stack1.y()(evt.point);
                 tooltip
@@ -346,13 +388,15 @@ nv.models.multiChart = function() {
             }
 
             function mouseover_bar(evt) {
-                var yaxis = data[evt.data.series].yAxis === 2 ? yAxis2 : yAxis1;
+                var yaxis = evt.series.yAxis === 2 ? yAxis2 : yAxis1;
 
                 evt.value = bars1.x()(evt.data);
                 evt['series'] = {
                     value: bars1.y()(evt.data),
                     color: evt.color,
-                    key: evt.data.key
+                    key: evt.data.key,
+                    //Viur - Support for Serie name
+                    name: evt.data.name,
                 };
                 tooltip
                     .duration(0)
@@ -377,13 +421,60 @@ nv.models.multiChart = function() {
               }
             }
 
-            function highlightPoint(serieIndex, pointIndex, b){
-              for(var i=0, il=charts.length; i < il; i++){
-                var chart = charts[i];
-                try {
-                  chart.highlightPoint(serieIndex, pointIndex, b);
-                } catch(e){}
-              }
+            function highlightPoint(series, pointIndex, b, pointYValue) {
+
+              var chartMap = {
+                'line': {
+                  'yAxis1': {
+                    chart: lines1,
+                    data: dataLines1
+                  },
+                  'yAxis2': {
+                    chart: lines2,
+                    data: dataLines2
+                  }
+                },
+                'scatter': {
+                  'yAxis1': {
+                    chart: scatters1,
+                    data: dataScatters1
+                  },
+                  'yAxis2': {
+                    chart: scatters2,
+                    data: dataScatters2
+                  }
+                },
+                'bar': {
+                  'yAxis1': {
+                    chart: bars1,
+                    data: dataBars1
+                  },
+                  'yAxis2': {
+                    chart: bars2,
+                    data: dataBars2
+                  }
+                },
+                'area': {
+                  'yAxis1': {
+                    chart: stack1,
+                    data: dataStack1
+                  },
+                  'yAxis2': {
+                    chart: stack2,
+                    data: dataStack2
+                  }
+                }
+              };
+
+              var relevantChart = chartMap[series.type]['yAxis' + series.yAxis].chart;
+              var relevantDatasets = chartMap[series.type]['yAxis' + series.yAxis].data;
+              var seriesIndex = relevantDatasets.reduce(function (seriesIndex, dataSet, i) {
+                return dataSet.key === series.key ? i : seriesIndex;
+              }, 0);
+
+              try {
+                relevantChart.highlightPoint(seriesIndex, pointIndex, b, pointYValue);
+              } catch(e){}
             }
 
             if(useInteractiveGuideline){
@@ -395,7 +486,7 @@ nv.models.multiChart = function() {
                         series.seriesIndex = i;
                         return !series.disabled;
                     })
-                    .forEach(function(series,i) {
+                    .forEach(function(series, i) {
                         var extent = x.domain();
                         var currentValues = series.values.filter(function(d,i) {
                             return chart.x()(d,i) >= extent[0] && chart.x()(d,i) <= extent[1];
@@ -404,8 +495,8 @@ nv.models.multiChart = function() {
                         pointIndex = nv.interactiveBisect(currentValues, e.pointXValue, chart.x());
                         var point = currentValues[pointIndex];
                         var pointYValue = chart.y()(point, pointIndex);
-                        if (pointYValue !== null) {
-                            highlightPoint(i, pointIndex, true);
+                        if (pointYValue !== null && !isNaN(pointYValue) && !series.noHighlightSeries) {
+                          highlightPoint(series, pointIndex, true);
                         }
                         if (point === undefined) return;
                         if (singlePoint === undefined) singlePoint = point;
@@ -419,19 +510,20 @@ nv.models.multiChart = function() {
                         });
                     });
 
-                    interactiveLayer.tooltip
-                    .headerFormatter(function(d, i) {
-                        return xAxis.tickFormat()(d, i);
-                    })
-                    .valueFormatter(function(d,i) {
+                    var defaultValueFormatter = function(d,i) {
                         var yAxis = allData[i].yAxis;
-                        return d === null ? "N/A" : yAxis.tickFormat()(d);
-                    })
-                    .data({
-                        value: chart.x()( singlePoint,pointIndex ),
-                        index: pointIndex,
-                        series: allData
-                    })();
+                        return d == null ? "N/A" : yAxis.tickFormat()(d);
+                    };
+                    interactiveLayer.tooltip
+                        .headerFormatter(function(d, i) {
+                            return xAxis.tickFormat()(d, i);
+                        })
+                        .valueFormatter(interactiveLayer.tooltip.valueFormatter() || defaultValueFormatter)
+                        .data({
+                            value: chart.x()( singlePoint,pointIndex ),
+                            index: pointIndex,
+                            series: allData
+                        })();
 
                     interactiveLayer.renderGuideLine(pointXLocation);
                 });
@@ -515,6 +607,7 @@ nv.models.multiChart = function() {
         width:      {get: function(){return width;}, set: function(_){width=_;}},
         height:     {get: function(){return height;}, set: function(_){height=_;}},
         showLegend: {get: function(){return showLegend;}, set: function(_){showLegend=_;}},
+        xScale: {get: function(){return x;}, set: function(_){ x = _; xAxis.scale(x); }},
         yDomain1:      {get: function(){return yDomain1;}, set: function(_){yDomain1=_;}},
         yDomain2:    {get: function(){return yDomain2;}, set: function(_){yDomain2=_;}},
         noData:    {get: function(){return noData;}, set: function(_){noData=_;}},
@@ -523,7 +616,10 @@ nv.models.multiChart = function() {
 
         // options that require extra logic in the setter
         margin: {get: function(){return margin;}, set: function(_){
-            margin.top    = _.top    !== undefined ? _.top    : margin.top;
+            if (_.top !== undefined) {
+                margin.top = _.top;
+                marginTop = _.top;
+            }
             margin.right  = _.right  !== undefined ? _.right  : margin.right;
             margin.bottom = _.bottom !== undefined ? _.bottom : margin.bottom;
             margin.left   = _.left   !== undefined ? _.left   : margin.left;
@@ -575,6 +671,13 @@ nv.models.multiChart = function() {
                 scatters1.interactive(false);
                 scatters2.interactive(false);
             }
+        }},
+
+        duration: {get: function(){return duration;}, set: function(_) {
+            duration = _;
+            [lines1, lines2, stack1, stack2, scatters1, scatters2, xAxis, yAxis1, yAxis2].forEach(function(model){
+              model.duration(duration);
+            });
         }}
     });
 

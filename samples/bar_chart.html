@@ -70,30 +70,18 @@
 
     var data = [
         {
-            "key": "col2",
-            "name": "A",
+            "key": "dormidas",
+            "name": "Dormidas",
             "values": [
-                {"x": "B rages lol a b c der per asd vfrt sdsd dsd dsds", "y": 1},
-                {"x": "Condiments", "y": 1},
-                {"x": "Confections", "y": 1},
-                {"x": "Dairy Products", "y": 1},
-                {"x": "Grains/Cereals lol", "y": 1},
-                {"x": "Meat/Poultry", "y": 1},
-                {"x": "Produce", "y": 5},
-                {"x": "Seafood", "y": -0.61}
-            ]
-        },{
-            "key": "col3",
-            "name": "B",
-            "values": [
-                {"x": "B rages lol a b c der per asd vfrt sdsd dsd dsds", "y": 1},
-                {"x": "Condiments", "y": 1},
-                {"x": "Confections", "y": 1},
-                {"x": "Dairy Products", "y": 1},
-                {"x": "Grains/Cereals lol", "y": 1},
-                {"x": "Meat/Poultry", "y": 1},
-                {"x": "Produce", "y": 5},
-                {"x": "Seafood", "y": -0.61}
+                {"x": "A_Santa Maria", "y": 34459.00},
+                {"x": "B_São Miguel", "y": 2023085.00},
+                {"x": "C_Terceira", "y": 385235.00},
+                {"x": "D_Graciosa", "y": 19337.00},
+                {"x": "E_São Jorge", "y": 53780.00},
+                {"x": "F_Pico", "y": 161406.00},
+                {"x": "G_Faial", "y": 186053.00},
+                {"x": "H_Flores", "y": 51521.00},
+                {"x": "I_Corvo", "y": -2967.00},
             ]
         }];
 
@@ -116,7 +104,8 @@
 
         chart.reduceXTicks(false);
 
-        chart.rotateLabels(-28);
+        //chart.rotateLabels(-28);
+        chart.showValues(true);
 
 
         chart.showClickable(true);

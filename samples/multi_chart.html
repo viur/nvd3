@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+
+    <link href="../build/nv.d3.css" rel="stylesheet" type="text/css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.js" charset="utf-8"></script>
+
+    <script src="../src/core.js"></script>
+    <script src="../src/interactiveLayer.js"></script>
+    <script src="../src/tooltip.js"></script>
+    <script src="../src/utils.js"></script>
+    <script src="../src/dom.js"></script>
+    <script src="../src/models/axis.js"></script>
+    <script src="../src/models/legend.js"></script>
+    <script src="../src/models/line.js"></script>
+    <script src="../src/models/scatter.js"></script>
+    <script src="../src/models/multiBar.js"></script>
+    <script src="../src/models/stackedArea.js"></script>
+    <script src="../src/models/multiChart.js"></script>
+
+
+    <style>
+
+        text {
+            font: 12px sans-serif;
+        }
+
+        svg {
+            display: block;
+        }
+
+        html, body, #chart1, svg {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            width: 100%;
+        }
+
+        .dashed {
+            stroke-dasharray: 5, 5;
+        }
+
+    </style>
+</head>
+<body class='with-3d-shadow with-transitions'>
+<div id="chart1" style="height: 300px; width: 800px;border: 1px solid"></div>
+<script>
+
+    data = [
+        {
+            "key": "col2",
+            "name": "OrderID",
+            "type": "bar",
+            "yAxis": 1,
+            "values": [
+                {
+                    "x": "2013-01-01T00:00:00.000",
+                    "y": 1538714696
+                },
+                {
+                    "x": "2014-01-01T00:00:00.000",
+                    "y": 4130234184
+                },
+                {
+                    "x": "2015-01-01T00:00:00.000",
+                    "y": 2733243210
+                }
+            ]
+        },
+        {
+            "key": "col3",
+            "name": "60738738",
+            "type": "line",
+            "yAxis": 2,
+            "values": [
+                {
+                    "x": "2013-01-01T00:00:00.000",
+                    "y": 60738738
+                },
+                {
+                    "x": "2014-01-01T00:00:00.000",
+                    "y": 60738738
+                },
+                {
+                    "x": "2015-01-01T00:00:00.000",
+                    "y": 60738738
+                }
+            ]
+        }
+    ];
+
+    nv.addGraph(function () {
+
+        var chart = nv.models.multiChart()
+            .margin({top: 30, right: 60, bottom: 50, left: 70})
+            .color(d3.scale.category10().range());
+
+        chart.xAxis.tickFormat(d3.format(',f'));
+        chart.yAxis1.tickFormat(d3.format(',.1f'));
+        chart.yAxis2.tickFormat(d3.format(',.1f'));
+
+        /*chart.xAxis.tickFormat(function (x) {
+            return moment(new Date(x)).format("MMM YYYY");
+            //return moment(new Date(x)).format("[Week] WW, YYYY");
+            //return moment(new Date(x)).format("MMM DD, YYYY");
+            //return moment(new Date(x)).format("YYYY-MM-DD HH");
+        });
+
+        chart.bars1.xScale(d3.time.scale());
+        chart.lines1.xScale(d3.time.scale());*/
+
+        //chart.showClickable(true);
+
+        d3.select('#chart1').append('svg')
+            .datum(data)
+            .call(chart);
+
+        nv.utils.windowResize(chart.update);
+
+        /*chart.dispatch.on("pointClick", function (e) {
+            console.log(e);
+        });*/
+
+        return chart;
+    });
+</script>
+</body>
+</html>
