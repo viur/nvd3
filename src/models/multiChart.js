@@ -54,6 +54,12 @@ nv.models.multiChart = function() {
 
     var charts = [lines1, lines2, scatters1, scatters2, bars1, bars2, stack1, stack2];
 
+    tooltip.valueFormatter(function(d, i) {
+        return yAxis1.tickFormat()(d, i);
+    }).headerFormatter(function(d, i) {
+        return xAxis.tickFormat()(d, i);
+    });
+
     function chart(selection) {
         selection.each(function(data) {
             var container = d3.select(this),
@@ -78,6 +84,8 @@ nv.models.multiChart = function() {
             // Display noData message if there's nothing to show.
             if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
                 nv.utils.noData(chart, container);
+                //Viur - Clean previous chart
+                container.selectAll('.nv-wrap').remove();
                 return chart;
             } else {
                 container.selectAll('.nv-noData').remove();
@@ -341,12 +349,6 @@ nv.models.multiChart = function() {
                 };
                 tooltip
                     .duration(0)
-                    .headerFormatter(function(d, i) {
-                    	return xAxis.tickFormat()(d, i);
-                    })
-                    .valueFormatter(function(d, i) {
-                        return yaxis.tickFormat()(d, i);
-                    })
                     .data(evt)
                     .hidden(false);
             }
@@ -361,12 +363,6 @@ nv.models.multiChart = function() {
                 };
                 tooltip
                     .duration(100)
-                    .headerFormatter(function(d, i) {
-                    	return xAxis.tickFormat()(d, i);
-                    })
-                    .valueFormatter(function(d, i) {
-                        return yaxis.tickFormat()(d, i);
-                    })
                     .data(evt)
                     .hidden(false);
             }
@@ -377,19 +373,12 @@ nv.models.multiChart = function() {
                 evt.point['y'] = stack1.y()(evt.point);
                 tooltip
                     .duration(0)
-                    .headerFormatter(function(d, i) {
-                    	return xAxis.tickFormat()(d, i);
-                    })
-                    .valueFormatter(function(d, i) {
-                        return yaxis.tickFormat()(d, i);
-                    })
                     .data(evt)
                     .hidden(false);
             }
 
             function mouseover_bar(evt) {
                 var yaxis = evt.series.yAxis === 2 ? yAxis2 : yAxis1;
-
                 evt.value = bars1.x()(evt.data);
                 evt['series'] = {
                     value: bars1.y()(evt.data),
@@ -400,12 +389,6 @@ nv.models.multiChart = function() {
                 };
                 tooltip
                     .duration(0)
-                    .headerFormatter(function(d, i) {
-                    	return xAxis.tickFormat()(d, i);
-                    })
-                    .valueFormatter(function(d, i) {
-                        return yaxis.tickFormat()(d, i);
-                    })
                     .data(evt)
                     .hidden(false);
             }
