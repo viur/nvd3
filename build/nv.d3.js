@@ -11601,14 +11601,14 @@ nv.models.multiChart = function() {
             //------------------------------------------------------------
 
             function mouseover_line(evt) {
-                var yaxis = evt.series.yAxis === 2 ? yAxis2 : yAxis1;
                 evt.value = evt.point.x;
                 evt.series = {
                     value: evt.point.y,
                     color: evt.point.color,
                     key: evt.series.key,
                     //Viur - Support for Serie name
-                    name: evt.series.name
+                    name: evt.series.name,
+                    yAxis: evt.series.yAxis
                 };
                 tooltip
                     .duration(0)
@@ -11617,12 +11617,14 @@ nv.models.multiChart = function() {
             }
 
             function mouseover_scatter(evt) {
-                var yaxis = evt.series.yAxis === 2 ? yAxis2 : yAxis1;
                 evt.value = evt.point.x;
                 evt.series = {
                     value: evt.point.y,
                     color: evt.point.color,
-                    key: evt.series.key
+                    key: evt.series.key,
+                    //Viur - Support for Serie name
+                    name: evt.series.name,
+                    yAxis: evt.series.yAxis
                 };
                 tooltip
                     .duration(100)
@@ -11641,22 +11643,20 @@ nv.models.multiChart = function() {
             }
 
             function mouseover_bar(evt) {
-                var yaxis = evt.series.yAxis === 2 ? yAxis2 : yAxis1;
                 evt.value = bars1.x()(evt.data);
-                evt['series'] = {
+                evt.series = {
                     value: bars1.y()(evt.data),
                     color: evt.color,
                     key: evt.data.key,
                     //Viur - Support for Serie name
                     name: evt.data.name,
+                    yAxis: evt.series.yAxis
                 };
                 tooltip
                     .duration(0)
                     .data(evt)
                     .hidden(false);
             }
-
-
 
             function clearHighlights() {
               for(var i=0, il=charts.length; i < il; i++){
