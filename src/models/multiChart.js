@@ -486,15 +486,17 @@ nv.models.multiChart = function() {
                         if (pointXLocation === undefined) pointXLocation = x(chart.x()(point,pointIndex));
                         allData.push({
                             key: series.key,
+                            //Viur - Support for Serie name
+                            name: series.name,
                             value: pointYValue,
                             color: color(series,series.seriesIndex),
                             data: point,
-                            yAxis: series.yAxis == 2 ? yAxis2 : yAxis1
+                            yAxis: series.yAxis
                         });
                     });
 
                     var defaultValueFormatter = function(d,i) {
-                        var yAxis = allData[i].yAxis;
+                        var yAxis = (allData[i].yAxis === 2 ? yAxis2 : yAxis1);
                         return d == null ? "N/A" : yAxis.tickFormat()(d);
                     };
                     interactiveLayer.tooltip
