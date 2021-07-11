@@ -526,6 +526,60 @@ nv.models.multiChart = function() {
                     interactiveLayer.renderGuideLine(pointXLocation);
                 });
 
+                interactiveLayer.dispatch.on('elementClick', function(e) {
+
+                    var pointXLocation, allData = [];
+
+                    data.filter(function(series, i) {
+                        series.seriesIndex = i;
+                        return !series.disabled;
+                    }).forEach(function(series) {
+                        var pointIndex = nv.interactiveBisect(series.values, e.pointXValue, chart.x());
+                        var point = series.values[pointIndex];
+                        if (typeof point === 'undefined') return;
+                        if (typeof pointXLocation === 'undefined') pointXLocation = chart.xScale()(chart.x()(point,pointIndex));
+                        var yScale = series.yAxis === 1 ? yScale1 : yScale2;
+                        var yPos = yScale(chart.y()(point,pointIndex));
+                        allData.push({
+                            point: point,
+                            pointIndex: pointIndex,
+                            pos: [pointXLocation, yPos],
+                            seriesIndex: series.seriesIndex,
+                            series: series
+                        });
+                    });
+
+                    var yValue = yScale1.invert(e.mouseY);
+                    var domainExtent = Math.abs(yScale1.domain()[0] - yScale1.domain()[1]);
+                    var threshold = 0.03 * domainExtent;
+                    var yScaleData = allData.filter(function(d){return d.series.yAxis === 1});
+                    var indexToHighlight = nv.nearestValueIndex(yScaleData.map(function(d){return d.point.y;}),yValue,threshold);
+
+                    if(indexToHighlight !== null){
+                        dispatch.pointClick({
+                            xValue: yScaleData[indexToHighlight].point.x,
+                            yValue: yScaleData[indexToHighlight].point.y,
+                            series: yScaleData[indexToHighlight].series.name ? yScaleData[indexToHighlight].series.name : yScaleData[indexToHighlight].series.key
+                        });
+                    }
+
+                    yValue = yScale2.invert(e.mouseY);
+                    domainExtent = Math.abs(yScale2.domain()[0] - yScale2.domain()[1]);
+                    threshold = 0.03 * domainExtent;
+                    yScaleData = allData.filter(function(d){return d.series.yAxis === 2});
+                    indexToHighlight = nv.nearestValueIndex(yScaleData.map(function(d){return d.point.y;}),yValue,threshold);
+
+                    if(indexToHighlight !== null){
+                        dispatch.pointClick({
+                            xValue: yScaleData[indexToHighlight].point.x,
+                            yValue: yScaleData[indexToHighlight].point.y,
+                            series: yScaleData[indexToHighlight].series.name ? yScaleData[indexToHighlight].series.name : yScaleData[indexToHighlight].series.key
+                        });
+                    }
+
+                    //lines.dispatch.elementClick(allData);
+                });
+
                 interactiveLayer.dispatch.on("elementMouseout",function(e) {
                     clearHighlights();
                 });
