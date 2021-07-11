@@ -11286,7 +11286,8 @@ nv.models.multiChart = function() {
         interactiveLayer = nv.interactiveGuideline(),
         useInteractiveGuideline = false,
         legendRightAxisHint = ' (right axis)',
-        duration = 250
+        duration = 250,
+        showClickable = false
         ;
 
     //============================================================
@@ -11773,6 +11774,20 @@ nv.models.multiChart = function() {
                         });
                     });
 
+                    //Highlight the tooltip entry based on which point the mouse is closest to.
+                    var yValue = yScale1.invert(e.mouseY);
+                    var domainExtent = Math.abs(yScale1.domain()[0] - yScale1.domain()[1]);
+                    var threshold = 0.03 * domainExtent;
+                    var indexToHighlight = nv.nearestValueIndex(allData.map(function(d){return d.value;}),yValue,threshold);
+                    if (indexToHighlight !== null) {
+                        if (allData.length > 1) {
+                            allData[indexToHighlight].highlight = true;
+                        }
+                        container.style('cursor',chart.showClickable() ? "pointer" : "auto");
+                    }else{
+                        container.style('cursor',"auto");
+                    }
+
                     var defaultValueFormatter = function(d,i) {
                         var yAxis = (allData[i].yAxis === 2 ? yAxis2 : yAxis1);
                         return d == null ? "N/A" : yAxis.tickFormat()(d);
@@ -11988,6 +12003,14 @@ nv.models.multiChart = function() {
                 scatters1.interactive(false);
                 scatters2.interactive(false);
             }
+        }},
+
+        showClickable: {get: function(){return showClickable;}, set: function(_){
+            showClickable = _;
+            lines1.showClickable(_);
+            lines2.showClickable(_);
+            bars1.showClickable(_);
+            bars2.showClickable(_);
         }},
 
         duration: {get: function(){return duration;}, set: function(_) {
