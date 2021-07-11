@@ -50,7 +50,7 @@ nv.models.multiChart = function() {
 
         legend = nv.models.legend().height(30),
         tooltip = nv.models.tooltip(),
-        dispatch = d3.dispatch();
+        dispatch = d3.dispatch('pointClick');
 
     var charts = [lines1, lines2, scatters1, scatters2, bars1, bars2, stack1, stack2];
 
@@ -322,6 +322,19 @@ nv.models.multiChart = function() {
             legend.dispatch.on('stateChange', function(newState) {
                 chart.update();
             });
+
+            var pointClick = function (d) {
+                dispatch.pointClick({
+                    xValue: d.data ? d.data.x : d.point.x,
+                    yValue: d.data ? d.data.y : d.point.y,
+                    series: d.series.name ? d.series.name : d.series.key
+                });
+            }
+
+            lines1.dispatch.on('elementClick', pointClick);
+            lines2.dispatch.on('elementClick', pointClick);
+            bars1.dispatch.on('elementClick', pointClick);
+            bars2.dispatch.on('elementClick', pointClick);
 
             if(useInteractiveGuideline){
                 interactiveLayer
