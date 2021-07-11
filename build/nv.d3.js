@@ -11785,7 +11785,18 @@ nv.models.multiChart = function() {
                         }
                         container.style('cursor',chart.showClickable() ? "pointer" : "auto");
                     }else{
-                        container.style('cursor',"auto");
+                        yValue = yScale2.invert(e.mouseY);
+                        domainExtent = Math.abs(yScale2.domain()[0] - yScale2.domain()[1]);
+                        threshold = 0.03 * domainExtent;
+                        indexToHighlight = nv.nearestValueIndex(allData.map(function(d){return d.value;}),yValue,threshold);
+                        if (indexToHighlight !== null) {
+                            if (allData.length > 1) {
+                                allData[indexToHighlight].highlight = true;
+                            }
+                            container.style('cursor',chart.showClickable() ? "pointer" : "auto");
+                        }else {
+                            container.style('cursor', "auto");
+                        }
                     }
 
                     var defaultValueFormatter = function(d,i) {
