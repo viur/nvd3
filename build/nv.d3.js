@@ -11852,20 +11852,21 @@ nv.models.multiChart = function() {
                             yValue: yScaleData[indexToHighlight].point.y,
                             series: yScaleData[indexToHighlight].series.name ? yScaleData[indexToHighlight].series.name : yScaleData[indexToHighlight].series.key
                         });
-                    }
+                    }else{
 
-                    yValue = yScale2.invert(e.mouseY);
-                    domainExtent = Math.abs(yScale2.domain()[0] - yScale2.domain()[1]);
-                    threshold = 0.03 * domainExtent;
-                    yScaleData = allData.filter(function(d){return d.series.yAxis === 2});
-                    indexToHighlight = nv.nearestValueIndex(yScaleData.map(function(d){return d.point.y;}),yValue,threshold);
+                        yValue = yScale2.invert(e.mouseY);
+                        domainExtent = Math.abs(yScale2.domain()[0] - yScale2.domain()[1]);
+                        threshold = 0.03 * domainExtent;
+                        yScaleData = allData.filter(function(d){return d.series.yAxis === 2});
+                        indexToHighlight = nv.nearestValueIndex(yScaleData.map(function(d){return d.point.y;}),yValue,threshold);
 
-                    if(indexToHighlight !== null){
-                        dispatch.pointClick({
-                            xValue: yScaleData[indexToHighlight].point.x,
-                            yValue: yScaleData[indexToHighlight].point.y,
-                            series: yScaleData[indexToHighlight].series.name ? yScaleData[indexToHighlight].series.name : yScaleData[indexToHighlight].series.key
-                        });
+                        if(indexToHighlight !== null){
+                            dispatch.pointClick({
+                                xValue: yScaleData[indexToHighlight].point.x,
+                                yValue: yScaleData[indexToHighlight].point.y,
+                                series: yScaleData[indexToHighlight].series.name ? yScaleData[indexToHighlight].series.name : yScaleData[indexToHighlight].series.key
+                            });
+                        }
                     }
 
                     //lines.dispatch.elementClick(allData);
